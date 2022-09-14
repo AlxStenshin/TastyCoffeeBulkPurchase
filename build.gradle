@@ -6,15 +6,19 @@ plugins {
 
 group = 'ru.alxstn'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'com.codeborne:selenide:6.7.4'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.4.0'
     implementation 'org.springframework.boot:spring-boot-starter'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 tasks.named('test') {
