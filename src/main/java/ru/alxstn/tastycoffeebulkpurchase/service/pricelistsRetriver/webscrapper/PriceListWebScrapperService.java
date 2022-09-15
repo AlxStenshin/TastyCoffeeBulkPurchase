@@ -7,18 +7,20 @@ import javax.annotation.PostConstruct;
 @Service
 public class PriceListWebScrapperService {
 
-    private final TastyCoffeeLoginPage loginPage;
+    private final TastyCoffeePage tastyCoffeeMain;
 
-    public PriceListWebScrapperService(TastyCoffeeLoginPage loginPage) {
-        this.loginPage = loginPage;
+    public PriceListWebScrapperService(TastyCoffeePage loginPage) {
+        this.tastyCoffeeMain = loginPage;
     }
 
     @PostConstruct
     void doIt() {
         callAuthDialog();
     }
+
     public void callAuthDialog() {
-        loginPage.login();
+        tastyCoffeeMain.login();
+        tastyCoffeeMain.expandAll();
     }
 
 }
