@@ -1,8 +1,10 @@
 package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver.webscrapper;
 
 import org.springframework.stereotype.Service;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Service
 public class PriceListWebScrapperService {
@@ -15,12 +17,13 @@ public class PriceListWebScrapperService {
 
     @PostConstruct
     void doIt() {
-        callAuthDialog();
+        getPrices();
     }
 
-    public void callAuthDialog() {
+    private void getPrices() {
         tastyCoffeeMain.login();
-        tastyCoffeeMain.expandAll();
+        List<Product> priceList = tastyCoffeeMain.buildPriceList();
+        System.out.println("Got " + priceList.size() + " items in price list");
     }
 
 }
