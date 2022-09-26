@@ -41,6 +41,8 @@ public class TastyCoffeePage {
         SelenideElement bulkPurchaseClientLoginButton = $(byText("Вход для оптовых клиентов"));
         bulkPurchaseClientLoginButton.click();
 
+        Selenide.sleep(1_000);
+
         SelenideElement usernameInput = $(byName("login"));
         usernameInput.setValue(tastyCoffeeConfig.getUserName());
 

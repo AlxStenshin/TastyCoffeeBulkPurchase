@@ -1,5 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver.webscrapper;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
@@ -7,7 +8,6 @@ import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PriceListRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.pricelistsSaver.PriceListFileSaver;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Service
@@ -26,16 +26,11 @@ public class PriceListWebScrapperService {
         this.repository = repository;
     }
 
-    @PostConstruct
-    void doIt() {
-        getPrices();
-    }
-
-    private void getPrices() {
+    @EventListener(ApplicationReadyEvent.class)
+    public void getPrices() {
         tastyCoffeeWebPage.login();
         List<Product> priceList = tastyCoffeeWebPage.buildPriceList();
         System.out.println("Got " + priceList.size() + " items in price list");
-
         priceListSaver.save(priceList, "priceList.json");
     }
 

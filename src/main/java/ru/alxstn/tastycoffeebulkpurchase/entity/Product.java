@@ -21,28 +21,30 @@ public class Product {
     @Column(name = "date_created")
     private LocalDateTime dateCreated;
 
-    @Column(name = "special_mark")
-    private String specialMark;
-
     @Column(name = "price")
     private Double price;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "package_id")
-    private Packaging productPackage;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "mark_id")
+    private ProductMark specialMark;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "package_id")
+    private ProductPackaging productPackage;
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "group_id")
     private ProductGroup productGroup;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "subgroup_id")
     private ProductSubgroup productSubGroup;
 
     public Product() {
 
     }
-    public Product(ProductGroup group, ProductSubgroup subgroup, String name, String specialMark, Packaging pack, Double price) {
+
+    public Product(ProductGroup group, ProductSubgroup subgroup, String name, ProductMark specialMark, ProductPackaging pack, Double price) {
         this.productGroup = group;
         this.productSubGroup = subgroup;
         this.name = name;
@@ -71,11 +73,11 @@ public class Product {
         this.name = name;
     }
 
-    public String getSpecialMark() {
+    public ProductMark getSpecialMark() {
         return specialMark;
     }
 
-    public void setSpecialMark(String specialMark) {
+    public void setSpecialMark(ProductMark specialMark) {
         this.specialMark = specialMark;
     }
 
@@ -87,11 +89,11 @@ public class Product {
         this.price = price;
     }
 
-    public Packaging getPack() {
+    public ProductPackaging getPack() {
         return productPackage;
     }
 
-    public void setPack(Packaging pack) {
+    public void setPack(ProductPackaging pack) {
         this.productPackage = pack;
     }
 
@@ -114,8 +116,8 @@ public class Product {
     public static class Builder {
         private ProductGroup group;
         private ProductSubgroup subgroup;
-        private Packaging pack;
-        private String specialMark;
+        private ProductPackaging pack;
+        private ProductMark specialMark;
         private String name;
         private Double price;
 
@@ -125,6 +127,7 @@ public class Product {
             this.group = new ProductGroup(group);
             return this;
         }
+
         public Builder setSubGroup(String subGroup) {
             this.subgroup = new ProductSubgroup(subGroup);
             return this;
@@ -136,12 +139,12 @@ public class Product {
         }
 
         public Builder setSpecialMark(String specialMark) {
-            this.specialMark = specialMark;
+            this.specialMark = new ProductMark(specialMark);
             return this;
         }
 
         public Builder setPackage(String pack) {
-            this.pack = new Packaging(pack);
+            this.pack = new ProductPackaging(pack);
             return this;
         }
 

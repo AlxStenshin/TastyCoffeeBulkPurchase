@@ -6,7 +6,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "package")
-public class Packaging {
+public class ProductPackaging {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,9 @@ public class Packaging {
         products.add(product);
     }
 
-    public Packaging() { }
+    public ProductPackaging() { }
 
-    public Packaging(String packageName) {
+    public ProductPackaging(String packageName) {
         this.packageName = packageName;
     }
 
