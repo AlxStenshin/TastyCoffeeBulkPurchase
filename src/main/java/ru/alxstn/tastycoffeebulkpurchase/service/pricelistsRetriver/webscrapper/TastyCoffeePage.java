@@ -8,9 +8,11 @@ import com.codeborne.selenide.ex.ElementNotFound;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 
 import java.util.*;
 
@@ -21,13 +23,17 @@ import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 @Component
 public class TastyCoffeePage {
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
+    private final ApplicationEventPublisher newProductEventPublisher;
 
-    public TastyCoffeePage(TastyCoffeeConfigProperties properties) {
+    public TastyCoffeePage(TastyCoffeeConfigProperties properties,
+                           ApplicationEventPublisher newProductPublisher) {
+        this.tastyCoffeeConfig = properties;
+        this.newProductEventPublisher = newProductPublisher;
+
         Configuration.timeout = 10;
         Configuration.browserSize = "1920x1080";
         Configuration.browserPosition = "2x2";
         Configuration.headless = true;
-        tastyCoffeeConfig = properties;
     }
 
     public void login() {
@@ -98,28 +104,27 @@ public class TastyCoffeePage {
         List<Product> categoryProducts = new ArrayList<>();
         ElementsCollection mainAccordions = $$("div.main-accordion");
 
+        Product.Builder productBuilder = new Product.Builder();
+
         for (SelenideElement mainAccordion : mainAccordions) {
             SelenideElement groupTitle = mainAccordion.find(By.cssSelector("h3.title"));
-            String productGroup = groupTitle.getAttribute("innerHTML");
+            productBuilder.setGroup(groupTitle.getAttribute("innerHTML"));
 
             ElementsCollection productAccordions = mainAccordion.findAll("div.accordion.accordion_product");
             for (SelenideElement productAccordion : productAccordions) {
-
                 SelenideElement subgroupTitle = productAccordion.find(By.cssSelector("span"));
-                String productSubgroup = subgroupTitle.getAttribute("innerHTML");
+                productBuilder.setSubGroup(subgroupTitle.getAttribute("innerHTML"));
 
                 SelenideElement productsTable = productAccordion.find(By.cssSelector("table.table-lk"));
                 ElementsCollection tableRows = productsTable.findAll(By.cssSelector("tr.searchTab"));
 
                 for (SelenideElement tableRow : tableRows) {
                     SelenideElement productNameTableCell = tableRow.find(By.cssSelector("button.font-13.p-0.selectable.btn.pointer"));
-                    String productName = productNameTableCell.getAttribute("innerHTML");
+                    productBuilder.setName(productNameTableCell.getAttribute("innerHTML"));
 
-                    Product product = new Product(productGroup, productSubgroup, productName);
                     try {
                         SelenideElement specialMark = tableRow.find(By.cssSelector("div.prefixdiv.empty-ic"));
-                        String mark = specialMark.getAttribute("data-div");
-                        product.setSpecialMark(mark);
+                        productBuilder.setSpecialMark(specialMark.getAttribute("data-div"));
                     } catch (ElementNotFound ignored) {}
 
                     ArrayList<SelenideElement> prices = new ArrayList<>();
@@ -128,21 +133,22 @@ public class TastyCoffeePage {
 
                     for (var productPriceTableCell : prices) {
                         try {
-                            var cost = getPriceFromTableCell(Objects.requireNonNull(
+                            var price = getPriceFromTableCell(Objects.requireNonNull(
                                     productPriceTableCell.find("div.coffee-week-price").getAttribute("innerHTML")));
+                            productBuilder.setPrice(price);
                             var pack = productPriceTableCell.find("samp.mob").getAttribute("innerHTML");
-                            if (cost != 0) {
-                                product.addPrice(pack, cost);
-                            }
-                        } catch (ElementNotFound e) {
-                            System.out.println("Element not found in field. " + e.getMessage());
+                            productBuilder.setPackage(pack);
+
+                            newProductEventPublisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
+                            categoryProducts.add(productBuilder.build());
+                        } catch (RuntimeException e) {
+                            System.out.println("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
                         }
                     }
-                    System.out.println(product);
-                    categoryProducts.add(product);
                 }
             }
         }
+
         System.out.println("Price List Parsing Complete! Found: " + categoryProducts.size() + " items.");
         return categoryProducts;
     }
@@ -151,11 +157,6 @@ public class TastyCoffeePage {
         src = src.replace("&nbsp;", "");
         src = src.replace(",", ".");
         double ret = 0;
-        try {
-            ret = Double.parseDouble(src);
-        } catch (NumberFormatException e) {
-            System.out.println("Error parsing price field from string '" + src + "', error: " + e.getMessage());
-        }
-        return ret;
+        return Double.parseDouble(src);
     }
 }
