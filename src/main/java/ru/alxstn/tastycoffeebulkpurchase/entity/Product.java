@@ -24,45 +24,29 @@ public class Product {
     @Column(name = "price")
     private Double price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "mark_id")
-    private ProductMark specialMark;
+    @Column(name = "mark")
+    private String specialMark;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "package_id")
-    private ProductPackaging productPackage;
+    @Column(name = "package")
+    private String productPackage;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "group_id")
-    private ProductGroup productGroup;
+    @Column(name = "category")
+    private String productCategory;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "subgroup_id")
-    private ProductSubgroup productSubGroup;
+    @Column(name = "subcategory")
+    private String productSubCategory;
 
     public Product() {
 
     }
 
-    public Product(ProductGroup group, ProductSubgroup subgroup, String name, ProductMark specialMark, ProductPackaging pack, Double price) {
-        this.productGroup = group;
-        this.productSubGroup = subgroup;
+    public Product(String name, Double price, String specialMark, String productPackage, String productGroup, String productSubGroup) {
         this.name = name;
-        this.specialMark = specialMark;
-        this.productPackage = pack;
         this.price = price;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "name='" + name + '\'' +
-                ", productGroup=" + productGroup +
-                ", productSubGroup=" + productSubGroup +
-                ", productPackage=" + productPackage +
-                ", price=" + price +
-                ", specialMark='" + specialMark + '\'' +
-                '}';
+        this.specialMark = specialMark;
+        this.productPackage = productPackage;
+        this.productCategory = productGroup;
+        this.productSubCategory = productSubGroup;
     }
 
     public String getName() {
@@ -73,14 +57,6 @@ public class Product {
         this.name = name;
     }
 
-    public ProductMark getSpecialMark() {
-        return specialMark;
-    }
-
-    public void setSpecialMark(ProductMark specialMark) {
-        this.specialMark = specialMark;
-    }
-
     public Double getPrice() {
         return price;
     }
@@ -89,47 +65,60 @@ public class Product {
         this.price = price;
     }
 
-    public ProductPackaging getPack() {
+    public String getSpecialMark() {
+        return specialMark;
+    }
+
+    public void setSpecialMark(String specialMark) {
+        this.specialMark = specialMark;
+    }
+
+    public String getProductPackage() {
         return productPackage;
     }
 
-    public void setPack(ProductPackaging pack) {
-        this.productPackage = pack;
+    public void setProductPackage(String productPackage) {
+        this.productPackage = productPackage;
     }
 
-    public ProductGroup getGroup() {
-        return productGroup;
+    public String getProductCategory() {
+        return productCategory;
     }
 
-    public void setGroup(ProductGroup group) {
-        this.productGroup = group;
+    public void setProductCategory(String productGroup) {
+        this.productCategory = productGroup;
     }
 
-    public ProductSubgroup getSubGroup() {
-        return productSubGroup;
+    public String getProductSubCategory() {
+        return productSubCategory;
     }
 
-    public void setSubGroup(ProductSubgroup subGroup) {
-        this.productSubGroup = subGroup;
+    public void setProductSubCategory(String productSubGroup) {
+        this.productSubCategory = productSubGroup;
+    }
+
+    @Override
+    public String toString() {
+        return name + " " + productPackage +" " + price;
     }
 
     public static class Builder {
-        private ProductGroup group;
-        private ProductSubgroup subgroup;
-        private ProductPackaging pack;
-        private ProductMark specialMark;
+        private String group;
+        private String subgroup;
+        private String pack;
+        private String specialMark;
         private String name;
         private Double price;
 
         public Builder() {}
 
         public Builder setGroup(String group) {
-            this.group = new ProductGroup(group);
+            this.group = group;
             return this;
         }
 
         public Builder setSubGroup(String subGroup) {
-            this.subgroup = new ProductSubgroup(subGroup);
+            this.subgroup = subGroup;
             return this;
         }
 
@@ -139,12 +128,12 @@ public class Product {
         }
 
         public Builder setSpecialMark(String specialMark) {
-            this.specialMark = new ProductMark(specialMark);
+            this.specialMark = specialMark;
             return this;
         }
 
         public Builder setPackage(String pack) {
-            this.pack = new ProductPackaging(pack);
+            this.pack = pack;
             return this;
         }
 
@@ -154,7 +143,7 @@ public class Product {
         }
 
         public Product build() {
-            return new Product(group, subgroup, name, specialMark, pack, price);
+            return new Product(name, price, specialMark, pack, group, subgroup);
         }
     }
 }

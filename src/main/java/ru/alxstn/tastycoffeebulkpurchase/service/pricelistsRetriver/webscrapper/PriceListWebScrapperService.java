@@ -17,7 +17,6 @@ public class PriceListWebScrapperService {
     private final PriceListFileSaver priceListSaver;
     private final PriceListRepository repository;
 
-
     public PriceListWebScrapperService(TastyCoffeePage page,
                                        PriceListRepository repository,
                                        PriceListFileSaver priceListSaver) {
@@ -32,12 +31,17 @@ public class PriceListWebScrapperService {
         List<Product> priceList = tastyCoffeeWebPage.buildPriceList();
         System.out.println("Got " + priceList.size() + " items in price list");
         priceListSaver.save(priceList, "priceList.json");
+        //repository.saveAll(priceList);
     }
 
     @EventListener
     public void handleNewProduct(final ProductFoundEvent event) {
         Product product = event.getProduct();
         System.out.println("Trying to save new product: " + product);
-        repository.save(product);
+        try {
+            repository.save(product);
+        } catch (RuntimeException e) {
+            System.out.printf("Error saving: " + product.toString() + " " + e.getMessage());
+        }
     }
 }

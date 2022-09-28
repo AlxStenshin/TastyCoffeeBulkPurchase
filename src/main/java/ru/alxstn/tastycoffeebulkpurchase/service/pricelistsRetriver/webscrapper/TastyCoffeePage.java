@@ -136,9 +136,11 @@ public class TastyCoffeePage {
                     for (var productPriceTableCell : prices) {
                         try {
                             var price = getPriceFromTableCell(Objects.requireNonNull(
-                                    productPriceTableCell.find("div.coffee-week-price").getAttribute("innerHTML")));
+                                    productPriceTableCell.find("div.coffee-week-price")
+                                            .getAttribute("innerHTML")));
                             productBuilder.setPrice(price);
-                            var pack = productPriceTableCell.find("samp.mob").getAttribute("innerHTML");
+                            var pack = productPriceTableCell.find("samp.mob")
+                                    .getAttribute("innerHTML");
                             productBuilder.setPackage(pack);
 
                             newProductEventPublisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
