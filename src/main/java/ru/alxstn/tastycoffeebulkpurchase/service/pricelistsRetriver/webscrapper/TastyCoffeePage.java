@@ -127,7 +127,9 @@ public class TastyCoffeePage {
                     try {
                         SelenideElement specialMark = tableRow.find(By.cssSelector("div.prefixdiv.empty-ic"));
                         productBuilder.setSpecialMark(specialMark.getAttribute("data-div"));
-                    } catch (ElementNotFound ignored) {}
+                    } catch (ElementNotFound ignored) {
+                        productBuilder.setSpecialMark(null);
+                    }
 
                     ArrayList<SelenideElement> prices = new ArrayList<>();
                     prices.addAll(tableRow.findAll(By.cssSelector("td.price-count-1")));

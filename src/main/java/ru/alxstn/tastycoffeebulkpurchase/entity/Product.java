@@ -15,6 +15,7 @@ public class Product {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonExclude
     private long id;
 
     @Column(name = "name")
@@ -22,6 +23,7 @@ public class Product {
 
     @CreationTimestamp
     @Column(name = "date_created")
+    @JsonExclude
     private LocalDateTime dateCreated;
 
     @Column(name = "price")
