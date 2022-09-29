@@ -3,8 +3,11 @@ package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsSaver;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,13 +24,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PriceListSaverTest {
 
-    private final PriceListFileSaver priceListSaver = new PriceListFileSaver();
-    private static final String targetFile = "priceList.json";
+    PriceListFileSaver priceListSaver;
+
+    @Mock
+    DateTimeProvider dtProvider;
+
+    @BeforeEach
+    void init() {
+        priceListSaver = new PriceListFileSaver(dtProvider);
+    }
+
+    static String priceListTestFile = "test_priceList.json";
 
     @AfterAll
     static void cleanup() {
         try {
-            Files.deleteIfExists(Path.of(targetFile));
+            Files.deleteIfExists(Path.of(priceListTestFile));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -53,16 +65,18 @@ class PriceListSaverTest {
                 .build();
 
         List<Product> priceList = new ArrayList<>(Arrays.asList(p0, p1));
-        priceListSaver.save(priceList, targetFile);
 
-        File price = new File(targetFile);
+        priceListSaver.savePriceList(priceList, priceListTestFile);
+
+        File price = new File(priceListTestFile);
         assertTrue(price.exists());
 
         Gson gson = new Gson();
         Type listOfProductType = new TypeToken<ArrayList<Product>>() {}.getType();
         List<Product> actual;
+
         try {
-            Reader reader = Files.newBufferedReader(Paths.get(targetFile));
+            Reader reader = Files.newBufferedReader(Paths.get(priceListTestFile));
             actual = gson.fromJson(reader, listOfProductType);
         } catch (IOException e) {
             throw new RuntimeException(e);

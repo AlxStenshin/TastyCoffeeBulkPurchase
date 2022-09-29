@@ -4,6 +4,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
+// ToDo: Normalize table, separate productCategory, productSubCategory, productPackage and productMark entities.
 
 @Entity
 @Table(name = "product")
@@ -97,10 +100,39 @@ public class Product {
         this.productSubCategory = productSubGroup;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        if (!Objects.equals(name, product.name)) return false;
+        if (!Objects.equals(price, product.price)) return false;
+        if (!Objects.equals(productPackage, product.productPackage))
+            return false;
+        if (!Objects.equals(productCategory, product.productCategory))
+            return false;
+        return Objects.equals(productSubCategory, product.productSubCategory);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (productPackage != null ? productPackage.hashCode() : 0);
+        result = 31 * result + (productCategory != null ? productCategory.hashCode() : 0);
+        result = 31 * result + (productSubCategory != null ? productSubCategory.hashCode() : 0);
+        return result;
+    }
+
     @Override
     public String toString() {
         return name + " " + productPackage +" " + price;
     }
+
+
 
     public static class Builder {
         private String group;
