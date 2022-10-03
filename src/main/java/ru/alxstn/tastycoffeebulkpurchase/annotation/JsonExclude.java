@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity;
+package ru.alxstn.tastycoffeebulkpurchase.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

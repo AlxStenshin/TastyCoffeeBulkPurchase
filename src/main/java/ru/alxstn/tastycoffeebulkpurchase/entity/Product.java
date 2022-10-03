@@ -1,6 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
+import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -133,8 +134,6 @@ public class Product {
     public String toString() {
         return name + " " + productPackage +" " + price;
     }
-
-
 
     public static class Builder {
         private String group;

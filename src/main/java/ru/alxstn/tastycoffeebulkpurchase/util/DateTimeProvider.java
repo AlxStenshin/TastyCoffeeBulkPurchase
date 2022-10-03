@@ -7,8 +7,12 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class DateTimeProvider {
-    public String getCurrentDate() {
+    public String getFormattedCurrentDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm");
         return LocalDateTime.now().format(formatter);
+    }
+
+    public LocalDateTime getCurrentTimestamp() {
+        return LocalDateTime.now();
     }
 }

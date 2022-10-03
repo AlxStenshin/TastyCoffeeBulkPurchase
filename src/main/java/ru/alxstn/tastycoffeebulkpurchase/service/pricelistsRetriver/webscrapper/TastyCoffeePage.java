@@ -5,6 +5,8 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.ex.ElementNotFound;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
+import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 
 import java.util.*;
 
@@ -24,11 +27,16 @@ import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 public class TastyCoffeePage {
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
     private final ApplicationEventPublisher newProductEventPublisher;
+    private final CustomerRepository userRepository;
+
+    Logger logger = LogManager.getLogger(TastyCoffeePage.class);
 
     public TastyCoffeePage(TastyCoffeeConfigProperties properties,
-                           ApplicationEventPublisher newProductPublisher) {
+                           ApplicationEventPublisher newProductPublisher,
+                           CustomerRepository userRepository) {
         this.tastyCoffeeConfig = properties;
         this.newProductEventPublisher = newProductPublisher;
+        this.userRepository = userRepository;
 
         Configuration.timeout = 10;
         Configuration.browserSize = "1920x1080";
@@ -67,12 +75,12 @@ public class TastyCoffeePage {
             SelenideElement link = tab.$("a");
             String text = link.innerHtml();
             if (acceptedCategories.stream().anyMatch(text::contains)) {
-                System.out.println("Now Parsing Group " + text);
+                logger.info("Now Parsing Group " + text);
                 clickWebElement(link.getWrappedElement());
                 expandAllAccordions();
                 allProducts.addAll(parseAccordions());
             } else {
-                System.out.println("Ignoring Price List Tab " + text);
+                logger.info("Ignoring Price List Tab " + text);
             }
         }
 
@@ -98,7 +106,7 @@ public class TastyCoffeePage {
             var driver = getWebDriver();
             ((JavascriptExecutor) driver).executeScript(jsClickCode, element);
         } catch (Exception e) {
-            System.out.println("Element could not be clicked.. " + e.getMessage());
+            logger.warn("Element could not be clicked.. " + e.getMessage());
         }
     }
 
@@ -148,14 +156,14 @@ public class TastyCoffeePage {
                             newProductEventPublisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
                             categoryProducts.add(productBuilder.build());
                         } catch (RuntimeException e) {
-                            System.out.println("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
+                           logger.error("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
                         }
                     }
                 }
             }
         }
 
-        System.out.println("Price List Parsing Complete! Found: " + categoryProducts.size() + " items.");
+        logger.info("Price List Parsing Complete! Found: " + categoryProducts.size() + " items.");
         return categoryProducts;
     }
 

@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("tasty-coffee")
 public class TastyCoffeeConfigProperties {
+
     String url;
     String userName;
     String password;
