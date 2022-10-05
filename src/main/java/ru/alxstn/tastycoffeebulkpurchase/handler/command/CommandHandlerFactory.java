@@ -2,6 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.command;
 
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
+import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;

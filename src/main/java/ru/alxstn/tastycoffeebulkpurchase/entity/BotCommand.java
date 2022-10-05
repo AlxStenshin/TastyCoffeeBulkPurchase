@@ -10,7 +10,7 @@ public enum BotCommand {
     ;
 
     private final String name;
-    private final String desc;
+    private final String description;
 
     public static Optional<BotCommand> parseCommand(String command) {
         if (StringUtils.isBlank(command)) {
@@ -21,9 +21,9 @@ public enum BotCommand {
         return Stream.of(values()).filter(c -> c.name.equalsIgnoreCase(format)).findFirst();
     }
 
-    BotCommand(String name, String desc) {
+    BotCommand(String name, String description) {
         this.name = name;
-        this.desc = desc;
+        this.description = description;
     }
 
     public String getName() {

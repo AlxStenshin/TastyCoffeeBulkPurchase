@@ -3,7 +3,7 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.command.parser;
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TelegramBotConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
-import ru.alxstn.tastycoffeebulkpurchase.handler.command.ParsedCommandDTO;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.ParsedCommandDto;
 
 import java.util.Optional;
 
@@ -19,7 +19,7 @@ public class BasicCommandParser implements CommandParser {
     }
 
     @Override
-    public Optional<ParsedCommandDTO> parseCommand(String message) {
+    public Optional<ParsedCommandDto> parseCommand(String message) {
 
         if (message.isEmpty()) {
             return Optional.empty();
@@ -32,7 +32,7 @@ public class BasicCommandParser implements CommandParser {
             if (isCommandForMe(commandAndText.getKey())) {
                 String commandForParse = cutCommandFromFullText(commandAndText.getKey());
                 Optional<BotCommand> command = BotCommand.parseCommand(commandForParse);
-                return command.map(c -> new ParsedCommandDTO(c, commandAndText.getValue()));
+                return command.map(c -> new ParsedCommandDto(c, commandAndText.getValue()));
             } else {
                 return Optional.empty();
             }

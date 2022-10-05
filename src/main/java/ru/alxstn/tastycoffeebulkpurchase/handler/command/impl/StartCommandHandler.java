@@ -10,7 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandler;
+import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.util.DtoSerializer;
 

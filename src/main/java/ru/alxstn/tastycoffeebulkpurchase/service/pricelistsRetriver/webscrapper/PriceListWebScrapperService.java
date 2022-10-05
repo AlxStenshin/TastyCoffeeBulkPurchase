@@ -16,7 +16,6 @@ import java.util.List;
 public class PriceListWebScrapperService implements PriceListUpdater {
 
     Logger logger = LogManager.getLogger(PriceListWebScrapperService.class);
-
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeePage tastyCoffeeWebPage;
 
@@ -25,6 +24,7 @@ public class PriceListWebScrapperService implements PriceListUpdater {
         this.tastyCoffeeWebPage = page;
     }
 
+    @Override
     @EventListener
     public void handleNewProduct(final ProductFoundEvent event) {
         logger.info("New product obtained: " + event.getProduct().toString());

@@ -5,6 +5,5 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 
 public interface UpdateHandler {
     boolean handleUpdate(Update update);
-
     UpdateHandlerStage getStage();
 }

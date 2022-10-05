@@ -5,13 +5,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandler;
+import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandlerFactory;
 import ru.alxstn.tastycoffeebulkpurchase.handler.command.parser.CommandParser;
-import ru.alxstn.tastycoffeebulkpurchase.handler.command.ParsedCommandDTO;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.ParsedCommandDto;
 
 import java.util.Optional;
-
 
 @Component
 public class CommandUpdateHandler implements UpdateHandler {
@@ -36,7 +35,7 @@ public class CommandUpdateHandler implements UpdateHandler {
         }
 
         String text = message.getText();
-        Optional<ParsedCommandDTO> command = commandParser.parseCommand(text);
+        Optional<ParsedCommandDto> command = commandParser.parseCommand(text);
         if (command.isEmpty()) {
             return false;
         }
