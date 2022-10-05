@@ -1,22 +1,30 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Entity;
 import java.time.LocalDateTime;
-
 
 @Entity(name = "customer")
 public class Customer {
 
     @Id
+    @Column(name = "chat_id")
     private Long chatId;
 
+    @Column(name = "first_name")
     private String firstName;
 
+    @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "user_name")
     private String userName;
 
+    @CreationTimestamp
+    @Column(name = "registration_timestamp")
     private LocalDateTime registrationTimestamp;
 
     public Long getChatId() {

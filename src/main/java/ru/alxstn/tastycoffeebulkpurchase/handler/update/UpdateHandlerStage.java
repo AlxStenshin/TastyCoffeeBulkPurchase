@@ -5,7 +5,8 @@ public enum UpdateHandlerStage {
     INLINE,
     PAYMENT,
     COMMAND,
-    REPLY_BUTTON;
+    REPLY_BUTTON,
+    ;
 
     public int getOrder() {
         return ordinal();

@@ -5,3 +5,13 @@ This application being developed for simplifying bulk coffee purchase process fr
 
 # Done so far:
 1) Tasty Coffee Price list web-scrapper using Selenide.
+2) Telegram Bot Api integration.
+
+# ToDO:
+1) User Settings entity
+2) Orders entity
+3) Products Entity skip duplicates, insert on some data changed
+4) Settings: Product Sorting: by Name, by Price
+5) Settings: Price Change Notify Message
+6) Settings: Discount Changed Notify Message
+7) Settings: Show "Product added to order" message for customer

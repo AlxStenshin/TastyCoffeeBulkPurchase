@@ -3,12 +3,11 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.update;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandlerFactory;
-import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandParser;
+import ru.alxstn.tastycoffeebulkpurchase.handler.command.parser.CommandParser;
 import ru.alxstn.tastycoffeebulkpurchase.handler.command.ParsedCommandDTO;
 
 import java.util.Optional;
@@ -26,7 +25,7 @@ public class CommandUpdateHandler implements UpdateHandler {
     }
 
     @Override
-    public boolean handleUpdate(Update update) throws TelegramApiException {
+    public boolean handleUpdate(Update update) {
         if (!update.hasMessage()) {
             return false;
         }
@@ -45,8 +44,7 @@ public class CommandUpdateHandler implements UpdateHandler {
         return true;
     }
 
-    private void handleCommand(Update update, BotCommand command, String text)
-            throws TelegramApiException {
+    private void handleCommand(Update update, BotCommand command, String text) {
         CommandHandler commandHandler = commandHandlerFactory.getHandler(command);
         commandHandler.handleCommand(update.getMessage(), text);
     }

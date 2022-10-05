@@ -25,18 +25,15 @@ import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 
 @Component
 public class TastyCoffeePage {
-    private final TastyCoffeeConfigProperties tastyCoffeeConfig;
-    private final ApplicationEventPublisher newProductEventPublisher;
-    private final CustomerRepository userRepository;
-
     Logger logger = LogManager.getLogger(TastyCoffeePage.class);
 
+    private final ApplicationEventPublisher publisher;
+    private final TastyCoffeeConfigProperties tastyCoffeeConfig;
+
     public TastyCoffeePage(TastyCoffeeConfigProperties properties,
-                           ApplicationEventPublisher newProductPublisher,
-                           CustomerRepository userRepository) {
+                           ApplicationEventPublisher newProductPublisher) {
+        this.publisher = newProductPublisher;
         this.tastyCoffeeConfig = properties;
-        this.newProductEventPublisher = newProductPublisher;
-        this.userRepository = userRepository;
 
         Configuration.timeout = 10;
         Configuration.browserSize = "1920x1080";
@@ -153,7 +150,7 @@ public class TastyCoffeePage {
                                     .getAttribute("innerHTML");
                             productBuilder.setPackage(pack);
 
-                            newProductEventPublisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
+                            publisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
                             categoryProducts.add(productBuilder.build());
                         } catch (RuntimeException e) {
                            logger.error("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
@@ -170,7 +167,6 @@ public class TastyCoffeePage {
     double getPriceFromTableCell(String src) {
         src = src.replace("&nbsp;", "");
         src = src.replace(",", ".");
-        double ret = 0;
         return Double.parseDouble(src);
     }
 }

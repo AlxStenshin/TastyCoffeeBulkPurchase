@@ -6,7 +6,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public enum BotCommand {
-    START("start", "Init Work");
+    START("start", "Initiate"),
+    ;
 
     private final String name;
     private final String desc;
@@ -29,7 +30,4 @@ public enum BotCommand {
         return name;
     }
 
-    public String getDesc() {
-        return desc;
-    }
 }

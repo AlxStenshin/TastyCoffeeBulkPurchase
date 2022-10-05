@@ -1,8 +1,9 @@
-package ru.alxstn.tastycoffeebulkpurchase.handler.command;
+package ru.alxstn.tastycoffeebulkpurchase.handler.command.parser;
 
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TelegramBotConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
+import ru.alxstn.tastycoffeebulkpurchase.handler.command.ParsedCommandDTO;
 
 import java.util.Optional;
 
@@ -57,7 +58,6 @@ public class BasicCommandParser implements CommandParser {
                 ? text.substring(1, text.indexOf(COMMAND_BOT_NAME_DELIMITER))
                 : text.substring(1);
     }
-
 
     private boolean isCommandForMe(String command) {
         if (command.contains(COMMAND_BOT_NAME_DELIMITER)) {
