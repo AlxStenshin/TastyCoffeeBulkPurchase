@@ -2,9 +2,9 @@ package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver.webscrapper
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
@@ -31,8 +31,8 @@ public class PriceListWebScrapperService implements PriceListUpdater {
         logger.info("New product obtained: " + event.getProduct().toString());
     }
 
-    @EventListener(ApplicationReadyEvent.class)
     @Override
+    @Scheduled(fixedRate = 3 * 60 * 1000 * 1000, initialDelay = 500)
     public void updatePriceList() {
         tastyCoffeeWebPage.login();
         List<Product> priceList = tastyCoffeeWebPage.buildPriceList();
