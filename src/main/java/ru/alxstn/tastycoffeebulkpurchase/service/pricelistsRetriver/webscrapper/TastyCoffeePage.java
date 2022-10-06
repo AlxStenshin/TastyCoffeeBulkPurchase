@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 
 import java.util.*;
 
@@ -133,7 +132,7 @@ public class TastyCoffeePage {
                         SelenideElement specialMark = tableRow.find(By.cssSelector("div.prefixdiv.empty-ic"));
                         productBuilder.setSpecialMark(specialMark.getAttribute("data-div"));
                     } catch (ElementNotFound ignored) {
-                        productBuilder.setSpecialMark(null);
+                        productBuilder.setSpecialMark("");
                     }
 
                     ArrayList<SelenideElement> prices = new ArrayList<>();

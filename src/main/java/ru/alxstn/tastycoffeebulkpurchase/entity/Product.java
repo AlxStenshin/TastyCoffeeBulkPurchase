@@ -11,6 +11,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "product")
+        // ToDo: find the way to avoid PSQLException: ERROR: duplicate key value violates unique constraint
+        //  enable "on conflict do nothing" with jpa?
+        //uniqueConstraints = {
+        //@UniqueConstraint(columnNames = { "name", "price", "mark", "package", "category", "subcategory" }})
 public class Product {
 
     @Id
@@ -103,7 +107,6 @@ public class Product {
         this.productSubCategory = productSubGroup;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -113,6 +116,7 @@ public class Product {
 
         if (!Objects.equals(name, product.name)) return false;
         if (!Objects.equals(price, product.price)) return false;
+        if (!Objects.equals(specialMark, product.specialMark)) return false;
         if (!Objects.equals(productPackage, product.productPackage))
             return false;
         if (!Objects.equals(productCategory, product.productCategory))
@@ -124,6 +128,7 @@ public class Product {
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (specialMark != null ? specialMark.hashCode() : 0);
         result = 31 * result + (productPackage != null ? productPackage.hashCode() : 0);
         result = 31 * result + (productCategory != null ? productCategory.hashCode() : 0);
         result = 31 * result + (productSubCategory != null ? productSubCategory.hashCode() : 0);
@@ -180,4 +185,3 @@ public class Product {
         }
     }
 }
-
