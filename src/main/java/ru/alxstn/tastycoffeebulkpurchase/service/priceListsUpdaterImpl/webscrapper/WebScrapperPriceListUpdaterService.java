@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver.webscrapper;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdaterImpl.webscrapper;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
-import ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver.PriceListUpdater;
+import ru.alxstn.tastycoffeebulkpurchase.service.PriceListUpdaterService;
 
 import java.util.List;
 
 @Service
-public class PriceListWebScrapperService implements PriceListUpdater {
+public class WebScrapperPriceListUpdaterService implements PriceListUpdaterService {
 
-    Logger logger = LogManager.getLogger(PriceListWebScrapperService.class);
+    Logger logger = LogManager.getLogger(WebScrapperPriceListUpdaterService.class);
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeePage tastyCoffeeWebPage;
 
-    public PriceListWebScrapperService(ApplicationEventPublisher newProductEventPublisher, TastyCoffeePage page) {
+    public WebScrapperPriceListUpdaterService(ApplicationEventPublisher newProductEventPublisher, TastyCoffeePage page) {
         this.publisher = newProductEventPublisher;
         this.tastyCoffeeWebPage = page;
     }
@@ -32,7 +32,7 @@ public class PriceListWebScrapperService implements PriceListUpdater {
     }
 
     @Override
-    @Scheduled(fixedRate = 3 * 60 * 1000 * 1000, initialDelay = 500)
+    @Scheduled(fixedRate = 3 * 60 * 60 * 1000, initialDelay = 500)
     public void updatePriceList() {
         tastyCoffeeWebPage.login();
         List<Product> priceList = tastyCoffeeWebPage.buildPriceList();

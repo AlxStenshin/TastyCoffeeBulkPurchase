@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver.webscrapper;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdaterImpl.webscrapper;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.ElementsCollection;
@@ -42,6 +42,10 @@ public class TastyCoffeePage {
 
     public void login() {
         open(tastyCoffeeConfig.getUrl());
+
+        Selenide.clearBrowserCookies();
+        Selenide.clearBrowserLocalStorage();
+
         SelenideElement bulkPurchaseClientLoginButton = $(byText("Вход для оптовых клиентов"));
         bulkPurchaseClientLoginButton.click();
 
@@ -110,7 +114,7 @@ public class TastyCoffeePage {
         List<Product> categoryProducts = new ArrayList<>();
         ElementsCollection mainAccordions = $$("div.main-accordion");
 
-        Product.Builder productBuilder = new Product.Builder();
+        Product.ProductBuilder productBuilder = new Product.ProductBuilder();
 
         for (SelenideElement mainAccordion : mainAccordions) {
             SelenideElement groupTitle = mainAccordion.find(By.cssSelector("h3.title"));

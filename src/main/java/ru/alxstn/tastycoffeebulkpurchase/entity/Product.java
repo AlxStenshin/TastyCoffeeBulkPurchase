@@ -1,6 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
 
 import javax.persistence.*;
@@ -27,9 +28,14 @@ public class Product {
     private String name;
 
     @CreationTimestamp
-    @Column(name = "date_created")
+    @Column(name = "date_created", updatable = false, nullable = false)
     @JsonExclude
     private LocalDateTime dateCreated;
+
+    @Column(name = "date_updated")
+    @UpdateTimestamp
+    @JsonExclude
+    private LocalDateTime dateUpdated;
 
     @Column(name = "price")
     private Double price;
@@ -46,6 +52,10 @@ public class Product {
     @Column(name = "subcategory")
     private String productSubCategory;
 
+    @Column(name = "actual")
+    @JsonExclude
+    private boolean actual;
+
     public Product() {
 
     }
@@ -57,6 +67,7 @@ public class Product {
         this.productPackage = productPackage;
         this.productCategory = productGroup;
         this.productSubCategory = productSubGroup;
+        this.actual = true;
     }
 
     public String getName() {
@@ -107,6 +118,14 @@ public class Product {
         this.productSubCategory = productSubGroup;
     }
 
+    public boolean isActual() {
+        return actual;
+    }
+
+    public void setActual(boolean actual) {
+        this.actual = actual;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -140,7 +159,7 @@ public class Product {
         return name + " " + productPackage +" " + price;
     }
 
-    public static class Builder {
+    public static class ProductBuilder {
         private String group;
         private String subgroup;
         private String pack;
@@ -148,34 +167,34 @@ public class Product {
         private String name;
         private Double price;
 
-        public Builder() {}
+        public ProductBuilder() {}
 
-        public Builder setGroup(String group) {
+        public ProductBuilder setGroup(String group) {
             this.group = group;
             return this;
         }
 
-        public Builder setSubGroup(String subGroup) {
+        public ProductBuilder setSubGroup(String subGroup) {
             this.subgroup = subGroup;
             return this;
         }
 
-        public Builder setName(String name) {
+        public ProductBuilder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder setSpecialMark(String specialMark) {
+        public ProductBuilder setSpecialMark(String specialMark) {
             this.specialMark = specialMark;
             return this;
         }
 
-        public Builder setPackage(String pack) {
+        public ProductBuilder setPackage(String pack) {
             this.pack = pack;
             return this;
         }
 
-        public Builder setPrice(Double price) {
+        public ProductBuilder setPrice(Double price) {
             this.price = price;
             return this;
         }

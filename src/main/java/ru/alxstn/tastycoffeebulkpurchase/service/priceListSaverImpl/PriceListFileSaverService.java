@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsSaver;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListSaverImpl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.AnnotationExclusionStrategy;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
+import ru.alxstn.tastycoffeebulkpurchase.service.PriceListSaverService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.io.FileNotFoundException;
@@ -15,14 +16,15 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @Component
-public class PriceListFileSaver {
+public class PriceListFileSaverService implements PriceListSaverService {
 
     private final DateTimeProvider dateTimeProvider;
-    public PriceListFileSaver(DateTimeProvider dateTimeProvider) {
+    public PriceListFileSaverService(DateTimeProvider dateTimeProvider) {
         this.dateTimeProvider = dateTimeProvider;
     }
 
     @EventListener
+    @Override
     public void handlePriceList(final PriceListReceivedEvent event) {
         savePriceList(event.getPriceList(), dateTimeProvider.getFormattedCurrentDate() + "_priceList.json");
     }

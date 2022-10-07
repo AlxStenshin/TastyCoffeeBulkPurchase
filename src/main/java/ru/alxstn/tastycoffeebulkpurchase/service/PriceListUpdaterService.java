@@ -1,8 +1,8 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.pricelistsRetriver;
+package ru.alxstn.tastycoffeebulkpurchase.service;
 
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 
-public interface PriceListUpdater {
+public interface PriceListUpdaterService {
 
     void updatePriceList();
     void handleNewProduct(final ProductFoundEvent event);
