@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdaterImpl.webscrapper;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdater.webscrapper;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;

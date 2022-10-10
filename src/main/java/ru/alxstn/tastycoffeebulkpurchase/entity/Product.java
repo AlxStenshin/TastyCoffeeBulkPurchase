@@ -12,12 +12,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "product")
-        // ToDo: find the way to avoid PSQLException: ERROR: duplicate key value violates unique constraint
-        //  enable "on conflict do nothing" with jpa?
-        //uniqueConstraints = {
-        //@UniqueConstraint(columnNames = { "name", "price", "mark", "package", "category", "subcategory" }})
 public class Product {
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +21,10 @@ public class Product {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "display_name")
+    @JsonExclude
+    private String displayName;
 
     @CreationTimestamp
     @Column(name = "date_created", updatable = false, nullable = false)
@@ -124,6 +123,14 @@ public class Product {
 
     public void setActual(boolean actual) {
         this.actual = actual;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdaterImpl.webscrapper;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdater.webscrapper;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.ElementsCollection;

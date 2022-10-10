@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
-import ru.alxstn.tastycoffeebulkpurchase.service.priceListSaverImpl.PriceListFileSaverService;
+import ru.alxstn.tastycoffeebulkpurchase.service.priceListSaver.PriceListFileSaverService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.io.File;

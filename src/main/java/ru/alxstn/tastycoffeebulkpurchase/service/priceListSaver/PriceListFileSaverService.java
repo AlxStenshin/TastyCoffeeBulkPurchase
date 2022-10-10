@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.priceListSaverImpl;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListSaver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
