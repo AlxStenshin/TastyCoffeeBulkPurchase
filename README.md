@@ -16,5 +16,7 @@ This application being developed for simplifying bulk coffee purchase process fr
 6) Settings: Discount Changed Notify Message
 7) Settings: Show "Product added to order" message for customer
 8) JVM, DB and App-specific Metrics monitoring using Prometheus and Grafana
-9) Add search by name, lowest price feature (with expected discount parameter)
+9) Add search by name and lowest price feature (with expected discount parameter)
 10) Send message if product from order becomes "inactive" after pricelist update
+11) Find The way to correctly display "Микролоты для фильра по 100г" subcategory
+12) Redis for telegram callback entity + md5 hash storage (cb_data + cb_hash)

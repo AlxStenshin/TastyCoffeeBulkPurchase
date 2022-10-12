@@ -6,6 +6,8 @@ import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 // ToDo: Normalize table, separate productCategory, productSubCategory, productPackage and productMark entities.
@@ -18,6 +20,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonExclude
     private long id;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    private List<Purchase> purchases = new ArrayList<>();
 
     @Column(name = "name")
     private String name;
@@ -131,6 +136,14 @@ public class Product {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public List<Purchase> getPurchases() {
+        return purchases;
+    }
+
+    public void setPurchases(List<Purchase> purchases) {
+        this.purchases = purchases;
     }
 
     @Override

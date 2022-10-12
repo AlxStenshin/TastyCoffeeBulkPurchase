@@ -1,5 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.handler.command.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,10 +10,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.util.DtoSerializer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,11 +24,17 @@ import java.util.List;
 public class StartCommandHandler implements CommandHandler {
     private final ApplicationEventPublisher publisher;
     private final CustomerRepository repository;
+    private final DtoSerializer serializer;
+
+    @Autowired
+    private DtoDeserializer deserializer;
 
     public StartCommandHandler(ApplicationEventPublisher publisher,
-                               CustomerRepository repository) {
+                               CustomerRepository repository,
+                               DtoSerializer serializer) {
         this.publisher = publisher;
         this.repository = repository;
+        this.serializer = serializer;
     }
 
     @Override
@@ -49,25 +57,25 @@ public class StartCommandHandler implements CommandHandler {
         buttons.add(Collections.singletonList(
                 InlineKeyboardButton.builder()
                         .text("Собрать заказ")
-                        .callbackData(DtoSerializer.serialize(new MainMenuCommandDto("PlaceOrder")))
+                        .callbackData(serializer.serialize(new MainMenuCommandDto("PlaceOrder")))
                         .build()));
 
         buttons.add(Collections.singletonList(
                 InlineKeyboardButton.builder()
                         .text("Просмотреть заказ")
-                        .callbackData(DtoSerializer.serialize(new MainMenuCommandDto("ViewOrder")))
+                        .callbackData(serializer.serialize(new MainMenuCommandDto("ViewOrder")))
                         .build()));
 
         buttons.add(Collections.singletonList(
                 InlineKeyboardButton.builder()
                         .text("Настройки")
-                        .callbackData(DtoSerializer.serialize(new MainMenuCommandDto("Settings")))
+                        .callbackData(serializer.serialize(new MainMenuCommandDto("Settings")))
                         .build()));
 
         buttons.add(Collections.singletonList(
                 InlineKeyboardButton.builder()
                         .text("Статистика")
-                        .callbackData(DtoSerializer.serialize(new MainMenuCommandDto("ViewStats")))
+                        .callbackData(serializer.serialize(new MainMenuCommandDto("ViewStats")))
                         .build()));
 
         publisher.publishEvent(new SendMessageEvent(this,

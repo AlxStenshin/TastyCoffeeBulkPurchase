@@ -1,12 +1,15 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class SerializableInlineObject {
+@RedisHash("SerializableInlineObject")
+public class SerializableInlineObject implements Serializable {
 
-    @JsonProperty("i")
+    private String id;
+
     private int index;
 
     public SerializableInlineObject(SerializableInlineType type) {
@@ -15,6 +18,18 @@ public class SerializableInlineObject {
 
     public int getIndex() {
         return index;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     @Override

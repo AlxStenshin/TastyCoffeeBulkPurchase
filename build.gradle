@@ -17,8 +17,12 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.4.0'
-    implementation 'com.codeborne:selenide:6.7.4'
+    implementation ('org.springframework.boot:spring-boot-starter-data-redis') {
+        exclude group: 'io.lettuce.lettuce-core'
+    }
+    implementation 'com.github.houbb:redis-client-jedis:0.0.3'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.5.0'
+    implementation 'com.codeborne:selenide:6.8.1'
     implementation 'org.telegram:telegrambots:6.1.0'
     implementation 'com.google.code.gson:gson:2.9.0'
 

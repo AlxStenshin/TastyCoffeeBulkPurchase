@@ -18,14 +18,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT DISTINCT productCategory FROM Product")
     List<String> findAllCategories();
 
-    @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory = ?1")
+    @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory LIKE ?1%")
     List<String> findAllSubCategories(String category);
 
-    @Query("SELECT DISTINCT name FROM Product  WHERE productSubCategory = ?1")
-    List<String> findAllProductsBySubCategory(String subCategory);
+    @Query("SELECT DISTINCT p.displayName FROM Product p WHERE p.productSubCategory LIKE ?1%")
+    List<String> findDistinctProductDisplayNamesBySubCategory(String subCategory);
 
-    @Query("SELECT p FROM Product p WHERE p.name = ?1")
-    List<Product> findAllProductPrices(String productName);
+    @Query("SELECT p FROM Product p WHERE p.displayName LIKE %?1% AND p.productSubCategory LIKE ?2%")
+    List<Product> findAllProductsByProductNameAndSubcategory(String productName, String productSubCat);
 
     @Query("SELECT p FROM Product p WHERE " +
             " p.name = :name AND" +
@@ -40,21 +40,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                     @Param(value = "pack") String pack,
                                     @Param(value = "mark") String mark,
                                     @Param(value = "price") Double price);
-
-    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Product p WHERE " +
-            " p.name = :name AND" +
-            " p.productCategory = :cat AND" +
-            " p.productSubCategory = :subCat AND" +
-            " p.productPackage = :pack AND" +
-            " p.specialMark = :mark AND" +
-            " p.price = :price")
-    boolean isExists(@Param(value = "name") String name,
-                     @Param(value = "cat") String cat,
-                     @Param(value = "subCat") String subCat,
-                     @Param(value = "pack") String pack,
-                     @Param(value = "mark") String mark,
-                     @Param(value = "price") Double price);
-
 
     @Transactional
     @Modifying

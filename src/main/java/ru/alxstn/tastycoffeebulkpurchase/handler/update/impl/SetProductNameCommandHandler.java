@@ -9,9 +9,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductPackageCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetSubCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
@@ -22,10 +23,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Component
-public class SetSubCategoryCommandHandler extends CallbackUpdateHandler<SetSubCategoryCommandDto> {
 
-    Logger logger = LogManager.getLogger(SetSubCategoryCommandHandler.class);
+@Component
+public class SetProductNameCommandHandler extends CallbackUpdateHandler<SetProductNameCommandDto> {
+
+    Logger logger = LogManager.getLogger(SetProductNameCommandHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
     private final DtoSerializer serializer;
@@ -33,40 +35,47 @@ public class SetSubCategoryCommandHandler extends CallbackUpdateHandler<SetSubCa
     @Autowired
     private DtoDeserializer deserializer;
 
-    public SetSubCategoryCommandHandler(ApplicationEventPublisher publisher,
+    public SetProductNameCommandHandler(ApplicationEventPublisher publisher,
                                         ProductRepository productRepository,
                                         DtoSerializer serializer) {
+        super();
         this.publisher = publisher;
         this.productRepository = productRepository;
         this.serializer = serializer;
     }
 
     @Override
-    protected Class<SetSubCategoryCommandDto> getDtoType() {
-        return SetSubCategoryCommandDto.class;
+    protected Class<SetProductNameCommandDto> getDtoType() {
+        return SetProductNameCommandDto.class;
     }
 
     @Override
     protected SerializableInlineType getSerializableType() {
-        return SerializableInlineType.SET_SUBCATEGORY;
+        return SerializableInlineType.SET_PRODUCT_NAME;
     }
 
     @Override
-    protected void handleCallback(Update update, SetSubCategoryCommandDto dto) {
-        String targetCategory = dto.getMessage();
-        logger.info("command received " + targetCategory);
+    protected void handleCallback(Update update, SetProductNameCommandDto dto) {
+        String message = dto.getName();
+        logger.info("Command Received: " + message);
+
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        String title = "Выберите упаковку для " + message + ":";
+        List<Product> availablePackages = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory());
 
-        String title = "Выберите продукт:";
-        List<String> selectedProducts = productRepository.findDistinctProductDisplayNamesBySubCategory(targetCategory);
+        for (Product p : availablePackages) {
+            String callback = serializer.serialize(
+                    new SetProductPackageCommandDto(message, p.getProductPackage(), p.getPrice().toString()));
+            assert (callback.length() < 64);
 
-        for (String displayName : selectedProducts) {
-            String buttonTitle = displayName.substring(0, Math.min(displayName.length(), 21));
-            String callback = serializer.serialize(new SetProductNameCommandDto(displayName, targetCategory));
+            String buttonText = p.getProductPackage() + ", " + p.getPrice() + "₽";
+            logger.debug("Trying to set button text: " + buttonText);
+            assert (buttonText.length() < 21);
 
+            logger.debug("Trying to set callback (" + callback.length() + "b) to button: " + callback);
             buttons.add(Collections.singletonList(
                     InlineKeyboardButton.builder()
-                            .text(buttonTitle)
+                            .text(buttonText)
                             .callbackData(callback)
                             .build()));
         }

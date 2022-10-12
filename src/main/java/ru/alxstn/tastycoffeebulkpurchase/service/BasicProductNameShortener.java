@@ -15,15 +15,15 @@ public class BasicProductNameShortener implements ProductNameShortener {
         if (product.getName().length() <= 21)
             return productName;
 
-        // Remove by Dictionary
-        List<String> dict = List.of("Дрип-пакеты", "Шоколад фирменный", "Горячий шоколад", "Капсулы");
+        // Remove words occurrence using pre-defined Dictionary
+        List<String> dict = List.of("Дрип-пакеты", "Шоколад фирменный", "Горячий шоколад", "Капсулы", "Напиток в банках");
         for (String s : dict) {
             if (productName.toLowerCase().contains(s.toLowerCase())) {
                 return remove(productName, s);
             }
         }
 
-        // Trying to remove everything between '(' and ')'
+        // Trying to remove any pointless clarification between '(' and ')'
         if (productName.contains("(") && productName.contains(")")) {
             String parentheses = productName.substring(productName.indexOf('('), productName.indexOf(')') + 1);
             return remove(productName, parentheses);

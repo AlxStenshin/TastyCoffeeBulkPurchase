@@ -2,6 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.update.impl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -11,10 +12,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetSubCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
-import ru.alxstn.tastycoffeebulkpurchase.util.DtoSerializer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,11 +28,17 @@ public class SetCategoryCommandHandler extends CallbackUpdateHandler<SetCategory
     Logger logger = LogManager.getLogger(SetCategoryCommandHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
+    private final DtoSerializer serializer;
+
+    @Autowired
+    private DtoDeserializer deserializer;
 
     public SetCategoryCommandHandler(ApplicationEventPublisher publisher,
-                                     ProductRepository productRepository) {
+                                     ProductRepository productRepository,
+                                     DtoSerializer serializer) {
         this.publisher = publisher;
         this.productRepository = productRepository;
+        this.serializer = serializer;
     }
 
     @Override
@@ -55,7 +63,7 @@ public class SetCategoryCommandHandler extends CallbackUpdateHandler<SetCategory
         for (String cat : availableSubCategories) {
             cat = cat.substring(0, Math.min(cat.length(), 21));
 
-            String callback = DtoSerializer.serialize(new SetSubCategoryCommandDto(cat));
+            String callback = serializer.serialize(new SetSubCategoryCommandDto(cat));
             assert (callback.length() < 64);
 
             logger.debug("Trying to set callback (" + callback.length() + ") to button: " + callback);

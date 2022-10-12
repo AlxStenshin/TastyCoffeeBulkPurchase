@@ -2,17 +2,20 @@ package ru.alxstn.tastycoffeebulkpurchase.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "customer")
 public class Customer {
 
     @Id
-    @Column(name = "chat_id")
+    @Column(name = "id")
     private Long chatId;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    private List<Purchase> purchases = new ArrayList<>();
 
     @Column(name = "first_name")
     private String firstName;
@@ -65,6 +68,14 @@ public class Customer {
 
     public void setRegistrationTimestamp(LocalDateTime registeredAt) {
         this.registrationTimestamp = registeredAt;
+    }
+
+    public List<Purchase> getPurchases() {
+        return purchases;
+    }
+
+    public void setPurchases(List<Purchase> purchases) {
+        this.purchases = purchases;
     }
 
     @Override

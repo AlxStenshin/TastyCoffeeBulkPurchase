@@ -1,11 +1,12 @@
-package ru.alxstn.tastycoffeebulkpurchase.util;
+package ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Optional;
 
-public class DtoDeserializer {
-    public static <T> Optional<T> deserialize(String json, Class<T> c) {
+public class BasicDtoDeserializer implements DtoDeserializer {
+    @Override
+    public <T> Optional<T> deserialize(String json, Class<T> c) {
         try {
             return Optional.ofNullable(new ObjectMapper().readValue(json, c));
         } catch (Exception e) {

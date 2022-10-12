@@ -4,9 +4,11 @@ public enum SerializableInlineType {
     SET_MAIN_COMMAND(0),
     SET_CATEGORY(1),
     SET_SUBCATEGORY(2),
+    SET_PRODUCT_NAME(3),
 
-    ADD_PRODUCT(3),
-    REMOVE_PRODUCT(4),
+    SET_PACKAGING(4),
+    ADD_PRODUCT(5),
+    REMOVE_PRODUCT(6),
     ;
 
     private final int index;
