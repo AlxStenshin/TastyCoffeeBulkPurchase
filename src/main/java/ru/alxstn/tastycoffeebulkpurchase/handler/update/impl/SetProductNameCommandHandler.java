@@ -60,19 +60,22 @@ public class SetProductNameCommandHandler extends CallbackUpdateHandler<SetProdu
         logger.info("Command Received: " + message);
 
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-        String title = "Выберите упаковку для " + message + ":";
+        Product targetProduct = productRepository.getProductByDisplayNameAndSubgroup(dto.getName(), dto.getSubCategory()).get(0);
+
+        String title = "Выберите параметры для " +
+                targetProduct.getName() + "\n" +
+                "Из категории товаров " + targetProduct.getProductCategory() + " " +
+                targetProduct.getProductSubCategory();
+
         List<Product> availablePackages = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory());
 
         for (Product p : availablePackages) {
             String callback = serializer.serialize(
                     new SetProductPackageCommandDto(message, p.getProductPackage(), p.getPrice().toString()));
-            assert (callback.length() < 64);
 
-            String buttonText = p.getProductPackage() + ", " + p.getPrice() + "₽";
-            logger.debug("Trying to set button text: " + buttonText);
-            assert (buttonText.length() < 21);
+            String packaging = p.getProductPackage().isEmpty() ? "" : p.getProductPackage() + ", ";
+            String buttonText = packaging + p.getPrice() + "₽";
 
-            logger.debug("Trying to set callback (" + callback.length() + "b) to button: " + callback);
             buttons.add(Collections.singletonList(
                     InlineKeyboardButton.builder()
                             .text(buttonText)

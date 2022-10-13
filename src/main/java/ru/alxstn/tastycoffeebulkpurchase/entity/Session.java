@@ -13,7 +13,7 @@ public class Session {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
     private List<Purchase> purchases = new ArrayList<>();
 
     @Column(name = "open_date")

@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetSubCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
@@ -57,21 +58,41 @@ public class SetCategoryCommandHandler extends CallbackUpdateHandler<SetCategory
         logger.info("command received " + message);
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
-        String title = "Выберите подкатегорию:";
         List<String> availableSubCategories = productRepository.findAllSubCategories(message);
+        String title;
 
-        for (String cat : availableSubCategories) {
-            cat = cat.substring(0, Math.min(cat.length(), 21));
+        if (availableSubCategories.size() > 1) {
+            title = "Выберите подкатегорию: ";
+            for (String cat : availableSubCategories) {
+                cat = cat.substring(0, Math.min(cat.length(), 21));
 
-            String callback = serializer.serialize(new SetSubCategoryCommandDto(cat));
-            assert (callback.length() < 64);
+                String callback = serializer.serialize(new SetSubCategoryCommandDto(cat));
+                assert (callback.length() < 64);
 
-            logger.debug("Trying to set callback (" + callback.length() + ") to button: " + callback);
-            buttons.add(Collections.singletonList(
-                    InlineKeyboardButton.builder()
-                            .text(cat)
-                            .callbackData(callback)
-                            .build()));
+                logger.debug("Trying to set callback (" + callback.length() + ") to button: " + callback);
+                buttons.add(Collections.singletonList(
+                        InlineKeyboardButton.builder()
+                                .text(cat)
+                                .callbackData(callback)
+                                .build()));
+            }
+
+        }
+        else {
+            title = "Выберите продукт: ";
+            String targetCategory = availableSubCategories.get(0);
+            List<String> selectedProducts = productRepository.findDistinctProductDisplayNamesBySubCategory(targetCategory);
+
+            for (String displayName : selectedProducts) {
+                String buttonTitle = displayName.substring(0, Math.min(displayName.length(), 21));
+                String callback = serializer.serialize(new SetProductNameCommandDto(displayName, targetCategory));
+
+                buttons.add(Collections.singletonList(
+                        InlineKeyboardButton.builder()
+                                .text(buttonTitle)
+                                .callbackData(callback)
+                                .build()));
+            }
         }
 
         publisher.publishEvent(new SendMessageEvent(this,

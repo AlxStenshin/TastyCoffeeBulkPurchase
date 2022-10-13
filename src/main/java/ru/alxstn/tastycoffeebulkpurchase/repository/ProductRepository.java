@@ -27,6 +27,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.displayName LIKE %?1% AND p.productSubCategory LIKE ?2%")
     List<Product> findAllProductsByProductNameAndSubcategory(String productName, String productSubCat);
 
+    @Query("SELECT DISTINCT p FROM Product p WHERE p.displayName LIKE ?1% AND p.productSubCategory LIKE ?2%")
+    List<Product> getProductByDisplayNameAndSubgroup(String displayName, String subCat);
+
     @Query("SELECT p FROM Product p WHERE " +
             " p.name = :name AND" +
             " p.productCategory = :cat AND" +
@@ -45,14 +48,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query("UPDATE Product p SET p.dateUpdated = :updateDateTime, p.actual = true WHERE" +
             " p.name = :name AND" +
-            " p.displayName = :displayName AND" +
             " p.productCategory = :cat AND" +
             " p.productSubCategory = :subCat AND" +
             " p.productPackage = :pack AND" +
             " p.specialMark = :mark AND" +
             " p.price = :price")
     void update(@Param(value = "name") String name,
-                @Param(value = "displayName") String displayName,
                 @Param(value = "cat") String cat,
                 @Param(value = "subCat") String subCat,
                 @Param(value = "pack") String pack,

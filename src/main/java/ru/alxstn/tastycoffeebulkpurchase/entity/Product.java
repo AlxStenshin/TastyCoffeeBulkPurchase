@@ -21,7 +21,7 @@ public class Product {
     @JsonExclude
     private long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.PERSIST)
     private List<Purchase> purchases = new ArrayList<>();
 
     @Column(name = "name")
@@ -60,9 +60,7 @@ public class Product {
     @JsonExclude
     private boolean actual;
 
-    public Product() {
-
-    }
+    public Product() { }
 
     public Product(String name, Double price, String specialMark, String productPackage, String productGroup, String productSubGroup) {
         this.name = name;

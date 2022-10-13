@@ -43,7 +43,6 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
                 repository.update(product.getName(),
                         product.getProductCategory(),
                         product.getProductSubCategory(),
-                        product.getDisplayName(),
                         product.getProductPackage(),
                         product.getSpecialMark(),
                         product.getPrice(),
