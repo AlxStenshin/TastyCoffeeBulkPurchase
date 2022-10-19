@@ -22,9 +22,9 @@ import java.util.List;
 
 
 @Component
-public class SetProductPackageCommandHandler extends CallbackUpdateHandler<SetProductPackageCommandDto> {
+public class SetProductPackageUpdateHandler extends CallbackUpdateHandler<SetProductPackageCommandDto> {
 
-    Logger logger = LogManager.getLogger(SetProductPackageCommandHandler.class);
+    Logger logger = LogManager.getLogger(SetProductPackageUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
     private final DtoSerializer serializer;
@@ -32,7 +32,7 @@ public class SetProductPackageCommandHandler extends CallbackUpdateHandler<SetPr
     @Autowired
     private DtoDeserializer deserializer;
 
-    public SetProductPackageCommandHandler(ApplicationEventPublisher publisher, ProductRepository productRepository, DtoSerializer serializer) {
+    public SetProductPackageUpdateHandler(ApplicationEventPublisher publisher, ProductRepository productRepository, DtoSerializer serializer) {
         this.publisher = publisher;
         this.productRepository = productRepository;
         this.serializer = serializer;

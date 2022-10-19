@@ -24,9 +24,9 @@ import java.util.List;
 
 
 @Component
-public class SetProductNameCommandHandler extends CallbackUpdateHandler<SetProductNameCommandDto> {
+public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProductNameCommandDto> {
 
-    Logger logger = LogManager.getLogger(SetProductNameCommandHandler.class);
+    Logger logger = LogManager.getLogger(SetProductNameUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
     private final DtoSerializer serializer;
@@ -34,9 +34,9 @@ public class SetProductNameCommandHandler extends CallbackUpdateHandler<SetProdu
     @Autowired
     private DtoDeserializer deserializer;
 
-    public SetProductNameCommandHandler(ApplicationEventPublisher publisher,
-                                        ProductRepository productRepository,
-                                        DtoSerializer serializer) {
+    public SetProductNameUpdateHandler(ApplicationEventPublisher publisher,
+                                       ProductRepository productRepository,
+                                       DtoSerializer serializer) {
         super();
         this.publisher = publisher;
         this.productRepository = productRepository;
