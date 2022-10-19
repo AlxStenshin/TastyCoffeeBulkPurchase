@@ -5,17 +5,16 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductPackageCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 
@@ -56,22 +55,21 @@ public class SetProductNameCommandHandler extends CallbackUpdateHandler<SetProdu
 
     @Override
     protected void handleCallback(Update update, SetProductNameCommandDto dto) {
-        String message = dto.getName();
-        logger.info("Command Received: " + message);
+        String productName = dto.getName();
+        logger.info("Command Received: " + productName);
 
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-        Product targetProduct = productRepository.getProductByDisplayNameAndSubgroup(dto.getName(), dto.getSubCategory()).get(0);
+        Product targetProduct = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory()).get(0);
+        String title = "Выберите параметры для " + targetProduct.getName();
 
-        String title = "Выберите параметры для " +
-                targetProduct.getName() + "\n" +
-                "Из категории товаров " + targetProduct.getProductCategory() + " " +
-                targetProduct.getProductSubCategory();
+        title += targetProduct.getProductCategory().isEmpty() ? "" : "\nИз категории " + targetProduct.getProductCategory();
+        title += targetProduct.getProductSubCategory().isEmpty() ? "" : "\nПодкатегории " + targetProduct.getProductSubCategory();
 
         List<Product> availablePackages = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory());
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
         for (Product p : availablePackages) {
             String callback = serializer.serialize(
-                    new SetProductPackageCommandDto(message, p.getProductPackage(), p.getPrice().toString()));
+                    new SetProductPackageCommandDto(productName, p.getProductPackage(), p.getPrice().toString()));
 
             String packaging = p.getProductPackage().isEmpty() ? "" : p.getProductPackage() + ", ";
             String buttonText = packaging + p.getPrice() + "₽";
@@ -83,12 +81,11 @@ public class SetProductNameCommandHandler extends CallbackUpdateHandler<SetProdu
                             .build()));
         }
 
-        publisher.publishEvent(new SendMessageEvent(this,
-                SendMessage.builder()
-                        .text(title)
-                        .parseMode("html")
-                        .chatId(update.getCallbackQuery().getMessage().getChatId().toString())
-                        .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
-                        .build()));
+        MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
+        answer.setTitle(title);
+        answer.setBackButtonCallback(serializer.serialize(dto));
+        answer.setButtons(buttons);
+
+        publisher.publishEvent(new UpdateMessageEvent(this, answer.updatePrevious()));
     }
 }

@@ -27,10 +27,6 @@ public class Product {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "display_name")
-    @JsonExclude
-    private String displayName;
-
     @CreationTimestamp
     @Column(name = "date_created", updatable = false, nullable = false)
     @JsonExclude
@@ -126,14 +122,6 @@ public class Product {
 
     public void setActual(boolean actual) {
         this.actual = actual;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public List<Purchase> getPurchases() {

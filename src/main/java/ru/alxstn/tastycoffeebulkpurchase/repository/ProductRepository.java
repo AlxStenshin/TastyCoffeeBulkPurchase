@@ -18,17 +18,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT DISTINCT productCategory FROM Product")
     List<String> findAllCategories();
 
-    @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory LIKE ?1%")
+    @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory = ?1")
     List<String> findAllSubCategories(String category);
 
-    @Query("SELECT DISTINCT p.displayName FROM Product p WHERE p.productSubCategory LIKE ?1%")
-    List<String> findDistinctProductDisplayNamesBySubCategory(String subCategory);
+    @Query("SELECT DISTINCT p.name FROM Product p WHERE p.productSubCategory = ?1")
+    List<String> findDistinctProductNamesBySubCategory(String subCategory);
 
-    @Query("SELECT p FROM Product p WHERE p.displayName LIKE %?1% AND p.productSubCategory LIKE ?2%")
+    @Query("SELECT p FROM Product p WHERE p.name = ?1 AND p.productSubCategory = ?2")
     List<Product> findAllProductsByProductNameAndSubcategory(String productName, String productSubCat);
-
-    @Query("SELECT DISTINCT p FROM Product p WHERE p.displayName LIKE ?1% AND p.productSubCategory LIKE ?2%")
-    List<Product> getProductByDisplayNameAndSubgroup(String displayName, String subCat);
 
     @Query("SELECT p FROM Product p WHERE " +
             " p.name = :name AND" +

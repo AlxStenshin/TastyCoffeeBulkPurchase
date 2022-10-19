@@ -8,7 +8,6 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.PriceListSaverService;
-import ru.alxstn.tastycoffeebulkpurchase.service.ProductNameShortener;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.List;
@@ -19,13 +18,11 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
 
     private final ProductRepository repository;
     private final DateTimeProvider dateTimeProvider;
-    private final ProductNameShortener productNameShortener;
 
     public PriceListDatabaseSaverService(ProductRepository repository,
-                                         DateTimeProvider dateTimeProvider, ProductNameShortener productNameShortener) {
+                                         DateTimeProvider dateTimeProvider) {
         this.repository = repository;
         this.dateTimeProvider = dateTimeProvider;
-        this.productNameShortener = productNameShortener;
     }
 
     @EventListener
@@ -34,7 +31,6 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
         repository.markAllNotActual();
 
         List<Product> toSave = event.getPriceList();
-        toSave.forEach(p -> p.setDisplayName(productNameShortener.getShortName(p)));
 
         for (var product : toSave) {
             if (repository.productExists(product.getName(), product.getProductCategory(), product.getProductSubCategory(),
