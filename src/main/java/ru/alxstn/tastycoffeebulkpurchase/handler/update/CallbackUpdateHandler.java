@@ -30,6 +30,7 @@ public abstract class CallbackUpdateHandler <T extends SerializableInlineObject>
         if (callbackQuery == null || callbackQuery.getMessage() == null) {
             return false;
         }
+
         String data = callbackQuery.getData();
         Optional<T> dto = deserializer.deserialize(data, getDtoType());
 

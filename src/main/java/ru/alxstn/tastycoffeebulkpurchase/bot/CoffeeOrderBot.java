@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TelegramBotConfigProperties;
+import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
@@ -71,6 +72,14 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
 
     @EventListener
     public void updateMessage(UpdateMessageEvent event) {
+        try {
+            execute(event.getMessage());
+        } catch (TelegramApiException e) {
+            logger.error(e.getMessage());
+        }
+    }
+    @EventListener
+    public void updateMessage(AlertMessageEvent event) {
         try {
             execute(event.getMessage());
         } catch (TelegramApiException e) {

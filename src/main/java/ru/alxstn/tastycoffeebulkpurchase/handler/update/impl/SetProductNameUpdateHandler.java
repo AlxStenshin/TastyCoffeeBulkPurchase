@@ -69,7 +69,7 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
 
         for (Product p : availablePackages) {
             String callback = serializer.serialize(
-                    new SetProductPackageCommandDto(productName, p.getProductPackage(), p.getPrice().toString()));
+                    new SetProductPackageCommandDto(p.getId(), p.getName(), p.getProductPackage(), p.getPrice().toString()));
 
             String packaging = p.getProductPackage().isEmpty() ? "" : p.getProductPackage() + ", ";
             String buttonText = packaging + p.getPrice() + "₽";

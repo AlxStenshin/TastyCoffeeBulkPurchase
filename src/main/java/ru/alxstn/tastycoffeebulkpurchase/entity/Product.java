@@ -68,6 +68,10 @@ public class Product {
         this.actual = true;
     }
 
+    public long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }

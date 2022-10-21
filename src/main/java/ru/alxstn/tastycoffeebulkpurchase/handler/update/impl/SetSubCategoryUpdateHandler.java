@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetSubCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductSubCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
@@ -18,7 +18,7 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 
 @Component
-public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetSubCategoryCommandDto> {
+public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProductSubCategoryCommandDto> {
 
     Logger logger = LogManager.getLogger(SetSubCategoryUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
@@ -37,8 +37,8 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetSubCat
     }
 
     @Override
-    protected Class<SetSubCategoryCommandDto> getDtoType() {
-        return SetSubCategoryCommandDto.class;
+    protected Class<SetProductSubCategoryCommandDto> getDtoType() {
+        return SetProductSubCategoryCommandDto.class;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetSubCat
     }
 
     @Override
-    protected void handleCallback(Update update, SetSubCategoryCommandDto dto) {
+    protected void handleCallback(Update update, SetProductSubCategoryCommandDto dto) {
 
         String targetCategory = dto.getMessage();
         logger.info("command received " + targetCategory);

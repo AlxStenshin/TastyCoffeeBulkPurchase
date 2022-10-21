@@ -5,6 +5,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 
 public class SetProductPackageCommandDto extends SerializableInlineObject {
 
+    private long productId;
+
     private String name;
 
     private String packaging;
@@ -15,27 +17,17 @@ public class SetProductPackageCommandDto extends SerializableInlineObject {
         super(SerializableInlineType.SET_PACKAGING);
     }
 
-    public SetProductPackageCommandDto(String name, String packaging, String cost) {
+    public SetProductPackageCommandDto(long productId, String name, String packaging, String cost) {
         this();
+        this.productId = productId;
         this.name = name;
         this.packaging = packaging;
         this.cost = cost;
     }
 
-    public String getPackaging() {
-        return packaging;
+    public long getProductId() {
+        return productId;
     }
 
-    public void setPackaging(String packaging) {
-        this.packaging = packaging;
-    }
-
-    public String getCost() {
-        return cost;
-    }
-
-    public void setCost(String cost) {
-        this.cost = cost;
-    }
 
 }

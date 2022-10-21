@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetSubCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductSubCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
@@ -18,7 +18,7 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 
 @Component
-public class SetCategoryUpdateHandler extends CallbackUpdateHandler<SetCategoryCommandDto> {
+public class SetCategoryUpdateHandler extends CallbackUpdateHandler<SetProductCategoryCommandDto> {
 
     Logger logger = LogManager.getLogger(SetCategoryUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
@@ -37,8 +37,8 @@ public class SetCategoryUpdateHandler extends CallbackUpdateHandler<SetCategoryC
     }
 
     @Override
-    protected Class<SetCategoryCommandDto> getDtoType() {
-        return SetCategoryCommandDto.class;
+    protected Class<SetProductCategoryCommandDto> getDtoType() {
+        return SetProductCategoryCommandDto.class;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SetCategoryUpdateHandler extends CallbackUpdateHandler<SetCategoryC
     }
 
     @Override
-    protected void handleCallback(Update update, SetCategoryCommandDto dto) {
+    protected void handleCallback(Update update, SetProductCategoryCommandDto dto) {
 
         String message = dto.getMessage();
         logger.info("command received " + message);
@@ -58,7 +58,7 @@ public class SetCategoryUpdateHandler extends CallbackUpdateHandler<SetCategoryC
         answer.setBackButtonCallback(serializer.serialize(dto));
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
-                .callbackData(serializer.serialize(new SetSubCategoryCommandDto(s)))
+                .callbackData(serializer.serialize(new SetProductSubCategoryCommandDto(s)))
                 .build());
 
         publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));

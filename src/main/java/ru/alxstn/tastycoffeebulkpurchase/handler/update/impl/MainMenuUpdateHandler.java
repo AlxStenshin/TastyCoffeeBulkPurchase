@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
@@ -59,7 +59,7 @@ public class MainMenuUpdateHandler extends CallbackUpdateHandler<MainMenuCommand
         answer.setBackButtonCallback(serializer.serialize(dto));
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
-                .callbackData(serializer.serialize(new SetCategoryCommandDto(s)))
+                .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s)))
                 .build());
 
         publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));

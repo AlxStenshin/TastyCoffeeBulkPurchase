@@ -5,7 +5,6 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 
 public class MainMenuCommandDto extends SerializableInlineObject {
 
-
     private String message;
 
     public MainMenuCommandDto() {

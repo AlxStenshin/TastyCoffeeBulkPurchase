@@ -3,15 +3,15 @@ package ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 
-public class SetCategoryCommandDto extends SerializableInlineObject {
+public class SetProductCategoryCommandDto extends SerializableInlineObject {
 
     private String message;
 
-    public SetCategoryCommandDto() {
+    public SetProductCategoryCommandDto() {
         super(SerializableInlineType.SET_CATEGORY);
     }
 
-    public SetCategoryCommandDto(String message) {
+    public SetProductCategoryCommandDto(String message) {
         this();
         this.message = message;
     }

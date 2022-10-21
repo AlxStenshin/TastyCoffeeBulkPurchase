@@ -7,8 +7,9 @@ public enum SerializableInlineType {
     SET_PRODUCT_NAME(3),
 
     SET_PACKAGING(4),
-    ADD_PRODUCT(5),
-    REMOVE_PRODUCT(6),
+    ADD_PURCHASE(5),
+    REMOVE_PURCHASE(6),
+    EDIT_PRODUCT_QUANTITY(7),
     ;
 
     private final int index;
