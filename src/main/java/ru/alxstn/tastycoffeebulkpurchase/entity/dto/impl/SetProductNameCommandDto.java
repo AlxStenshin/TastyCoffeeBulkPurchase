@@ -12,10 +12,11 @@ public class SetProductNameCommandDto extends SerializableInlineObject {
         super(SerializableInlineType.SET_PRODUCT_NAME);
     }
 
-    public SetProductNameCommandDto(String name, String subCategory) {
+    public SetProductNameCommandDto(String name, String subCategory, SerializableInlineObject previous) {
         this();
         this.name = name;
         this.subCategory = subCategory;
+        this.setPrevious(previous);
     }
 
     public String getName() {

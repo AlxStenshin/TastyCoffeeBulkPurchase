@@ -11,9 +11,10 @@ public class SetProductSubCategoryCommandDto extends SerializableInlineObject {
         super(SerializableInlineType.SET_SUBCATEGORY);
     }
 
-    public SetProductSubCategoryCommandDto(String message) {
+    public SetProductSubCategoryCommandDto(String message, SerializableInlineObject previous) {
         this();
         this.message = message;
+        this.setPrevious(previous);
     }
 
     public String getMessage() {

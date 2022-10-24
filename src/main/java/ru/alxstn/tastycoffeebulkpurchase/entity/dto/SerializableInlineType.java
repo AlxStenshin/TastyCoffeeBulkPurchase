@@ -13,7 +13,6 @@ public enum SerializableInlineType {
     ;
 
     private final int index;
-    //private final String description;
 
     SerializableInlineType(int index) {
         this.index = index;

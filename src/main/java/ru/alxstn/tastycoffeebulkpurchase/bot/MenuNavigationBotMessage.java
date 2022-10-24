@@ -12,11 +12,14 @@ import java.util.List;
 import java.util.function.Function;
 
 public class MenuNavigationBotMessage {
+
     private final Update update;
     private List<String> dataSource;
     private String title;
     private Function<String, InlineKeyboardButton> buttonCreator;
     private String backButtonCallback;
+    private String mainMenuButtonCallback;
+    private String selectProductCategoryButtonCallback;
 
     private List<List<InlineKeyboardButton>> buttons;
 
@@ -39,6 +42,14 @@ public class MenuNavigationBotMessage {
 
     public void setBackButtonCallback(String backButtonCallback) {
         this.backButtonCallback = backButtonCallback;
+    }
+
+    public void setMainMenuButtonCallback(String mainMenuButtonCallback) {
+        this.mainMenuButtonCallback = mainMenuButtonCallback;
+    }
+
+    public void setSelectProductCategoryButtonCallback(String selectProductCategoryButtonCallback) {
+        this.selectProductCategoryButtonCallback = selectProductCategoryButtonCallback;
     }
 
     public void setButtons(List<List<InlineKeyboardButton>> buttons) {
@@ -72,12 +83,29 @@ public class MenuNavigationBotMessage {
             }
         }
 
-        if (!backButtonCallback.isEmpty())
-            buttons.add(Collections.singletonList(
-                    InlineKeyboardButton.builder()
+        List<InlineKeyboardButton> serviceButtonsRow = new ArrayList<>();
+        if (backButtonCallback != null) {
+            serviceButtonsRow.add(InlineKeyboardButton.builder()
                             .text("< Назад")
                             .callbackData(backButtonCallback)
-                            .build()));
+                            .build());
+        }
+
+        if (selectProductCategoryButtonCallback != null) {
+            serviceButtonsRow.add(InlineKeyboardButton.builder()
+                            .text("Выбрать категорию")
+                            .callbackData(selectProductCategoryButtonCallback)
+                            .build());
+        }
+
+        if (mainMenuButtonCallback != null) {
+            serviceButtonsRow.add(InlineKeyboardButton.builder()
+                            .text("Главное меню")
+                            .callbackData(mainMenuButtonCallback)
+                            .build());
+        }
+
+        buttons.add(serviceButtonsRow);
 
         int maxLen = buttons.stream()
                 .flatMap(List::stream)

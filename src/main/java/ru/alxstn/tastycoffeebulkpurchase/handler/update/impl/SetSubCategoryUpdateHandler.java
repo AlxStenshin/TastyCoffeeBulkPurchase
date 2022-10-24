@@ -50,15 +50,15 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
     protected void handleCallback(Update update, SetProductSubCategoryCommandDto dto) {
 
         String targetCategory = dto.getMessage();
-        logger.info("command received " + targetCategory);
+        logger.info("Command Received: Set Product SubCategory " + targetCategory);
 
         MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
         answer.setTitle("Выберите продукт: ");
         answer.setDataSource(productRepository.findDistinctProductNamesBySubCategory(targetCategory));
-        answer.setBackButtonCallback(serializer.serialize(dto));
+        answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
-                .callbackData(serializer.serialize(new SetProductNameCommandDto(s, targetCategory)))
+                .callbackData(serializer.serialize(new SetProductNameCommandDto(s, targetCategory, dto)))
                 .build());
 
         publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));

@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductSubCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
@@ -18,48 +18,48 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 
 @Component
-public class MainMenuUpdateHandler extends CallbackUpdateHandler<MainMenuCommandDto> {
+public class SetProductCategoryUpdateHandler extends CallbackUpdateHandler<SetProductCategoryCommandDto> {
 
-    Logger logger = LogManager.getLogger(MainMenuUpdateHandler.class);
+    Logger logger = LogManager.getLogger(SetProductCategoryUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
     private final DtoSerializer serializer;
 
     @Autowired
-    private  DtoDeserializer deserializer;
+    private DtoDeserializer deserializer;
 
-    public MainMenuUpdateHandler(ApplicationEventPublisher publisher,
-                                 ProductRepository productRepository,
-                                 DtoSerializer serializer){
-        super();
+    public SetProductCategoryUpdateHandler(ApplicationEventPublisher publisher,
+                                           ProductRepository productRepository,
+                                           DtoSerializer serializer) {
         this.publisher = publisher;
         this.productRepository = productRepository;
         this.serializer = serializer;
     }
 
     @Override
-    protected Class<MainMenuCommandDto> getDtoType() {
-        return MainMenuCommandDto.class;
+    protected Class<SetProductCategoryCommandDto> getDtoType() {
+        return SetProductCategoryCommandDto.class;
     }
 
     @Override
     protected SerializableInlineType getSerializableType() {
-        return SerializableInlineType.SET_MAIN_COMMAND;
+        return SerializableInlineType.SET_CATEGORY;
     }
 
     @Override
-    protected void handleCallback(Update update, MainMenuCommandDto dto) {
+    protected void handleCallback(Update update, SetProductCategoryCommandDto dto) {
 
         String message = dto.getMessage();
-        logger.info("Command received " + message);
+        logger.info("Command received: Set Product Category " + message);
 
         MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
-        answer.setTitle("Выберите категорию: ");
-        answer.setDataSource(productRepository.findAllCategories());
-        answer.setBackButtonCallback(serializer.serialize(dto));
+        answer.setTitle("Выберите подкатегорию: ");
+        answer.setDataSource(productRepository.findAllSubCategories(message));
+        answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
+
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
-                .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s)))
+                .callbackData(serializer.serialize(new SetProductSubCategoryCommandDto(s, dto)))
                 .build());
 
         publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));

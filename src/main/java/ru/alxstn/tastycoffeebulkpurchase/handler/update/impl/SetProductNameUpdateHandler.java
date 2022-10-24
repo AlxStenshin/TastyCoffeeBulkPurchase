@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductPackageCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
@@ -59,7 +60,7 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         logger.info("Command Received: " + productName);
 
         Product targetProduct = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory()).get(0);
-        String title = "Выберите параметры для " + targetProduct.getName();
+        String title = "Выберите параметры для \n" + targetProduct.getName();
 
         title += targetProduct.getProductCategory().isEmpty() ? "" : "\nИз категории " + targetProduct.getProductCategory();
         title += targetProduct.getProductSubCategory().isEmpty() ? "" : "\nПодкатегории " + targetProduct.getProductSubCategory();
@@ -83,7 +84,8 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
 
         MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
         answer.setTitle(title);
-        answer.setBackButtonCallback(serializer.serialize(dto));
+        answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
+        answer.setSelectProductCategoryButtonCallback(serializer.serialize(new MainMenuCommandDto("PlaceOrder")));
         answer.setButtons(buttons);
 
         publisher.publishEvent(new UpdateMessageEvent(this, answer.updatePrevious()));

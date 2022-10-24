@@ -12,6 +12,8 @@ public class SerializableInlineObject implements Serializable {
 
     private int index;
 
+    private SerializableInlineObject previous;
+
     public SerializableInlineObject(SerializableInlineType type) {
         this.index = type.getIndex();
     }
@@ -30,6 +32,14 @@ public class SerializableInlineObject implements Serializable {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public SerializableInlineObject getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(SerializableInlineObject previous) {
+        this.previous = previous;
     }
 
     @Override

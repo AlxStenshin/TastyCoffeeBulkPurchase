@@ -78,6 +78,7 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
             logger.error(e.getMessage());
         }
     }
+
     @EventListener
     public void updateMessage(AlertMessageEvent event) {
         try {
