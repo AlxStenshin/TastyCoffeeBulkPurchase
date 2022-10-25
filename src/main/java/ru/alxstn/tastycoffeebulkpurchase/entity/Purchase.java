@@ -29,6 +29,16 @@ public class Purchase {
     @Column(name = "count")
     private Integer count;
 
+    public Purchase() { }
+
+    public Purchase(Customer customer, Product product, Session session, String productForm, Integer count) {
+        this.customer = customer;
+        this.product = product;
+        this.session = session;
+        this.productForm = productForm;
+        this.count = count;
+    }
+
     public Long getId() {
         return id;
     }

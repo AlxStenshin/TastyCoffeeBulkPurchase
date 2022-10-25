@@ -23,4 +23,19 @@ public class SavePurchaseCommandDto extends SerializableInlineObject {
         this.productForm = productForm;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
+    public long getCustomerId() {
+        return customerId;
+    }
+
+    public int getProductCount() {
+        return productCount;
+    }
+
+    public String getProductForm() {
+        return productForm;
+    }
 }
