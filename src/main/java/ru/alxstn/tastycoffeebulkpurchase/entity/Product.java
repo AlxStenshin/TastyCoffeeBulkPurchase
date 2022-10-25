@@ -21,7 +21,8 @@ public class Product {
     @JsonExclude
     private long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product", cascade = CascadeType.PERSIST)
+    @JsonExclude
     private List<Purchase> purchases = new ArrayList<>();
 
     @Column(name = "name")
@@ -55,16 +56,27 @@ public class Product {
     @Column(name = "actual")
     @JsonExclude
     private boolean actual;
+    
+    @Column(name = "grindable")
+    @JsonExclude
+    private boolean grindable;
 
     public Product() { }
 
-    public Product(String name, Double price, String specialMark, String productPackage, String productGroup, String productSubGroup) {
+    public Product(String name,
+                   Double price,
+                   String specialMark,
+                   String productPackage,
+                   String productGroup,
+                   String productSubGroup,
+                   boolean grindable) {
         this.name = name;
         this.price = price;
         this.specialMark = specialMark;
         this.productPackage = productPackage;
         this.productCategory = productGroup;
         this.productSubCategory = productSubGroup;
+        this.grindable = grindable;
         this.actual = true;
     }
 
@@ -128,9 +140,18 @@ public class Product {
         this.actual = actual;
     }
 
+    public boolean isGrindable() {
+        return grindable;
+    }
+
+    public void setGrindable(boolean grindable) {
+        this.grindable = grindable;
+    }
+
     public List<Purchase> getPurchases() {
         return purchases;
     }
+
 
     public void setPurchases(List<Purchase> purchases) {
         this.purchases = purchases;
@@ -176,6 +197,7 @@ public class Product {
         private String specialMark;
         private String name;
         private Double price;
+        private boolean grindable;
 
         public ProductBuilder() {}
 
@@ -209,8 +231,13 @@ public class Product {
             return this;
         }
 
+        public ProductBuilder setGrindable(boolean grindable) {
+            this.grindable = grindable;
+            return this;
+        }
+
         public Product build() {
-            return new Product(name, price, specialMark, pack, group, subgroup);
+            return new Product(name, price, specialMark, pack, group, subgroup, grindable);
         }
     }
 }

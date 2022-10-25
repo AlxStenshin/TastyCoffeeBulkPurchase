@@ -139,32 +139,37 @@ public class TastyCoffeePage {
                         productBuilder.setSpecialMark("");
                     }
 
-                    ArrayList<SelenideElement> prices = new ArrayList<>();
-                    prices.addAll(tableRow.findAll(By.cssSelector("td.price-count-1")));
-                    prices.addAll(tableRow.findAll(By.cssSelector("td.price-count-2")));
+                    ArrayList<SelenideElement> products = new ArrayList<>(tableRow.findAll(By.cssSelector("td.price-count-1")));
+                    productBuilder.setGrindable(false);
+                    addProducts(categoryProducts, productBuilder, products);
 
-                    for (var productPriceTableCell : prices) {
-                        try {
-                            var price = getPriceFromTableCell(Objects.requireNonNull(
-                                    productPriceTableCell.find("div.coffee-week-price")
-                                            .getAttribute("innerHTML")));
-                            productBuilder.setPrice(price);
-                            var pack = productPriceTableCell.find("samp.mob")
-                                    .getAttribute("innerHTML");
-                            productBuilder.setPackage(pack);
-
-                            publisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
-                            categoryProducts.add(productBuilder.build());
-                        } catch (RuntimeException e) {
-                           logger.error("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
-                        }
-                    }
+                    ArrayList<SelenideElement> grindableProducts = new ArrayList<>(tableRow.findAll(By.cssSelector("td.price-count-2")));
+                    productBuilder.setGrindable(true);
+                    addProducts(categoryProducts, productBuilder, grindableProducts);
                 }
             }
         }
 
         logger.info("Price List Parsing Complete! Found: " + categoryProducts.size() + " items.");
         return categoryProducts;
+    }
+
+    private void addProducts(List<Product> categoryProducts, Product.ProductBuilder productBuilder, ArrayList<SelenideElement> products) {
+        for (var productPriceTableCell : products) {
+            try {
+                var price = getPriceFromTableCell(Objects.requireNonNull(
+                        productPriceTableCell.find("div.coffee-week-price").getAttribute("innerHTML")));
+                productBuilder.setPrice(price);
+
+                var pack = productPriceTableCell.find("samp.mob").getAttribute("innerHTML");
+                productBuilder.setPackage(pack);
+
+                publisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
+                categoryProducts.add(productBuilder.build());
+            } catch (RuntimeException e) {
+                logger.error("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
+            }
+        }
     }
 
     double getPriceFromTableCell(String src) {

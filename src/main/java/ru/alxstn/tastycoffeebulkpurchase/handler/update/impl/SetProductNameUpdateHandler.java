@@ -11,8 +11,8 @@ import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductPackageCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
@@ -57,20 +57,20 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
     @Override
     protected void handleCallback(Update update, SetProductNameCommandDto dto) {
         String productName = dto.getName();
-        logger.info("Command Received: " + productName);
+        logger.info("Set Product Name Command Received: " + productName);
 
-        Product targetProduct = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory()).get(0);
+        Product targetProduct = productRepository.findAllActiveProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory()).get(0);
         String title = "Выберите параметры для \n" + targetProduct.getName();
 
         title += targetProduct.getProductCategory().isEmpty() ? "" : "\nИз категории " + targetProduct.getProductCategory();
         title += targetProduct.getProductSubCategory().isEmpty() ? "" : "\nПодкатегории " + targetProduct.getProductSubCategory();
 
-        List<Product> availablePackages = productRepository.findAllProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory());
+        List<Product> availablePackages = productRepository.findAllActiveProductsByProductNameAndSubcategory(
+                dto.getName(), dto.getSubCategory());
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
         for (Product p : availablePackages) {
-            String callback = serializer.serialize(
-                    new SetProductPackageCommandDto(p.getId(), p.getName(), p.getProductPackage(), p.getPrice().toString()));
+            String callback = serializer.serialize(new SetProductQuantityCommandDto(p, 1, dto));
 
             String packaging = p.getProductPackage().isEmpty() ? "" : p.getProductPackage() + ", ";
             String buttonText = packaging + p.getPrice() + "₽";

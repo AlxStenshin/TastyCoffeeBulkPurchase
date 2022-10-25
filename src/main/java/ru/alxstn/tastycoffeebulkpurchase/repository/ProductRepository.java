@@ -15,17 +15,17 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT DISTINCT productCategory FROM Product")
-    List<String> findAllCategories();
+    @Query("SELECT DISTINCT productCategory FROM Product WHERE actual = true")
+    List<String> findAllActiveCategories();
 
-    @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory = ?1")
-    List<String> findAllSubCategories(String category);
+    @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory = ?1 AND actual = true")
+    List<String> findAllActiveSubCategories(String category);
 
-    @Query("SELECT DISTINCT p.name FROM Product p WHERE p.productSubCategory = ?1")
-    List<String> findDistinctProductNamesBySubCategory(String subCategory);
+    @Query("SELECT DISTINCT p.name FROM Product p WHERE p.productSubCategory = ?1 AND p.actual = true")
+    List<String> findDistinctActiveProductNamesBySubCategory(String subCategory);
 
-    @Query("SELECT p FROM Product p WHERE p.name = ?1 AND p.productSubCategory = ?2")
-    List<Product> findAllProductsByProductNameAndSubcategory(String productName, String productSubCat);
+    @Query("SELECT p FROM Product p WHERE p.name = ?1 AND p.productSubCategory = ?2 AND p.actual = true")
+    List<Product> findAllActiveProductsByProductNameAndSubcategory(String productName, String productSubCat);
 
     @Query("SELECT p FROM Product p WHERE " +
             " p.name = :name AND" +
@@ -33,7 +33,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             " p.productSubCategory = :subCat AND" +
             " p.productPackage = :pack AND" +
             " p.specialMark = :mark AND" +
-            " p.price = :price")
+            " p.price = :price"
+    )
     Optional<Product> productExists(@Param(value = "name") String name,
                                     @Param(value = "cat") String cat,
                                     @Param(value = "subCat") String subCat,
@@ -49,7 +50,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             " p.productSubCategory = :subCat AND" +
             " p.productPackage = :pack AND" +
             " p.specialMark = :mark AND" +
-            " p.price = :price")
+            " p.price = :price"
+    )
     void update(@Param(value = "name") String name,
                 @Param(value = "cat") String cat,
                 @Param(value = "subCat") String subCat,

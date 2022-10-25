@@ -55,7 +55,7 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<MainMenuComma
 
         MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
         answer.setTitle("Выберите категорию: ");
-        answer.setDataSource(productRepository.findAllCategories());
+        answer.setDataSource(productRepository.findAllActiveCategories());
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
                 .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,

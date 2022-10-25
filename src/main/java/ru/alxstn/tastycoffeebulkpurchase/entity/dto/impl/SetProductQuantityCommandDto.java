@@ -1,30 +1,48 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl;
 
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 
 public class SetProductQuantityCommandDto extends SerializableInlineObject {
 
-    private long productId;
+    private Product targetProduct;
     private int productQuantity;
-    private String productForm;
+    private String productForm = "";
 
     public SetProductQuantityCommandDto() {
         super(SerializableInlineType.EDIT_PRODUCT_QUANTITY);
     }
 
-    public SetProductQuantityCommandDto(long productId, int productQuantity) {
+    public SetProductQuantityCommandDto(Product product, int productQuantity, SerializableInlineObject previous) {
         this();
-        this.productId = productId;
+        this.targetProduct = product;
         this.productQuantity = productQuantity;
+        this.setPrevious(previous);
     }
 
-    public long getProductId() {
-        return productId;
+    public SetProductQuantityCommandDto(SetProductQuantityCommandDto dto, int productQuantity) {
+        this();
+        this.targetProduct = dto.getTargetProduct();
+        this.productForm = dto.getProductForm();
+        this.productQuantity = productQuantity;
+        this.setPrevious(dto.getPrevious());
     }
 
-    public void setProductId(long productId) {
-        this.productId = productId;
+    public SetProductQuantityCommandDto(SetProductQuantityCommandDto dto, String form) {
+        this();
+        this.targetProduct = dto.getTargetProduct();
+        this.productQuantity = dto.getProductQuantity();
+        this.productForm = form;
+        this.setPrevious(dto.getPrevious());
+    }
+
+    public Product getTargetProduct() {
+        return targetProduct;
+    }
+
+    public void setTargetProduct(Product targetProduct) {
+        this.targetProduct = targetProduct;
     }
 
     public int getProductQuantity() {

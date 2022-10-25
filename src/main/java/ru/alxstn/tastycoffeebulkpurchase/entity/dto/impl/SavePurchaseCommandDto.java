@@ -1,12 +1,13 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl;
 
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 
 public class SavePurchaseCommandDto extends SerializableInlineObject {
 
     private long customerId;
-    private long productId;
+    private Product product;
     private int productCount;
     private String productForm;
 
@@ -14,10 +15,10 @@ public class SavePurchaseCommandDto extends SerializableInlineObject {
         super(SerializableInlineType.ADD_PURCHASE);
     }
 
-    public SavePurchaseCommandDto(long customerId, long productId, int productCount, String productForm) {
+    public SavePurchaseCommandDto(long customerId, Product product, int productCount, String productForm) {
         this();
         this.customerId = customerId;
-        this.productId = productId;
+        this.product = product;
         this.productCount = productCount;
         this.productForm = productForm;
     }

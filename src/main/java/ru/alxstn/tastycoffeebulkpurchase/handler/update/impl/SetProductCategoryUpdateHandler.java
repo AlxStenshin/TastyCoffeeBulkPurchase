@@ -54,7 +54,7 @@ public class SetProductCategoryUpdateHandler extends CallbackUpdateHandler<SetPr
 
         MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
         answer.setTitle("Выберите подкатегорию: ");
-        answer.setDataSource(productRepository.findAllSubCategories(message));
+        answer.setDataSource(productRepository.findAllActiveSubCategories(message));
         answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
 
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
