@@ -60,7 +60,7 @@ public class MenuNavigationBotMessage {
         prepareMessage();
         return SendMessage.builder()
                 .text(title)
-                .chatId(update.getCallbackQuery().getMessage().getChatId().toString())
+                .chatId(update.getMessage().getChatId().toString())
                 .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
                 .build();
     }

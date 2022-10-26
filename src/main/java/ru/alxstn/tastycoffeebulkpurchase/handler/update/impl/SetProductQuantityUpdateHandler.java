@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.PlaceOrderCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
@@ -91,23 +91,23 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
 
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("") ? "Зерно *" : "Зерно")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "")))
+                    .text(currentForm.equals("Зерно") ? "Зерно *" : "Зерно")
+                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Зерно")))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Coarse") ? "Крупный *" : "Крупный")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Coarse")))
+                    .text(currentForm.equals("Крупный") ? "Крупный *" : "Крупный")
+                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Крупный")))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Medium") ? "Средний *" : "Средний")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Medium")))
+                    .text(currentForm.equals("Средний") ? "Средний *" : "Средний")
+                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Средний")))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Fine") ? "Мелкий *" : "Мелкий")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Fine")))
+                    .text(currentForm.equals("Мелкий") ? "Мелкий *" : "Мелкий")
+                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Мелкий")))
                     .build());
 
             keyboardRows.add(productFormButtons);
@@ -121,12 +121,12 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
 
         menuNavigationButtons.add(InlineKeyboardButton.builder()
                 .text("Выбрать категорию")
-                .callbackData(serializer.serialize(new MainMenuCommandDto("PlaceOrder")))
+                .callbackData(serializer.serialize(new PlaceOrderCommandDto("PlaceOrder")))
                 .build());
 
         menuNavigationButtons.add(InlineKeyboardButton.builder()
                 .text("Главное меню")
-                .callbackData(serializer.serialize(new MainMenuCommandDto("PlaceOrder")))
+                .callbackData(serializer.serialize(new PlaceOrderCommandDto("PlaceOrder")))
                 .build());
 
         keyboardRows.add(menuNavigationButtons);

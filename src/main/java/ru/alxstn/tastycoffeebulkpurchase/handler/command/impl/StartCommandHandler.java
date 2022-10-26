@@ -5,20 +5,19 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import ru.alxstn.tastycoffeebulkpurchase.bot.MainMenuKeyboard;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
 @Component
 public class StartCommandHandler implements CommandHandler {
@@ -51,39 +50,33 @@ public class StartCommandHandler implements CommandHandler {
             customer.setUserName(message.getChat().getUserName());
             repository.save(customer);
         }
-
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
-
-        buttons.add(Collections.singletonList(
-                InlineKeyboardButton.builder()
-                        .text("Собрать заказ")
-                        .callbackData(serializer.serialize(new MainMenuCommandDto("PlaceOrder")))
-                        .build()));
-
-        buttons.add(Collections.singletonList(
-                InlineKeyboardButton.builder()
-                        .text("Просмотреть заказ")
-                        .callbackData(serializer.serialize(new MainMenuCommandDto("ViewOrder")))
-                        .build()));
-
-        buttons.add(Collections.singletonList(
-                InlineKeyboardButton.builder()
-                        .text("Настройки")
-                        .callbackData(serializer.serialize(new MainMenuCommandDto("Settings")))
-                        .build()));
-
-        buttons.add(Collections.singletonList(
-                InlineKeyboardButton.builder()
-                        .text("Статистика")
-                        .callbackData(serializer.serialize(new MainMenuCommandDto("ViewStats")))
-                        .build()));
-
         publisher.publishEvent(new SendMessageEvent(this,
                 SendMessage.builder()
                         .text(welcomeMessage + ", " +
                                 message.getChat().getFirstName() + " " +
                                 message.getChat().getLastName() + "!")
-                        .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
+                        .replyMarkup(
+                                ReplyKeyboardMarkup.builder()
+                                        .resizeKeyboard(true)
+                                        .keyboardRow(
+                                                new KeyboardRow(
+                                                        Arrays.asList(
+                                                                KeyboardButton.builder()
+                                                                        .text(MainMenuKeyboard.PLACE_ORDER.getLabel())
+                                                                        .build(),
+                                                                KeyboardButton.builder()
+                                                                        .text(MainMenuKeyboard.SETTING.getLabel())
+                                                                        .build())))
+                                        .keyboardRow(
+                                                new KeyboardRow(
+                                                        Arrays.asList(
+                                                                KeyboardButton.builder()
+                                                                        .text(MainMenuKeyboard.EDIT_ORDER.getLabel())
+                                                                        .build(),
+                                                                KeyboardButton.builder()
+                                                                        .text(MainMenuKeyboard.STATISTIC.getLabel())
+                                                                        .build())))
+                                        .build())
                         .chatId(message.getChatId().toString())
                         .parseMode("html")
                         .build()));

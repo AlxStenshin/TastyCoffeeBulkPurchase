@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.MainMenuCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.PlaceOrderCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductCategoryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
@@ -18,7 +18,7 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 
 @Component
-public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<MainMenuCommandDto> {
+public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<PlaceOrderCommandDto> {
 
     Logger logger = LogManager.getLogger(PlaceOrderUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
@@ -38,8 +38,8 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<MainMenuComma
     }
 
     @Override
-    protected Class<MainMenuCommandDto> getDtoType() {
-        return MainMenuCommandDto.class;
+    protected Class<PlaceOrderCommandDto> getDtoType() {
+        return PlaceOrderCommandDto.class;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<MainMenuComma
     }
 
     @Override
-    protected void handleCallback(Update update, MainMenuCommandDto dto) {
+    protected void handleCallback(Update update, PlaceOrderCommandDto dto) {
 
         String message = dto.getMessage();
         logger.info("Place Order Update Received: " + message);
@@ -59,7 +59,7 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<MainMenuComma
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
                 .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,
-                        new MainMenuCommandDto("PlaceOrder"))))
+                        new PlaceOrderCommandDto("PlaceOrder"))))
                 .build());
 
         publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));

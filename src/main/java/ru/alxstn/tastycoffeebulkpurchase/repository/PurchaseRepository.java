@@ -1,8 +1,18 @@
 package ru.alxstn.tastycoffeebulkpurchase.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+
+import java.util.List;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
+    @Query("SELECT p FROM Purchase p WHERE p.session = :session AND p.customer = :customer")
+    List<Purchase> findAllPurchasesInCurrentSessionByCustomerId(
+            @Param(value = "session") Session session,
+            @Param(value = "customer") Customer customer);
 
 }
