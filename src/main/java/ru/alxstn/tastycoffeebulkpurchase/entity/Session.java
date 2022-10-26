@@ -13,9 +13,6 @@ public class Session {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "session")
-    private List<Purchase> purchases = new ArrayList<>();
-
     @Column(name = "open_date")
     private LocalDateTime dateTimeOpened;
 
@@ -47,14 +44,6 @@ public class Session {
 
     public void setDateTimeClosed(LocalDateTime dateTimeClosed) {
         this.dateTimeClosed = dateTimeClosed;
-    }
-
-    public List<Purchase> getPurchases() {
-        return purchases;
-    }
-
-    public void setPurchases(List<Purchase> purchases) {
-        this.purchases = purchases;
     }
 
     public int getDiscountPercentage() {

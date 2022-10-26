@@ -36,8 +36,7 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
 
     @PostConstruct
     public void init() {
-        updateHandlers =
-                updateHandlers.stream()
+        updateHandlers = updateHandlers.stream()
                         .sorted(Comparator.comparingInt(u -> u.getStage().getOrder()))
                         .collect(Collectors.toList());
         try {

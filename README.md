@@ -9,7 +9,7 @@ This application being developed for simplifying bulk coffee purchase process fr
 
 # ToDO:
 1) User Settings entity
-2) Orders entity
+2) ~~Orders entity~~
 3) ~~Products Entity skip duplicates,~~ insert on some data changed
 4) Settings: Product Sorting: by Name, by Price
 5) Settings: Price Change Notify Message
@@ -18,5 +18,5 @@ This application being developed for simplifying bulk coffee purchase process fr
 8) JVM, DB and App-specific Metrics monitoring using Prometheus and Grafana
 9) Add search by name and lowest price feature (with expected discount parameter)
 10) Send message if product from order becomes "inactive" after pricelist update
-11) Find The way to correctly display "Микролоты для фильра по 100г" subcategory
-12) Redis for telegram callback entity + md5 hash storage (cb_data + cb_hash)
+11) ~~Find The way to correctly display "Микролоты для фильра по 100г" subcategory~~
+12) ~~Redis for telegram callback entity + md5 hash storage (cb_data + cb_hash)~~

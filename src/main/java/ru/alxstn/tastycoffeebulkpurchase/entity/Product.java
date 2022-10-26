@@ -21,10 +21,6 @@ public class Product {
     @JsonExclude
     private long id;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product", cascade = CascadeType.PERSIST)
-    @JsonExclude
-    private List<Purchase> purchases = new ArrayList<>();
-
     @Column(name = "name")
     private String name;
 
@@ -146,15 +142,6 @@ public class Product {
 
     public void setGrindable(boolean grindable) {
         this.grindable = grindable;
-    }
-
-    public List<Purchase> getPurchases() {
-        return purchases;
-    }
-
-
-    public void setPurchases(List<Purchase> purchases) {
-        this.purchases = purchases;
     }
 
     @Override

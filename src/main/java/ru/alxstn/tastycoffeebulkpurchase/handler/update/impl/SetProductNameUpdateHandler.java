@@ -59,14 +59,14 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         String productName = dto.getName();
         logger.info("Set Product Name Command Received: " + productName);
 
-        Product targetProduct = productRepository.findAllActiveProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory()).get(0);
+        List<Product> availablePackages = productRepository.findAllActiveProductsByProductNameAndSubcategory(
+                dto.getName(), dto.getSubCategory());
+        Product targetProduct = availablePackages.get(0);
         String title = "Выберите параметры для \n" + targetProduct.getName();
 
         title += targetProduct.getProductCategory().isEmpty() ? "" : "\nИз категории " + targetProduct.getProductCategory();
         title += targetProduct.getProductSubCategory().isEmpty() ? "" : "\nПодкатегории " + targetProduct.getProductSubCategory();
 
-        List<Product> availablePackages = productRepository.findAllActiveProductsByProductNameAndSubcategory(
-                dto.getName(), dto.getSubCategory());
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
 
         for (Product p : availablePackages) {
