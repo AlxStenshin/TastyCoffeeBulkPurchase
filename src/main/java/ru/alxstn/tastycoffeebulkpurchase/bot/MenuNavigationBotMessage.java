@@ -11,41 +11,41 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-public class MenuNavigationBotMessage {
+public class MenuNavigationBotMessage <T>  {
 
     private final Update update;
-    private List<String> dataSource;
+    private List<T> dataSource;
     private String title;
-    private Function<String, InlineKeyboardButton> buttonCreator;
+    private Function<T, InlineKeyboardButton> buttonCreator;
     private String backButtonCallback;
-    private String mainMenuButtonCallback;
     private String selectProductCategoryButtonCallback;
 
     private List<List<InlineKeyboardButton>> buttons;
+    private List<InlineKeyboardButton> additionalButtons = new ArrayList<>();
 
-    public MenuNavigationBotMessage(Update update) {
-        this.update = update;
-        buttons = new ArrayList<>();
-    }
-
-    public void setDataSource(List<String> dataSource) {
-        this.dataSource = dataSource;
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public void setButtonCreator(Function<String, InlineKeyboardButton> buttonCreator) {
+    public MenuNavigationBotMessage(Update update) {
+        this.update = update;
+        buttons = new ArrayList<>();
+    }
+
+    public void setDataSource(List<T> dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public void setButtonCreator(Function<T, InlineKeyboardButton> buttonCreator) {
         this.buttonCreator = buttonCreator;
     }
 
     public void setBackButtonCallback(String backButtonCallback) {
         this.backButtonCallback = backButtonCallback;
-    }
-
-    public void setMainMenuButtonCallback(String mainMenuButtonCallback) {
-        this.mainMenuButtonCallback = mainMenuButtonCallback;
     }
 
     public void setSelectProductCategoryButtonCallback(String selectProductCategoryButtonCallback) {
@@ -56,8 +56,13 @@ public class MenuNavigationBotMessage {
         this.buttons = buttons;
     }
 
+    public void addAdditionalButtons(List<InlineKeyboardButton> buttons) {
+        this.additionalButtons = buttons;
+    }
+
     public SendMessage newMessage() {
         prepareMessage();
+
         return SendMessage.builder()
                 .text(title)
                 .chatId(update.getMessage().getChatId().toString())
@@ -76,12 +81,13 @@ public class MenuNavigationBotMessage {
     }
 
     private void prepareMessage() {
-
         if (buttons.isEmpty()) {
-            for (var s : dataSource) {
-                buttons.add(Collections.singletonList(buttonCreator.apply(s)));
+            for (var o : dataSource) {
+                buttons.add(Collections.singletonList(buttonCreator.apply(o)));
             }
         }
+
+        buttons.add(additionalButtons);
 
         List<InlineKeyboardButton> serviceButtonsRow = new ArrayList<>();
         if (backButtonCallback != null) {
@@ -93,15 +99,8 @@ public class MenuNavigationBotMessage {
 
         if (selectProductCategoryButtonCallback != null) {
             serviceButtonsRow.add(InlineKeyboardButton.builder()
-                            .text("Выбрать категорию")
+                            .text("< Категории")
                             .callbackData(selectProductCategoryButtonCallback)
-                            .build());
-        }
-
-        if (mainMenuButtonCallback != null) {
-            serviceButtonsRow.add(InlineKeyboardButton.builder()
-                            .text("Главное меню")
-                            .callbackData(mainMenuButtonCallback)
                             .build());
         }
 

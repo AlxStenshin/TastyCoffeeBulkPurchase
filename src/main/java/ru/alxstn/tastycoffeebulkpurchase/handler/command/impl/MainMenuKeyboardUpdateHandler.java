@@ -1,5 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.handler.command.impl;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -8,10 +10,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MainMenuKeyboard;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.PlaceOrderCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductCategoryCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
@@ -24,10 +27,12 @@ import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Component
 public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
+
+    Logger logger = LogManager.getLogger(MainMenuKeyboardUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
     private final PurchaseRepository purchaseRepository;
@@ -54,11 +59,13 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
     @Override
     public boolean handleUpdate(Update update) {
+        Message message = update.getMessage();
+        logger.info("Main Menu Button Click Command Received: " + message);
+
         if (!update.hasMessage()) {
             return false;
         }
 
-        Message message = update.getMessage();
         if (!message.hasText()) {
             return false;
         }
@@ -67,45 +74,62 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
         Optional<MainMenuKeyboard> keyboardButton = MainMenuKeyboard.parse(messageText);
         if (keyboardButton.isPresent()) {
             String chatId = message.getChatId().toString();
-            MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
+
             switch (keyboardButton.get()) {
 
                 case PLACE_ORDER:
-                    answer.setTitle("Выберите категорию: ");
-                    answer.setDataSource(productRepository.findAllActiveCategories());
-                    answer.setButtonCreator(s -> InlineKeyboardButton.builder()
+                    MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
+                    placeOrderAnswer.setTitle("Выберите категорию: ");
+                    placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
+                    placeOrderAnswer.setButtonCreator(s -> InlineKeyboardButton.builder()
                             .text(s)
                             .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,
                                     new PlaceOrderCommandDto("PlaceOrder"))))
                             .build());
 
-                    publisher.publishEvent(new SendMessageEvent( this, answer.newMessage()));
+                    publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
                     break;
 
                 case EDIT_ORDER:
-                    List<Purchase> purchases = purchaseRepository.findAllPurchasesInCurrentSessionByCustomerId(
-                            sessionRepository.getCurrentSession(dateTimeProvider.getCurrentTimestamp()),
-                            customerRepository.getReferenceById(Long.parseLong(chatId)));
+                    Session session = sessionRepository.getCurrentSession(dateTimeProvider.getCurrentTimestamp());
+                    Customer customer = customerRepository.getReferenceById(Long.parseLong(chatId));
 
-                    answer.setTitle("Выберите продукт из заказа: ");
-                    answer.setDataSource(purchases.stream()
-                                    .map(p -> {
-                                        Product product = p.getProduct();
-                                        return product.getName() + " " +
-                                                product.getProductPackage() + " " +
-                                                p.getProductForm() + " x " +
-                                        p.getCount() + " шт.";
-                                    })
-                                    .collect(Collectors.toList()));
+                    List<Purchase> purchases = purchaseRepository
+                            .findAllPurchasesInCurrentSessionByCustomerId(session, customer);
 
-                    answer.setButtonCreator(s -> InlineKeyboardButton.builder()
-                            .text(s)
-                            .callbackData(serializer.serialize(
-                                    new SetProductCategoryCommandDto(s, new PlaceOrderCommandDto("PlaceOrder"))))
-                            .build());
+                    if (purchases.size() > 0) {
+                        MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
+                        editOrderAnswer.setTitle("Выберите продукт из заказа: ");
+                        editOrderAnswer.setDataSource(purchases);
 
-                    publisher.publishEvent(new SendMessageEvent( this, answer.newMessage()));
+                        Function<Purchase, String> buttonTitleCreator = purchase -> {
+                            Product product = purchase.getProduct();
+                            return product.getName() + " " +
+                                    product.getProductPackage() + " " +
+                                    purchase.getProductForm() + " x " +
+                                    purchase.getCount() + " шт.";
+                        };
+
+                        editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
+                                .text(buttonTitleCreator.apply(p))
+                                .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
+                                .build());
+
+                        editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
+                                .text("Очистить заказ")
+                                .callbackData(serializer.serialize(new ClearPurchasesCommandDto(purchases)))
+                                .build()));
+
+                        publisher.publishEvent(new SendMessageEvent(this, editOrderAnswer.newMessage()));
+
+                    } else {
+                        publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                                .text("Ваш заказ пуст")
+                                .chatId(update.getMessage().getChatId().toString())
+                                .build()));
+                    }
                     break;
+
 
                 case SETTING:
                     publisher.publishEvent(new SendMessageEvent(this,
@@ -126,4 +150,5 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     public UpdateHandlerStage getStage() {
         return UpdateHandlerStage.REPLY_BUTTON;
     }
+
 }

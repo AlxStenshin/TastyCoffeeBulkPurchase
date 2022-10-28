@@ -9,10 +9,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.PlaceOrderCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
@@ -21,35 +20,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetProductQuantityCommandDto> {
+public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchaseCommandDto> {
 
-    Logger logger = LogManager.getLogger(SetProductQuantityUpdateHandler.class);
+    Logger logger = LogManager.getLogger(EditPurchaseUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final DtoSerializer serializer;
 
-    public SetProductQuantityUpdateHandler(ApplicationEventPublisher publisher,
-                                           DtoSerializer serializer) {
+    public EditPurchaseUpdateHandler(ApplicationEventPublisher publisher, DtoSerializer serializer) {
         this.publisher = publisher;
         this.serializer = serializer;
     }
 
     @Override
-    protected Class<SetProductQuantityCommandDto> getDtoType() {
-        return SetProductQuantityCommandDto.class;
+    protected Class<EditPurchaseCommandDto> getDtoType() {
+        return EditPurchaseCommandDto.class;
     }
 
     @Override
     protected SerializableInlineType getSerializableType() {
-        return SerializableInlineType.SET_PRODUCT_QUANTITY;
+        return SerializableInlineType.EDIT_PURCHASE;
     }
 
     @Override
-    protected void handleCallback(Update update, SetProductQuantityCommandDto dto) {
-        Product targetProduct = dto.getTargetProduct();
+    protected void handleCallback(Update update, EditPurchaseCommandDto dto) {
+        Purchase purchase = dto.getPurchase();
+        Product targetProduct = purchase.getProduct();
 
-        logger.info("Set Product Quantity Command Received: " + targetProduct.getName());
+        logger.info("Edit Purchase Command Received: " + purchase);
 
-        String title = "Выберите количество: " + targetProduct.getName();
+        String title = "Измените заказ: " + targetProduct.getName();
         title += targetProduct.getProductPackage().isEmpty() ? " " : ", " + targetProduct.getProductPackage() + " ";
         title += targetProduct.getPrice() + "₽";
 
@@ -58,74 +57,62 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
 
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("-")
-                .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto,
-                        dto.getProductQuantity() > 1 ? dto.getProductQuantity() - 1 : 1)))
+                .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+                        new Purchase(purchase, purchase.getCount() > 1 ? purchase.getCount() - 1 : 1))))
                 .build());
 
         countButtonsRow.add(InlineKeyboardButton.builder()
-                .text(dto.getProductQuantity() + " шт, " + targetProduct.getPrice() * dto.getProductQuantity() + "₽")
+                .text(purchase.getCount() + " шт, " + targetProduct.getPrice() * purchase.getCount() + "₽")
                 .callbackData(" ")
                 .build());
 
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("+")
-                .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto,
-                        dto.getProductQuantity() < Integer.MAX_VALUE ? dto.getProductQuantity() + 1 : Integer.MAX_VALUE)))
+                .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+                        new Purchase(purchase, purchase.getCount() < Integer.MAX_VALUE ? purchase.getCount() + 1 : Integer.MAX_VALUE))))
                 .build());
 
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
-
         countButtonsRow.add(InlineKeyboardButton.builder()
-                .text("Добавить")
-                .callbackData(serializer.serialize(new SavePurchaseCommandDto(
-                        chatId,
-                        dto.getTargetProduct(),
-                        dto.getProductQuantity(),
-                        dto.getProductForm())))
+                .text("Сохранить")
+                .callbackData(serializer.serialize(new UpdatePurchaseCommandDto(purchase)))
                 .build());
 
         keyboardRows.add(countButtonsRow);
 
         if (targetProduct.isGrindable()) {
-            String currentForm = dto.getProductForm();
+            String currentForm = purchase.getProductForm();
 
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Зерно") ? "Зерно *" : "Зерно")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Зерно")))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Зерно"))))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Крупный") ? "Крупный *" : "Крупный")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Крупный")))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Крупный"))))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Средний") ? "Средний *" : "Средний")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Средний")))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Средний"))))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Мелкий") ? "Мелкий *" : "Мелкий")
-                    .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Мелкий")))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Мелкий"))))
                     .build());
 
             keyboardRows.add(productFormButtons);
         }
 
-        List<InlineKeyboardButton> menuNavigationButtons = new ArrayList<>();
-        if (dto.getPrevious() != null)
-            menuNavigationButtons.add(InlineKeyboardButton.builder()
-                    .text("< Назад")
-                    .callbackData(serializer.serialize(dto.getPrevious()))
-                    .build());
-
-        menuNavigationButtons.add(InlineKeyboardButton.builder()
-                .text("< Категории")
-                .callbackData(serializer.serialize(new PlaceOrderCommandDto("PlaceOrder")))
+        List<InlineKeyboardButton> deletePurchaseButtons = new ArrayList<>();
+        deletePurchaseButtons.add(InlineKeyboardButton.builder()
+                .text("Удалить из заказа")
+                .callbackData(serializer.serialize(new RemovePurchaseCommandDto(purchase)))
                 .build());
 
-        keyboardRows.add(menuNavigationButtons);
+        keyboardRows.add(deletePurchaseButtons);
 
         InlineKeyboardMarkup.InlineKeyboardMarkupBuilder builder = InlineKeyboardMarkup.builder();
         for (var row : keyboardRows) {

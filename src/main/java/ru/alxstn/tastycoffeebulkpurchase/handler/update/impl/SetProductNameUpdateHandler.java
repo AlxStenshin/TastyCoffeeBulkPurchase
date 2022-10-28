@@ -82,7 +82,7 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
                             .build()));
         }
 
-        MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
+        MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle(title);
         answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
         answer.setSelectProductCategoryButtonCallback(serializer.serialize(new PlaceOrderCommandDto("PlaceOrder")));

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
@@ -29,20 +28,16 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
     private final PurchaseRepository purchaseRepository;
     private final DateTimeProvider dateTimeProvider;
 
-    private final DtoSerializer serializer;
-
     public SavePurchaseUpdateHandler(ApplicationEventPublisher publisher,
                                      CustomerRepository customerRepository,
                                      PurchaseRepository purchaseRepository,
                                      SessionRepository sessionRepository,
-                                     DateTimeProvider dateTimeProvider,
-                                     DtoSerializer serializer) {
+                                     DateTimeProvider dateTimeProvider) {
         this.publisher = publisher;
         this.sessionRepository = sessionRepository;
         this.customerRepository = customerRepository;
         this.purchaseRepository = purchaseRepository;
         this.dateTimeProvider = dateTimeProvider;
-        this.serializer = serializer;
     }
 
     @Override
@@ -57,12 +52,12 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
 
     @Override
     protected void handleCallback(Update update, SavePurchaseCommandDto dto) {
-        Session currentSession = sessionRepository.getCurrentSession(dateTimeProvider.getCurrentTimestamp());
+        logger.info("Save Purchase Command Received.");
 
         purchaseRepository.save(new Purchase(
                 customerRepository.getReferenceById(dto.getCustomerId()),
                 dto.getProduct(),
-                currentSession,
+                sessionRepository.getCurrentSession(dateTimeProvider.getCurrentTimestamp()),
                 dto.getProductForm(),
                 dto.getProductCount()));
 
@@ -72,5 +67,7 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
                 .showAlert(false)
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
+
+        // ToDo: Show Edit Purchase DTO After That
     }
 }

@@ -53,7 +53,7 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<PlaceOrderCom
         String message = dto.getMessage();
         logger.info("Place Order Update Received: " + message);
 
-        MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
+        MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите категорию: ");
         answer.setDataSource(productRepository.findAllActiveCategories());
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()

@@ -38,6 +38,34 @@ public class Purchase {
         this.productForm = productForm;
         this.count = count;
     }
+    public Purchase(Purchase purchase, int newCount) {
+        this.id = purchase.getId();
+        this.customer = purchase.getCustomer();
+        this.product = purchase.getProduct();
+        this.session = purchase.getSession();
+        this.productForm = purchase.getProductForm();
+        this.count = newCount;
+    }
+
+    public Purchase(Purchase purchase, String newForm) {
+        this.id = purchase.getId();
+        this.customer = purchase.getCustomer();
+        this.product = purchase.getProduct();
+        this.session = purchase.getSession();
+        this.productForm = newForm;
+        this.count = purchase.count;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Purchase{" +
+                "customer=" + customer +
+                ", product=" + product +
+                ", productForm='" + productForm + '\'' +
+                ", count=" + count +
+                '}';
+    }
 
     public Long getId() {
         return id;

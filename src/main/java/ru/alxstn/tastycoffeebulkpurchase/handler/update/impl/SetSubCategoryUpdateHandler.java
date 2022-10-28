@@ -43,7 +43,7 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
 
     @Override
     protected SerializableInlineType getSerializableType() {
-        return SerializableInlineType.SET_SUBCATEGORY;
+        return SerializableInlineType.SET_PRODUCT_SUBCATEGORY;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
         String targetCategory = dto.getMessage();
         logger.info("Command Received: Set Product SubCategory " + targetCategory);
 
-        MenuNavigationBotMessage answer = new MenuNavigationBotMessage(update);
+        MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите продукт: ");
         answer.setDataSource(productRepository.findDistinctActiveProductNamesBySubCategory(targetCategory));
         answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));

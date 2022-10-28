@@ -4,8 +4,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity(name = "customer")
 public class Customer {
@@ -69,12 +67,5 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "User{" +
-                "chatId=" + chatId +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", userName='" + userName + '\'' +
-                ", registeredAt=" + registrationTimestamp +
-                '}';
-    }
+        return "FirstName='" + firstName + ", LastName='" + lastName;}
 }
