@@ -48,9 +48,7 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
 
         logger.info("Edit Purchase Command Received: " + purchase);
 
-        String title = "Измените заказ: " + targetProduct.getName();
-        title += targetProduct.getProductPackage().isEmpty() ? " " : ", " + targetProduct.getProductPackage() + " ";
-        title += targetProduct.getPrice() + "₽";
+        String title = "Измените заказ: \n" + targetProduct.getFullDisplayName();
 
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         List<InlineKeyboardButton> countButtonsRow = new ArrayList<>();
@@ -62,7 +60,7 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                 .build());
 
         countButtonsRow.add(InlineKeyboardButton.builder()
-                .text(purchase.getCount() + " шт, " + targetProduct.getPrice() * purchase.getCount() + "₽")
+                .text(purchase.getProductCountAndTotalPrice())
                 .callbackData(" ")
                 .build());
 
@@ -127,4 +125,6 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                         .replyMarkup(builder.build())
                         .build()));
     }
+
+
 }

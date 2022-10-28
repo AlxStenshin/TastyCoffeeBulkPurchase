@@ -56,7 +56,6 @@ public class Purchase {
         this.count = purchase.count;
     }
 
-
     @Override
     public String toString() {
         return "Purchase{" +
@@ -65,6 +64,10 @@ public class Purchase {
                 ", productForm='" + productForm + '\'' +
                 ", count=" + count +
                 '}';
+    }
+
+    public String getProductCountAndTotalPrice() {
+        return getCount() + " шт, " + getProduct().getPrice() * getCount() + "₽";
     }
 
     public Long getId() {

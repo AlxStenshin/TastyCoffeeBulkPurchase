@@ -2,8 +2,6 @@ package ru.alxstn.tastycoffeebulkpurchase.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity(name = "session")
 public class Session {
@@ -52,5 +50,10 @@ public class Session {
 
     public void setDiscountPercentage(int discountPercentage) {
         this.discountPercentage = discountPercentage;
+    }
+
+    @Override
+    public String toString() {
+        return "SessionId = "  + id;
     }
 }

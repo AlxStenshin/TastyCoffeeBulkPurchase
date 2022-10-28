@@ -3,12 +3,10 @@ package ru.alxstn.tastycoffeebulkpurchase.entity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
+import ru.alxstn.tastycoffeebulkpurchase.util.StringUtil;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 // ToDo: Normalize table, separate productCategory, productSubCategory, productPackage and productMark entities.
 
@@ -145,36 +143,23 @@ public class Product {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Product product = (Product) o;
-
-        if (!Objects.equals(name, product.name)) return false;
-        if (!Objects.equals(price, product.price)) return false;
-        if (!Objects.equals(specialMark, product.specialMark)) return false;
-        if (!Objects.equals(productPackage, product.productPackage))
-            return false;
-        if (!Objects.equals(productCategory, product.productCategory))
-            return false;
-        return Objects.equals(productSubCategory, product.productSubCategory);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        result = 31 * result + (specialMark != null ? specialMark.hashCode() : 0);
-        result = 31 * result + (productPackage != null ? productPackage.hashCode() : 0);
-        result = 31 * result + (productCategory != null ? productCategory.hashCode() : 0);
-        result = 31 * result + (productSubCategory != null ? productSubCategory.hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public String toString() {
-        return name + " " + productPackage +" " + price;
+        return name;
+    }
+
+    public String getDisplayName() {
+        String displayName = name;
+        displayName += productPackage.isEmpty() ? "" : ", " + productPackage;
+        displayName += specialMark.isEmpty() ? "" : ", '" + StringUtil.capitalize(specialMark)+ "'";
+        displayName +=  ", " + price + "₽";
+        return displayName;
+    }
+
+    public String getFullDisplayName() {
+        String displayName = getDisplayName();
+        displayName += productCategory.isEmpty() ? "" : "\nИз категории " + productCategory;
+        displayName += productSubCategory.isEmpty() ? "" : "\nПодкатегории " + productSubCategory;
+        return displayName;
     }
 
     public static class ProductBuilder {

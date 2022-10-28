@@ -11,7 +11,7 @@ public class SetProductQuantityCommandDto extends SerializableInlineObject {
     private String productForm = "";
 
     public SetProductQuantityCommandDto() {
-        super(SerializableInlineType.EDIT_PRODUCT_QUANTITY);
+        super(SerializableInlineType.SET_PRODUCT_QUANTITY);
     }
 
     public SetProductQuantityCommandDto(Product product, int productQuantity, SerializableInlineObject previous) {
@@ -41,23 +41,12 @@ public class SetProductQuantityCommandDto extends SerializableInlineObject {
         return targetProduct;
     }
 
-    public void setTargetProduct(Product targetProduct) {
-        this.targetProduct = targetProduct;
-    }
-
     public int getProductQuantity() {
         return productQuantity;
-    }
-
-    public void setProductQuantity(int productQuantity) {
-        this.productQuantity = productQuantity;
     }
 
     public String getProductForm() {
         return productForm;
     }
 
-    public void setProductForm(String productForm) {
-        this.productForm = productForm;
-    }
 }

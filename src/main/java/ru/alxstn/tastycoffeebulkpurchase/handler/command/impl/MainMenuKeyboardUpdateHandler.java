@@ -104,10 +104,11 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                         Function<Purchase, String> buttonTitleCreator = purchase -> {
                             Product product = purchase.getProduct();
-                            return product.getName() + " " +
-                                    product.getProductPackage() + " " +
-                                    purchase.getProductForm() + " x " +
-                                    purchase.getCount() + " шт.";
+                            String buttonTitle = product.getName();
+                            buttonTitle += product.getProductPackage().isEmpty() ? "" : ", " + product.getProductPackage();
+                            buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
+                            buttonTitle += " x " + purchase.getCount() + " шт.";
+                            return buttonTitle;
                         };
 
                         editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
