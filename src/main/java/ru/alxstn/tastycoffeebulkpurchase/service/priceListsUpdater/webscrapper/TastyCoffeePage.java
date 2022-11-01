@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 
 import java.util.*;
@@ -162,7 +163,7 @@ public class TastyCoffeePage {
                 productBuilder.setPrice(price);
 
                 var pack = productPriceTableCell.find("samp.mob").getAttribute("innerHTML");
-                productBuilder.setPackage(pack);
+                productBuilder.setPackage(new ProductPackage(pack));
 
                 publisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
                 categoryProducts.add(productBuilder.build());

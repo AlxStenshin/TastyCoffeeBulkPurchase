@@ -4,8 +4,13 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "purchase")
+//@NamedEntityGraph(name = "purchase-graph", attributeNodes = {
+//        @NamedAttributeNode("customer"),
+//        @NamedAttributeNode("product"),
+//        @NamedAttributeNode("session"),
+//
+//})
 public class Purchase {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
@@ -38,6 +43,7 @@ public class Purchase {
         this.productForm = productForm;
         this.count = count;
     }
+
     public Purchase(Purchase purchase, int newCount) {
         this.id = purchase.getId();
         this.customer = purchase.getCustomer();

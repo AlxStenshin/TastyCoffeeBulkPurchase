@@ -1,5 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
@@ -8,7 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.util.StringUtil;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-// ToDo: Normalize table, separate productCategory, productSubCategory, productPackage and productMark entities.
+// ToDo: Normalize table, separate productCategory, productSubCategory and productMark entities.
 
 @Entity
 @Table(name = "product")
@@ -38,8 +40,10 @@ public class Product {
     @Column(name = "mark")
     private String specialMark;
 
-    @Column(name = "package")
-    private String productPackage;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @JoinColumn(name = "product_package_id")
+    private ProductPackage productPackage;
 
     @Column(name = "category")
     private String productCategory;
@@ -60,7 +64,7 @@ public class Product {
     public Product(String name,
                    Double price,
                    String specialMark,
-                   String productPackage,
+                   ProductPackage productPackage,
                    String productGroup,
                    String productSubGroup,
                    boolean grindable) {
@@ -102,11 +106,11 @@ public class Product {
         this.specialMark = specialMark;
     }
 
-    public String getProductPackage() {
+    public ProductPackage getProductPackage() {
         return productPackage;
     }
 
-    public void setProductPackage(String productPackage) {
+    public void setProductPackage(ProductPackage productPackage) {
         this.productPackage = productPackage;
     }
 
@@ -149,7 +153,7 @@ public class Product {
 
     public String getDisplayName() {
         String displayName = name;
-        displayName += productPackage.isEmpty() ? "" : ", " + productPackage;
+        displayName += productPackage.getDescription().isEmpty() ? "" : ", " + productPackage.getDescription();
         displayName += specialMark.isEmpty() ? "" : ", '" + StringUtil.capitalize(specialMark)+ "'";
         displayName +=  ", " + price + "₽";
         return displayName;
@@ -165,7 +169,7 @@ public class Product {
     public static class ProductBuilder {
         private String group;
         private String subgroup;
-        private String pack;
+        private ProductPackage pack;
         private String specialMark;
         private String name;
         private Double price;
@@ -193,7 +197,7 @@ public class Product {
             return this;
         }
 
-        public ProductBuilder setPackage(String pack) {
+        public ProductBuilder setPackage(ProductPackage pack) {
             this.pack = pack;
             return this;
         }

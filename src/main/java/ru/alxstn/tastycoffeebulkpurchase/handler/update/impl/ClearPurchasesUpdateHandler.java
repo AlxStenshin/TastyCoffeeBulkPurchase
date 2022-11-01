@@ -10,6 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ClearPurchasesCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 
@@ -52,6 +53,8 @@ public class ClearPurchasesUpdateHandler extends CallbackUpdateHandler<ClearPurc
                 .showAlert(false)
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
+
+        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Clear"));
 
         // ToDo: Show Main Menu After That
     }

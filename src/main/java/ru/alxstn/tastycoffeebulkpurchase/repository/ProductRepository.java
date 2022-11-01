@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +39,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> productExists(@Param(value = "name") String name,
                                     @Param(value = "cat") String cat,
                                     @Param(value = "subCat") String subCat,
-                                    @Param(value = "pack") String pack,
+                                    @Param(value = "pack") ProductPackage pack,
                                     @Param(value = "mark") String mark,
                                     @Param(value = "price") Double price);
 
@@ -55,7 +56,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     void update(@Param(value = "name") String name,
                 @Param(value = "cat") String cat,
                 @Param(value = "subCat") String subCat,
-                @Param(value = "pack") String pack,
+                @Param(value = "pack") ProductPackage pack,
                 @Param(value = "mark") String mark,
                 @Param(value = "price") Double price,
                 @Param(value = "updateDateTime") LocalDateTime updateDateTime);

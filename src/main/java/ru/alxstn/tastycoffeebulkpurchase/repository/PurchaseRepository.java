@@ -25,4 +25,12 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             @Param(value = "count") int count,
             @Param(value = "form") String form);
 
+    @Query("SELECT SUM (p.count * p.product.productPackage.weight) FROM Purchase p WHERE " +
+            "p.session.dateTimeOpened < CURRENT_TIMESTAMP AND " +
+            "p.session.dateTimeClosed > CURRENT_TIMESTAMP AND " +
+            "p.product.specialMark <> 'Сорт недели' AND " +
+            "(p.product.productCategory = 'КОФЕ ДЛЯ ФИЛЬТРА' OR " +
+            "p.product.productCategory = 'КОФЕ ДЛЯ ЭСПРЕССО' OR " +
+            "p.product.productCategory = 'КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ')")
+    Double getTotalDiscountSensitiveWeightForCurrentSession();
 }

@@ -8,7 +8,9 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.PlaceOrderCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
@@ -16,6 +18,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityComma
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
+import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +30,17 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
     Logger logger = LogManager.getLogger(SetProductQuantityUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final DtoSerializer serializer;
+    private final SessionRepository sessionRepository;
+    private final CustomerRepository customerRepository;
 
     public SetProductQuantityUpdateHandler(ApplicationEventPublisher publisher,
-                                           DtoSerializer serializer) {
+                                           DtoSerializer serializer,
+                                           SessionRepository sessionRepository,
+                                           CustomerRepository customerRepository) {
         this.publisher = publisher;
         this.serializer = serializer;
+        this.sessionRepository = sessionRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -50,7 +60,7 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
         logger.info("Set Product Quantity Command Received: " + targetProduct.getName());
 
         String title = "Выберите количество: " + targetProduct.getName();
-        title += targetProduct.getProductPackage().isEmpty() ? " " : ", " + targetProduct.getProductPackage() + " ";
+        title += targetProduct.getProductPackage().getDescription().isEmpty() ? " " : ", " + targetProduct.getProductPackage() + " ";
         title += targetProduct.getPrice() + "₽";
 
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
@@ -74,12 +84,15 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
                 .build());
 
         long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Customer customer = customerRepository.getByChatId(chatId);
+        Session session = sessionRepository.getCurrentSession();
 
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("Добавить")
                 .callbackData(serializer.serialize(new SavePurchaseCommandDto(
-                        chatId,
+                        customer,
                         dto.getTargetProduct(),
+                        session,
                         dto.getProductQuantity(),
                         dto.getProductForm())))
                 .build());

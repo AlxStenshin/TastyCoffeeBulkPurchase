@@ -38,7 +38,6 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     private final PurchaseRepository purchaseRepository;
     private final SessionRepository sessionRepository;
     private final CustomerRepository customerRepository;
-    private final DateTimeProvider dateTimeProvider;
     private final DtoSerializer serializer;
 
     public MainMenuKeyboardUpdateHandler(ApplicationEventPublisher publisher,
@@ -46,14 +45,12 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                          PurchaseRepository purchaseRepository,
                                          SessionRepository sessionRepository,
                                          CustomerRepository customerRepository,
-                                         DateTimeProvider dateTimeProvider,
                                          DtoSerializer serializer) {
         this.publisher = publisher;
         this.productRepository = productRepository;
         this.purchaseRepository = purchaseRepository;
         this.sessionRepository = sessionRepository;
         this.customerRepository = customerRepository;
-        this.dateTimeProvider = dateTimeProvider;
         this.serializer = serializer;
     }
 
@@ -91,8 +88,8 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                     break;
 
                 case EDIT_ORDER:
-                    Session session = sessionRepository.getCurrentSession(dateTimeProvider.getCurrentTimestamp());
-                    Customer customer = customerRepository.getReferenceById(Long.parseLong(chatId));
+                    Session session = sessionRepository.getCurrentSession();
+                    Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
 
                     List<Purchase> purchases = purchaseRepository
                             .findAllPurchasesInCurrentSessionByCustomerId(session, customer);
@@ -105,7 +102,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                         Function<Purchase, String> buttonTitleCreator = purchase -> {
                             Product product = purchase.getProduct();
                             String buttonTitle = product.getName();
-                            buttonTitle += product.getProductPackage().isEmpty() ? "" : ", " + product.getProductPackage();
+                            buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
                             buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
                             buttonTitle += " x " + purchase.getCount() + " шт.";
                             return buttonTitle;

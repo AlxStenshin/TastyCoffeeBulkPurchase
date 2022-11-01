@@ -13,6 +13,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
+import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 
@@ -125,6 +126,5 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                         .replyMarkup(builder.build())
                         .build()));
     }
-
 
 }

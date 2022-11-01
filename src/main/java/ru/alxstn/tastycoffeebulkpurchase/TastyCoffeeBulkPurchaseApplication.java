@@ -9,7 +9,9 @@ import ru.alxstn.tastycoffeebulkpurchase.configuration.TelegramBotConfigProperti
 
 @SpringBootApplication
 @EnableScheduling
-@EnableConfigurationProperties({TastyCoffeeConfigProperties.class, TelegramBotConfigProperties.class})
+@EnableConfigurationProperties({
+        TastyCoffeeConfigProperties.class,
+        TelegramBotConfigProperties.class})
 public class TastyCoffeeBulkPurchaseApplication {
 
     public static void main(String[] args) {

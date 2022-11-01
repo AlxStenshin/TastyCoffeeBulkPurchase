@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.AnnotationExclusionStrategy;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@Component
+@Service
 public class PriceListFileSaverService implements PriceListSaverService {
 
     private final DateTimeProvider dateTimeProvider;
