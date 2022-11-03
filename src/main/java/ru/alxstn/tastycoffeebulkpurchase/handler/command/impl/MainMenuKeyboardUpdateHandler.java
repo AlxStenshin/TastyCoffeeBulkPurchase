@@ -23,7 +23,6 @@ import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
-import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +74,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
             switch (keyboardButton.get()) {
 
                 case PLACE_ORDER:
+                    // ToDo: Separate DTO: PlaceOrder (Purchase)
                     MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
                     placeOrderAnswer.setTitle("Выберите категорию: ");
                     placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
@@ -88,6 +88,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                     break;
 
                 case EDIT_ORDER:
+                    // ToDo: Separate DTO: EditOrder (Purchase)
                     Session session = sessionRepository.getCurrentSession();
                     Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
 

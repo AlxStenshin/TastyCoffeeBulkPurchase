@@ -43,8 +43,8 @@ public class RedisDtoSerializer implements DtoSerializer {
             obj.setId(myHash);
             repository.save(obj);
             return myHash;
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("Error Serializing Redis Object: MessageDigest Algorithm not found");
+        } catch (NoSuchAlgorithmException | RuntimeException e) {
+            logger.error("Error Serializing Redis Object: " + e.getMessage());
             return null;
         }
     }

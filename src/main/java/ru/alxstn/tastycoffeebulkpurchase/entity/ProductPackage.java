@@ -28,7 +28,6 @@ public class ProductPackage {
                 description.contains("2 кг") ? 2 : 0;
     }
 
-
     public Long getId() {
         return id;
     }

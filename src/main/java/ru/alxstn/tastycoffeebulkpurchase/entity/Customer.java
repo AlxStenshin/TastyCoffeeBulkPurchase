@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity(name = "customer")
-//@NamedEntityGraph(name = "purchase")
 public class Customer {
 
     @Id
