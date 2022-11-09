@@ -12,8 +12,11 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import java.util.List;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
+    @Query("SELECT p FROM Purchase p WHERE p.session = :session")
+    List<Purchase> findAllPurchasesInSession(@Param(value = "session") Session session);
+
     @Query("SELECT p FROM Purchase p WHERE p.session = :session AND p.customer = :customer")
-    List<Purchase> findAllPurchasesInCurrentSessionByCustomerId(
+    List<Purchase> findAllPurchasesInSessionByCustomerId(
             @Param(value = "session") Session session,
             @Param(value = "customer") Customer customer);
 
@@ -33,4 +36,5 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             "p.product.productCategory = 'КОФЕ ДЛЯ ЭСПРЕССО' OR " +
             "p.product.productCategory = 'КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ')")
     Double getTotalDiscountSensitiveWeightForCurrentSession();
+
 }

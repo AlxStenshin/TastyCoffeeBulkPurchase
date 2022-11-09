@@ -15,9 +15,11 @@ import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
@@ -70,16 +72,16 @@ public class TastyCoffeePage {
 
         SelenideElement tabsBar = $("ul.nav.tab-lk");
         ElementsCollection tabs = tabsBar.$$("li.nav-item");
-        List<String> acceptedCategories = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+        List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
 
         for (var tab : tabs) {
             SelenideElement link = tab.$("a");
             String text = link.innerHtml();
-            if (acceptedCategories.stream().anyMatch(text::contains)) {
-                logger.info("Now Parsing Group " + text);
+            if (acceptedProductTypes.stream().anyMatch(text::contains)) {
+                logger.info("Now Parsing Tab " + text);
                 clickWebElement(link.getWrappedElement());
-                expandAllAccordions();
-                allProducts.addAll(parseAccordions());
+                expandAllProductGroups();
+                allProducts.addAll(parseProductType());
             } else {
                 logger.info("Ignoring Price List Tab " + text);
             }
@@ -88,7 +90,28 @@ public class TastyCoffeePage {
         return allProducts;
     }
 
-    public void expandAllAccordions() {
+    public List<Purchase> placeOrder(List<Purchase> currentSessionPurchases) {
+        SelenideElement tabsBar = $("ul.nav.tab-lk");
+        ElementsCollection tabs = tabsBar.$$("li.nav-item");
+        List<String> acceptedCategories = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+
+        for (var tab : tabs) {
+            SelenideElement link = tab.$("a");
+            String text = link.innerHtml();
+            if (acceptedCategories.stream().anyMatch(text::contains)) {
+                logger.info("Now Filling Group " + text);
+                clickWebElement(link.getWrappedElement());
+                expandAllProductGroups();
+                fillPurchasesAvailableOnPage(currentSessionPurchases);
+            } else {
+                logger.info("Ignoring Price List Tab " + text);
+            }
+        }
+        return currentSessionPurchases;
+    }
+
+
+    public void expandAllProductGroups() {
         clickElements(byCssSelector("button.status.active"));
         Selenide.sleep(1_000);
     }
@@ -111,66 +134,173 @@ public class TastyCoffeePage {
         }
     }
 
-    public List<Product> parseAccordions() {
-        List<Product> categoryProducts = new ArrayList<>();
-        ElementsCollection mainAccordions = $$("div.main-accordion");
+    private void fillPurchasesAvailableOnPage(List<Purchase> currentSessionPurchases) {
 
+        for (SelenideElement productGroup : getProductGroups()) {
+            for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
+                String subgroupTitle = getSubGroupTitle(productSubgroup);
+
+                List<Purchase> currentSubcategoryPurchases = currentSessionPurchases.stream()
+                        .filter(p -> p.getProduct().getProductSubCategory().equals(subgroupTitle))
+                        .collect(Collectors.toList());
+
+                for (Purchase purchase : currentSubcategoryPurchases) {
+                    try {
+                        String productName = purchase.getProduct().getName();
+                        String productPackage = purchase.getProduct().getProductPackage().getDescription();
+                        String productForm = purchase.getProductForm();
+                        int productCount = purchase.getCount();
+
+                        SelenideElement correspondingProduct = productSubgroup.find(byText(productName));
+                        SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
+                        SelenideElement counter = getQuantityControlElement(correspondingProductTableRow, productPackage, productForm);
+                        SelenideElement incrementButton = getIncrementButtonFromQuantityCounter(counter);
+
+                        while (productCount > 0) {
+                            clickWebElement(incrementButton);
+                            productCount--;
+                        }
+                    } catch (ElementNotFound ignored) {
+                        logger.warn("Could Not Find Element By Text: " + purchase.getProduct().getName());
+                    }
+                }
+            }
+        }
+    }
+
+    private SelenideElement getQuantityControlElement(SelenideElement productTableRow, String productPackage, String productForm) {
+
+        // Product Table Row:
+        //
+        // | <productName>          | <productPackage>                                                   | ... |
+        // | <productName>          | <productPrice>    | <quantitySelector>                             | ... |
+        // | td: searchTab count-n  | td: price-count-m | td: quantity quantity-custom quantity-count-m  | ... |
+        //
+        // searchTab count-n : n is available product Packages count (productPrice + productQuantitySelector columns)
+        // price-count-m : m is productQuantitySelector's count for current product package
+        //
+        // Basic product contains one quantity selector:
+        // | <productName> | ... | <productPrice | countSelector1 | ... |
+        //
+        // Grindable product contains two quantity selectors:
+        // | <productName> | ... | <productPrice> | <countSelector1> | <countSelector2> | ... |
+        // First selector is for Beans. Second - grindable.
+
+        ElementsCollection availableElements = productTableRow.findAll(By.xpath("./*"));
+        ElementsCollection pricesForPackage = productTableRow.findAll(By.cssSelector("samp.mob"));
+        Optional<SelenideElement> targetProductPrice = Optional.empty();
+
+        for (var price : pricesForPackage) {
+            if (price.innerHtml().contains(productPackage))
+                targetProductPrice = Optional.of(price.find(By.xpath("./../..")));
+        }
+
+        int priceElementIndex = availableElements
+                .indexOf(targetProductPrice.orElseThrow(() -> new RuntimeException("product not found")));
+
+        if (productForm.isEmpty())
+            // Beans or other non-grindable package
+            return availableElements.get(priceElementIndex + 1);
+        else {
+            // Grindable Package
+            return availableElements.get(priceElementIndex + 2);
+        }
+    }
+
+    public List<Product> parseProductType() {
+        List<Product> currentTypeProducts = new ArrayList<>();
         Product.ProductBuilder productBuilder = new Product.ProductBuilder();
 
-        for (SelenideElement mainAccordion : mainAccordions) {
-            SelenideElement groupTitle = mainAccordion.find(By.cssSelector("h3.title"));
-            productBuilder.setGroup(groupTitle.getAttribute("innerHTML"));
-
-            ElementsCollection productAccordions = mainAccordion.findAll("div.accordion.accordion_product");
-            for (SelenideElement productAccordion : productAccordions) {
-                SelenideElement subgroupTitle = productAccordion.find(By.cssSelector("span"));
-                productBuilder.setSubGroup(subgroupTitle.getAttribute("innerHTML"));
-
-                SelenideElement productsTable = productAccordion.find(By.cssSelector("table.table-lk"));
-                ElementsCollection tableRows = productsTable.findAll(By.cssSelector("tr.searchTab"));
-
-                for (SelenideElement tableRow : tableRows) {
-                    SelenideElement productNameTableCell = tableRow.find(By.cssSelector("button.font-13.p-0.selectable.btn.pointer"));
-                    productBuilder.setName(productNameTableCell.getAttribute("innerHTML"));
-
+        for (SelenideElement productGroup : getProductGroups()) {
+            productBuilder.setGroup(getGroupTitle(productGroup));
+            for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
+                productBuilder.setSubGroup(getSubGroupTitle(productSubgroup));
+                for (SelenideElement product : getProductsListFromSubgroup(productSubgroup)) {
+                    productBuilder.setName(getProductTitle(product));
                     try {
-                        SelenideElement specialMark = tableRow.find(By.cssSelector("div.prefixdiv.empty-ic"));
-                        productBuilder.setSpecialMark(specialMark.getAttribute("data-div"));
+                        productBuilder.setSpecialMark(getSpecialMarkTitle(product));
                     } catch (ElementNotFound ignored) {
                         productBuilder.setSpecialMark("");
                     }
 
-                    ArrayList<SelenideElement> products = new ArrayList<>(tableRow.findAll(By.cssSelector("td.price-count-1")));
                     productBuilder.setGrindable(false);
-                    addProducts(categoryProducts, productBuilder, products);
+                    addProducts(currentTypeProducts, productBuilder, getProductPacks(product));
 
-                    ArrayList<SelenideElement> grindableProducts = new ArrayList<>(tableRow.findAll(By.cssSelector("td.price-count-2")));
                     productBuilder.setGrindable(true);
-                    addProducts(categoryProducts, productBuilder, grindableProducts);
+                    addProducts(currentTypeProducts, productBuilder, getGrindableProductPacks(product));
                 }
             }
         }
 
-        logger.info("Price List Parsing Complete! Found: " + categoryProducts.size() + " items.");
-        return categoryProducts;
+        logger.info("Price List Parsing Complete! Found: " + currentTypeProducts.size() + " items.");
+        return currentTypeProducts;
     }
 
-    private void addProducts(List<Product> categoryProducts, Product.ProductBuilder productBuilder, ArrayList<SelenideElement> products) {
-        for (var productPriceTableCell : products) {
+    private void addProducts(List<Product> categoryProducts, Product.ProductBuilder productBuilder, List<SelenideElement> products) {
+        for (var product : products) {
             try {
-                var price = getPriceFromTableCell(Objects.requireNonNull(
-                        productPriceTableCell.find("div.coffee-week-price").getAttribute("innerHTML")));
-                productBuilder.setPrice(price);
+                productBuilder.setPrice(getProductPrice(product));
+                productBuilder.setPackage(new ProductPackage(getProductPackage(product)));
 
-                var pack = productPriceTableCell.find("samp.mob").getAttribute("innerHTML");
-                productBuilder.setPackage(new ProductPackage(pack));
-
-                publisher.publishEvent(new ProductFoundEvent(this, productBuilder.build()));
-                categoryProducts.add(productBuilder.build());
+                Product newProduct = productBuilder.build();
+                publisher.publishEvent(new ProductFoundEvent(this, newProduct));
+                categoryProducts.add(newProduct);
             } catch (RuntimeException e) {
                 logger.error("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
             }
         }
+    }
+
+    private ElementsCollection getProductGroups() {
+        return $$("div.main-accordion");
+    }
+
+    private ElementsCollection getProductSubgroupsFromGroup(SelenideElement productGroup) {
+        return productGroup.$$("div.accordion.accordion_product");
+    }
+
+    private ElementsCollection getProductsListFromSubgroup(SelenideElement productSubgroup) {
+        SelenideElement productsTable = productSubgroup.find(By.cssSelector("table.table-lk"));
+        return productsTable.findAll(By.cssSelector("tr.searchTab"));
+    }
+
+    private List<SelenideElement> getProductPacks(SelenideElement product) {
+        return new ArrayList<>(product.findAll(By.cssSelector("td.price-count-1")));
+    }
+    private List<SelenideElement> getGrindableProductPacks(SelenideElement product) {
+        return new ArrayList<>(product.findAll(By.cssSelector("td.price-count-2")));
+    }
+
+    private SelenideElement getIncrementButtonFromQuantityCounter(SelenideElement counter) {
+        return counter.find(By.cssSelector("div.input-group-append")).find(By.tagName("button"));
+    }
+
+    private String getGroupTitle(SelenideElement groupElement) {
+        SelenideElement groupTitle = groupElement.find(By.cssSelector("h3.title"));
+        return groupTitle.getAttribute("innerHTML");
+    }
+
+    private String getSubGroupTitle(SelenideElement subgroupElement) {
+        SelenideElement subgroupTitle = subgroupElement.find(By.cssSelector("span"));
+        return subgroupTitle.getAttribute("innerHTML");
+    }
+
+    private String getProductTitle(SelenideElement product) {
+        SelenideElement productNameTableCell = product.find(By.cssSelector("button.font-13.p-0.selectable.btn.pointer"));
+        return productNameTableCell.getAttribute("innerHTML");
+    }
+
+    private String getSpecialMarkTitle(SelenideElement product) {
+        SelenideElement specialMark = product.find(By.cssSelector("div.prefixdiv.empty-ic"));
+        return specialMark.getAttribute("data-div");
+    }
+
+    private double getProductPrice(SelenideElement product) {
+        return getPriceFromTableCell(product.find("div.coffee-week-price").getAttribute("innerHTML"));
+    }
+
+    private String getProductPackage(SelenideElement product) {
+        return product.find("samp.mob").getAttribute("innerHTML");
     }
 
     double getPriceFromTableCell(String src) {
@@ -178,4 +308,5 @@ public class TastyCoffeePage {
         src = src.replace(",", ".");
         return Double.parseDouble(src);
     }
+
 }

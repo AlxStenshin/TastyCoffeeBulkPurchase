@@ -93,7 +93,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                     Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
 
                     List<Purchase> purchases = purchaseRepository
-                            .findAllPurchasesInCurrentSessionByCustomerId(session, customer);
+                            .findAllPurchasesInSessionByCustomerId(session, customer);
 
                     if (purchases.size() > 0) {
                         MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
