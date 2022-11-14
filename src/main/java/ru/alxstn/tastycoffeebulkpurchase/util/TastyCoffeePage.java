@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service;
+package ru.alxstn.tastycoffeebulkpurchase.util;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.ElementsCollection;
@@ -157,6 +157,8 @@ public class TastyCoffeePage {
                         .filter(p -> p.getProduct().getProductSubCategory().equals(subgroupTitle))
                         .collect(Collectors.toList());
 
+                List<Purchase> successfullyPlacedPurchases = new ArrayList<>();
+
                 for (Purchase purchase : currentSubcategoryPurchases) {
                     try {
                         String productName = purchase.getProduct().getName();
@@ -172,11 +174,13 @@ public class TastyCoffeePage {
                         while (productCount > 0) {
                             clickWebElement(incrementButton);
                             productCount--;
+                            currentSessionPurchases.remove(purchase);
                         }
                     } catch (ElementNotFound ignored) {
                         logger.warn("Could Not Find Element By Text: " + purchase.getProduct().getName());
                     }
                 }
+                currentSubcategoryPurchases.removeAll(successfullyPlacedPurchases);
             }
         }
     }
