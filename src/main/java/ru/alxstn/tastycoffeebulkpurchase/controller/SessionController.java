@@ -37,11 +37,18 @@ public class SessionController {
     }
 
     @GetMapping(value = "/sessions/new", produces = MediaType.TEXT_HTML_VALUE)
-    public String addNewSession(Model model) {
-        Session session = new Session();
-        model.addAttribute("session", session);
-        model.addAttribute("pageTitle", "Create new Session");
-        return "session_form";
+    public String addNewSession(Model model, RedirectAttributes redirectAttributes) {
+        if (sessionManager.isNewSessionAllowed()) {
+            Session session = new Session();
+            model.addAttribute("session", session);
+            model.addAttribute("pageTitle", "Create new Session");
+            return "session_form";
+        }
+        else {
+            redirectAttributes.addFlashAttribute("message", "Only One Active Session Allowed.\n" +
+                    "Please close active session first.");
+        }
+        return "redirect:/sessions";
     }
 
     @GetMapping(value = "/sessions/{id}", produces = MediaType.TEXT_HTML_VALUE)

@@ -45,4 +45,14 @@ public class BasicSessionManagerService implements SessionManagerService {
     public Session getSessionById(long sessionId) {
         return sessionRepository.findById(sessionId).orElseThrow(SessionNotFoundException::new);
     }
+
+    @Override
+    public boolean isNewSessionAllowed() {
+        try {
+            sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+        } catch (SessionNotFoundException e) {
+            return true;
+        }
+        return false;
+    }
 }
