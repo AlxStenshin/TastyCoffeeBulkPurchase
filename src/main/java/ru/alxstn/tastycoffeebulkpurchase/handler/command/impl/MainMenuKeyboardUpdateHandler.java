@@ -17,6 +17,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
@@ -89,7 +90,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                 case EDIT_ORDER:
                     // ToDo: Separate DTO: EditOrder (Purchase)
-                    Session session = sessionRepository.getCurrentSession();
+                    Session session = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
                     Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
 
                     List<Purchase> purchases = purchaseRepository

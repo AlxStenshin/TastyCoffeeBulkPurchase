@@ -7,12 +7,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 
+import java.util.Optional;
+
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
     @Query("SELECT s FROM session s WHERE " +
             "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
             "s.dateTimeClosed > CURRENT_TIMESTAMP")
-    Session getCurrentSession();
+    Optional<Session> getCurrentSession();
 
     @Transactional
     @Modifying
@@ -21,8 +23,17 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
             "s.dateTimeClosed > CURRENT_TIMESTAMP")
     void setCurrentSessionDiscountValue(@Param(value = "discount") int value);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE session s SET s.discountableWeight = :weight WHERE " +
+            "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
+            "s.dateTimeClosed > CURRENT_TIMESTAMP")
+    void setCurrentSessionDiscountableWeight(@Param(value = "weight") Double currentSessionDiscountSensitiveWeight);
+
+
     @Query("SELECT s.discountPercentage FROM session s WHERE " +
             "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
             "s.dateTimeClosed > CURRENT_TIMESTAMP")
     int getCurrentSessionDiscountValue();
+
 }

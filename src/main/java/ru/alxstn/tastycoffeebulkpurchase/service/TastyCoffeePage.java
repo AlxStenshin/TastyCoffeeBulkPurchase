@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdater.webscrapper;
+package ru.alxstn.tastycoffeebulkpurchase.service;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.ElementsCollection;
@@ -88,6 +88,19 @@ public class TastyCoffeePage {
         }
 
         return allProducts;
+    }
+
+    public void resetOrder() {
+        SelenideElement resetButtonTextElement = $(byText("Сбросить заказ"));
+        SelenideElement resetOrderButton = resetButtonTextElement.find(By.xpath("./.."));
+        clickWebElement(resetOrderButton);
+        try {
+            SelenideElement confirmButtonText = $(byText("Да"));
+            SelenideElement confirmButton = confirmButtonText.find(By.xpath("./.."));
+            clickWebElement(confirmButton);
+        } catch (ElementNotFound ignored) {
+            logger.info("Confirm Reset Order button not found, is order empty already?");
+        }
     }
 
     public List<Purchase> placeOrder(List<Purchase> currentSessionPurchases) {

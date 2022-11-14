@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.annotation;
+package ru.alxstn.tastycoffeebulkpurchase.entity.annotation;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;

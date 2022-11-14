@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0" />
+    <title>Tasty Coffee Purchase Session Manager</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.2.2/css/bootstrap.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/6.2.0/css/all.css} "/>
+
+    <script type="text/javascript" th:src="@{/webjars/jquery/3.6.1/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/5.2.2/js/bootstrap.js}"></script>
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container-fluid" style="max-width: 1280px; margin: 0 auto;">
+        <h2 class="text-center">Session Management</h2>
+
+        <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show text-center message"
+             role="alert">
+            [[${message}]]
+            <button type="button" class="close btn-sm" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div th:if="${sessions.size() > 0}">
+            <table class="table table-hover table-responsive-xl">
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Open Date</th>
+                    <th scope="col">Close Date</th>
+                    <th scope="col">Closed</th>
+                    <th scope="col">Discount Value</th>
+                    <th scope="col">Discountable Weight</th>
+                    <th scope="col">Total Weight</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${sessions}">
+                    <th scope="row">
+                        [[${s.id}]]</th>
+                    <td>[[${s.title}]]</td>
+                    <td>[[${s.dateTimeOpened}]]</td>
+                    <td>[[${s.dateTimeClosed}]]</td>
+                    <td>
+                        <div th:if="${s.closed == true}" class="fa-regular fa-square-check"></div>
+                        <div>
+                            <a th:if="${s.closed == false}"  class="fa-regular fa-square icon-dark"
+                                th:href="@{'/sessions/close/' + ${s.id}}" title="Close this session"></a>
+                        </div>
+                    </td>
+                    <td>[[${s.discountPercentage}]]%</td>
+                    <td>[[${s.discountableWeight}]] kg</td>
+                    <td>[[${s.totalWeight}]] kg</td>
+                    <td>
+                        <a th:href="@{'/sessions/' + ${s.id}}"
+                           title="Edit this session"  class="fa-regular fa-pen-to-square icon-dark"></a>
+                        <!--
+                        <a th:href="@{'/sessions/delete/' + ${s.id}}"
+                           th:sessionTitle="${s.title}" id="btnDelete"
+                           title="Delete this session" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+
+
+                        <a th:href="@{'/sessions/receipt/' + ${s.id}}"
+                           th:sessionTitle="${s.title}" id="btnReceipt"
+                           title="Get receipt for this session" class="fa-regular fa-receipt icon-dark"></a>
+
+                        -->
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="" th:unless="${sessions.size() > 0}">
+            <span>No Sessions found!</span>
+        </div>
+    </div>
+
+    <div class="modal fade text-center" id="confirmModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <span id="confirmText"></span>
+                </div>
+
+                <div class="modal-footer">
+                    <a type="button" id="yesBtn" class="btn btn-danger">Yes</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".btn-delete").on("click", function (e) {
+                e.preventDefault();
+                const link = $(this);
+
+                $("#yesBtn").attr("href", link.attr("href"));
+                $("#confirmText").html("Sure to delete this Session?");
+                $("#confirmModal").modal();
+            });
+
+            $("#btnClear").on("click", function (e) {
+                e.preventDefault();
+                $("#keyword").text("");
+                window.location = "[[@{/sessions}]]";
+            });
+        });
+    </script>
+
+</body>
+
+</html>

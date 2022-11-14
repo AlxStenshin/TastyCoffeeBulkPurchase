@@ -17,6 +17,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
@@ -85,7 +86,7 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
 
         long chatId = update.getCallbackQuery().getMessage().getChatId();
         Customer customer = customerRepository.getByChatId(chatId);
-        Session session = sessionRepository.getCurrentSession();
+        Session session = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
 
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("Добавить")

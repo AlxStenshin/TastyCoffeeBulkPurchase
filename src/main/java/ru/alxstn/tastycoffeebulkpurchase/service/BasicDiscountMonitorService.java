@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Settings;
 import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SettingsRepository;
@@ -23,7 +22,6 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
     Logger logger = LogManager.getLogger(DiscountMonitorService.class);
     private final ApplicationEventPublisher publisher;
     private final PurchaseRepository purchaseRepository;
-    private final CustomerRepository customerRepository;
     private final SettingsRepository settingsRepository;
     private final SessionRepository sessionRepository;
     private final TreeMap<Integer, Integer> discounts;
@@ -31,12 +29,10 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
     public BasicDiscountMonitorService(ApplicationEventPublisher publisher,
                                        PurchaseRepository purchaseRepository,
                                        SessionRepository sessionRepository,
-                                       CustomerRepository customerRepository,
                                        SettingsRepository settingsRepository) {
         this.publisher = publisher;
         this.purchaseRepository = purchaseRepository;
         this.sessionRepository = sessionRepository;
-        this.customerRepository = customerRepository;
         this.settingsRepository = settingsRepository;
 
         this.discounts =  new TreeMap<>();
@@ -57,10 +53,10 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
     @Override
     public void checkDiscountSize() {
         Double currentSessionDiscountSensitiveWeight = purchaseRepository.getTotalDiscountSensitiveWeightForCurrentSession();
+        sessionRepository.setCurrentSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
         logger.debug("Discount value: " + newDiscount + " Purchase Weight: " + currentSessionDiscountSensitiveWeight);
         int previousDiscount = sessionRepository.getCurrentSessionDiscountValue();
-
 
         if (previousDiscount!= newDiscount) {
             sessionRepository.setCurrentSessionDiscountValue(newDiscount);
@@ -78,5 +74,4 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
             }
         }
     }
-
 }
