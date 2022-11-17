@@ -67,6 +67,13 @@ public class Purchase {
                 '}';
     }
 
+    public String getPurchaseSummary() {
+        String summary = product.getProductCategory() + " " + product.getDisplayName();
+        summary += productForm.isEmpty() ? ", Зерно, " : " , " + productForm + " ";
+        summary += getProductCountAndTotalPrice();
+        return summary;
+    }
+
     public String getProductCountAndTotalPrice() {
         return getCount() + " шт, " + getProduct().getPrice() * getCount() + "₽";
     }

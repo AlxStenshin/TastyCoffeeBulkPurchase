@@ -37,4 +37,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             "p.product.productCategory = 'КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ')")
     Double getTotalDiscountSensitiveWeightForCurrentSession();
 
+    @Query("SELECT DISTINCT p.customer FROM Purchase p WHERE p.session = :session")
+    List<Customer> getSessionCustomers(@Param(value = "session") Session session);
 }

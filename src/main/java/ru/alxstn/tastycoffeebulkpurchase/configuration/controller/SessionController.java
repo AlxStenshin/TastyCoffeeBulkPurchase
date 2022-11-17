@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.controller;
+package ru.alxstn.tastycoffeebulkpurchase.configuration.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -10,6 +10,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 
+
+// ToDo: Remove all logic from session controller, controllers should be simple and stupid.
 
 @Controller
 public class SessionController {
@@ -38,7 +40,7 @@ public class SessionController {
 
     @GetMapping(value = "/sessions/new", produces = MediaType.TEXT_HTML_VALUE)
     public String addNewSession(Model model, RedirectAttributes redirectAttributes) {
-        if (sessionManager.isNewSessionAllowed()) {
+        if (!sessionManager.activeSessionAvailable()) {
             Session session = new Session();
             model.addAttribute("session", session);
             model.addAttribute("pageTitle", "Create new Session");
@@ -73,8 +75,9 @@ public class SessionController {
         try {
             sessionManager.saveSession(session);
             redirectAttributes.addFlashAttribute("message", "The Session has been saved successfully!");
-            if (session.isClosed())
+            if (session.isClosed()) {
                 sessionManager.closeSession(session);
+            }
         } catch (Exception e) {
             redirectAttributes.addAttribute("message", e.getMessage());
         }

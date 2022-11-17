@@ -16,12 +16,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class BasicUnfinishedPurchasesNotifierService implements UnfinishedPurchasesNotifierService {
-    Logger logger = LogManager.getLogger(BasicUnfinishedPurchasesNotifierService.class);
+public class BasicUnfinishedPurchasesCoustomerNotifierService implements UnfinishedPurchasesCoustomerNotifierService {
+    Logger logger = LogManager.getLogger(BasicUnfinishedPurchasesCoustomerNotifierService.class);
 
     private final ApplicationEventPublisher publisher;
 
-    public BasicUnfinishedPurchasesNotifierService(ApplicationEventPublisher publisher) {
+    public BasicUnfinishedPurchasesCoustomerNotifierService(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
     }
 

@@ -11,5 +11,6 @@ public interface SessionManagerService {
     void closeSession(Session session);
     List<Session> getAllSessions();
     Session getSessionById(long sessionId);
-    boolean isNewSessionAllowed();
+    Session getCurrentSession();
+    boolean activeSessionAvailable();
 }

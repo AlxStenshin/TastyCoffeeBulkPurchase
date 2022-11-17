@@ -36,6 +36,16 @@ public class Session {
     @Column(name = "discountable_weight")
     private double discountableWeight;
 
+    @Column(name = "payment_instruction")
+    private String paymentInstruction;
+
+    // ToDo: Add Session Customers Counter
+    @Column(name = "customers_count")
+    private int customersCount;
+
+    @Column(name = "complete_payments_count")
+    private int completePaymentsCount;
+
     public Session() {
         this.closed = false;
         this.title = "";
@@ -106,6 +116,30 @@ public class Session {
 
     public void setTotalWeight(double totalWeight) {
         this.totalWeight = totalWeight;
+    }
+
+    public String getPaymentInstruction() {
+        return paymentInstruction;
+    }
+
+    public void setPaymentInstruction(String paymentInstruction) {
+        this.paymentInstruction = paymentInstruction;
+    }
+
+    public int getCustomersCount() {
+        return customersCount;
+    }
+
+    public void setCustomersCount(int customersCount) {
+        this.customersCount = customersCount;
+    }
+
+    public int getCompletePaymentsCount() {
+        return completePaymentsCount;
+    }
+
+    public void setCompletePaymentsCount(int completePaymentsCount) {
+        this.completePaymentsCount = completePaymentsCount;
     }
 
     @Override

@@ -151,6 +151,13 @@ public class Product {
         return name;
     }
 
+    public boolean isDiscountable() {
+        return (!getSpecialMark().equals("Сорт недели") &&
+                getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") &&
+                getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") &&
+                getProductCategory().equals("ККОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ"));
+    }
+
     public String getDisplayName() {
         String displayName = name;
         displayName += productPackage.getDescription().isEmpty() ? "" : ", " + productPackage.getDescription();

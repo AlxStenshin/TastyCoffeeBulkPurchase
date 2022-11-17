@@ -30,7 +30,7 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<PlaceOrderCom
 
     public PlaceOrderUpdateHandler(ApplicationEventPublisher publisher,
                                    ProductRepository productRepository,
-                                   DtoSerializer serializer){
+                                   DtoSerializer serializer) {
         super();
         this.publisher = publisher;
         this.productRepository = productRepository;
@@ -62,6 +62,6 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<PlaceOrderCom
                         new PlaceOrderCommandDto("PlaceOrder"))))
                 .build());
 
-        publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));
+        publisher.publishEvent(new UpdateMessageEvent(this, answer.updatePrevious()));
     }
 }

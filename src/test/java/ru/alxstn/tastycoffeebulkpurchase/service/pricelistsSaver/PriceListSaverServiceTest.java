@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.service.priceListSaver.PriceListFileSaverService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
@@ -52,7 +53,7 @@ class PriceListSaverServiceTest {
                 .setGroup("Group0")
                 .setSubGroup("SubGroup0")
                 .setName("Name0")
-                .setPackage("Pack0")
+                .setPackage(new ProductPackage("Упаковка 250 г"))
                 .setPrice(0d)
                 .build();
 
@@ -60,7 +61,7 @@ class PriceListSaverServiceTest {
                 .setGroup("Group1")
                 .setSubGroup("SubGroup1")
                 .setName("Name1")
-                .setPackage("Pack1")
+                .setPackage(new ProductPackage("Упаковка 250 г"))
                 .setSpecialMark("So Special!")
                 .setPrice(1d)
                 .build();

@@ -14,6 +14,7 @@ public enum SerializableInlineType {
     UPDATE_PURCHASE(8),
     REMOVE_PURCHASE(9),
     CLEAR_PURCHASES(10),
+    PAYMENT_CONFIRMATION(11),
     ;
 
     private final int index;

@@ -47,12 +47,17 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public boolean isNewSessionAllowed() {
+    public Session getCurrentSession() {
+        return sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+    }
+
+    @Override
+    public boolean activeSessionAvailable() {
         try {
-            sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+            Session activeSession = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+            return !activeSession.isClosed();
         } catch (SessionNotFoundException e) {
-            return true;
+            return false;
         }
-        return false;
     }
 }

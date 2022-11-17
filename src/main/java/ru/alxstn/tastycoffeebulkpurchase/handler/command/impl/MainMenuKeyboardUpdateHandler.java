@@ -17,13 +17,12 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,20 +35,20 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
     private final PurchaseRepository purchaseRepository;
-    private final SessionRepository sessionRepository;
+    private final SessionManagerService sessionManager;
     private final CustomerRepository customerRepository;
     private final DtoSerializer serializer;
 
     public MainMenuKeyboardUpdateHandler(ApplicationEventPublisher publisher,
                                          ProductRepository productRepository,
                                          PurchaseRepository purchaseRepository,
-                                         SessionRepository sessionRepository,
+                                         SessionManagerService sessionManager,
                                          CustomerRepository customerRepository,
                                          DtoSerializer serializer) {
         this.publisher = publisher;
         this.productRepository = productRepository;
         this.purchaseRepository = purchaseRepository;
-        this.sessionRepository = sessionRepository;
+        this.sessionManager = sessionManager;
         this.customerRepository = customerRepository;
         this.serializer = serializer;
     }
@@ -75,58 +74,66 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
             switch (keyboardButton.get()) {
 
                 case PLACE_ORDER:
-                    // ToDo: Separate DTO: PlaceOrder (Purchase)
-                    MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
-                    placeOrderAnswer.setTitle("Выберите категорию: ");
-                    placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
-                    placeOrderAnswer.setButtonCreator(s -> InlineKeyboardButton.builder()
-                            .text(s)
-                            .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,
-                                    new PlaceOrderCommandDto("PlaceOrder"))))
-                            .build());
+                    if (sessionManager.activeSessionAvailable()) {
+                        // ToDo: Separate DTO: PlaceOrder (Purchase)
+                        MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
+                        placeOrderAnswer.setTitle("Выберите категорию: ");
+                        placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
+                        placeOrderAnswer.setButtonCreator(s -> InlineKeyboardButton.builder()
+                                .text(s)
+                                .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,
+                                        new PlaceOrderCommandDto("PlaceOrder"))))
+                                .build());
 
-                    publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
+                        publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
+                    } else {
+                        sendNoActiveSessionFoundMessage(update);
+                    }
                     break;
 
                 case EDIT_ORDER:
                     // ToDo: Separate DTO: EditOrder (Purchase)
-                    Session session = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
-                    Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
+                    if (sessionManager.activeSessionAvailable()) {
+                        Session currentSession = sessionManager.getCurrentSession();
+                        Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
 
-                    List<Purchase> purchases = purchaseRepository
-                            .findAllPurchasesInSessionByCustomerId(session, customer);
+                        List<Purchase> purchases = purchaseRepository
+                                .findAllPurchasesInSessionByCustomerId(currentSession, customer);
 
-                    if (purchases.size() > 0) {
-                        MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
-                        editOrderAnswer.setTitle("Выберите продукт из заказа: ");
-                        editOrderAnswer.setDataSource(purchases);
+                        if (purchases.size() > 0) {
+                            MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
+                            editOrderAnswer.setTitle("Выберите продукт из заказа: ");
+                            editOrderAnswer.setDataSource(purchases);
 
-                        Function<Purchase, String> buttonTitleCreator = purchase -> {
-                            Product product = purchase.getProduct();
-                            String buttonTitle = product.getName();
-                            buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
-                            buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
-                            buttonTitle += " x " + purchase.getCount() + " шт.";
-                            return buttonTitle;
-                        };
+                            Function<Purchase, String> buttonTitleCreator = purchase -> {
+                                Product product = purchase.getProduct();
+                                String buttonTitle = product.getName();
+                                buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
+                                buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
+                                buttonTitle += " x " + purchase.getCount() + " шт.";
+                                return buttonTitle;
+                            };
 
-                        editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
-                                .text(buttonTitleCreator.apply(p))
-                                .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
-                                .build());
+                            editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
+                                    .text(buttonTitleCreator.apply(p))
+                                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
+                                    .build());
 
-                        editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
-                                .text("Очистить заказ")
-                                .callbackData(serializer.serialize(new ClearPurchasesCommandDto(purchases)))
-                                .build()));
+                            editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
+                                    .text("Очистить заказ")
+                                    .callbackData(serializer.serialize(new ClearPurchasesCommandDto(purchases)))
+                                    .build()));
 
-                        publisher.publishEvent(new SendMessageEvent(this, editOrderAnswer.newMessage()));
+                            publisher.publishEvent(new SendMessageEvent(this, editOrderAnswer.newMessage()));
 
+                        } else {
+                            publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                                    .text("Ваш заказ пуст")
+                                    .chatId(update.getMessage().getChatId().toString())
+                                    .build()));
+                        }
                     } else {
-                        publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
-                                .text("Ваш заказ пуст")
-                                .chatId(update.getMessage().getChatId().toString())
-                                .build()));
+                        sendNoActiveSessionFoundMessage(update);
                     }
                     break;
 
@@ -144,6 +151,15 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
             return true;
         }
         return false;
+    }
+
+    void sendNoActiveSessionFoundMessage(Update update) {
+        publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                .text("Активная сессия не обнаружена. \n" +
+                        "Заказы не принимаются.\n" +
+                        "Для открытия новой сессии обратитесь к администратору бота или запустите <Голосование>")
+                .chatId(update.getMessage().getChatId().toString())
+                .build()));
     }
 
     @Override

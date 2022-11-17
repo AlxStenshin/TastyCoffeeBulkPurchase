@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.PurchaseSummaryNotificationEvent;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.OrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
@@ -36,10 +37,14 @@ public class WebPageOrderCreator implements OrderCreatorService {
     public void createOrder(Session session) {
         logger.info("Now placing order from current session " + session.getId() + ":" + session.getTitle());
         List<Purchase> currentSessionPurchases = purchaseRepository.findAllPurchasesInSession(session);
+
+        publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, session, currentSessionPurchases));
+
         executorService.execute(() -> {
             tastyCoffeePage.login();
             tastyCoffeePage.resetOrder();
             List<Purchase> unfinishedPurchases = tastyCoffeePage.placeOrder(currentSessionPurchases);
+
             publisher.publishEvent(new PurchasePlacementErrorEvent(this, unfinishedPurchases));
         });
         logger.info("Order Placed!");

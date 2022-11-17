@@ -10,6 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 import ru.alxstn.tastycoffeebulkpurchase.service.PriceListUpdaterService;
+import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
 
 import java.util.List;
 
