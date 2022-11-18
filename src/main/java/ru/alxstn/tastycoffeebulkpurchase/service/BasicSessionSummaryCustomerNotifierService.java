@@ -80,6 +80,8 @@ public class BasicSessionSummaryCustomerNotifierService implements SessionSummar
 
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("Ваш заказ:\n\n");
+        // ToDo: find the way to display styled order text
+        // messageBuilder.append("<code>");
 
         for (var p : purchases) {
             Product targetProduct = p.getProduct();
@@ -96,6 +98,7 @@ public class BasicSessionSummaryCustomerNotifierService implements SessionSummar
         // ToDo: Discountable products only should appear in discount calculation
         double totalPriceWithDiscount = discountablePrice * ((double)(100 - discountValue) / 100);
 
+        //messageBuilder.append("</code>");
         messageBuilder.append("--- Итого ---\n");
         messageBuilder.append("Без скидки: ").append(totalPrice).append("₽");
         messageBuilder.append(discountValue > 0 ? "\nС учетом скидки " + discountValue + "% на кофе: " + totalPriceWithDiscount +"₽" : "");

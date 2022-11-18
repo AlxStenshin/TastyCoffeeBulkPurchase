@@ -15,31 +15,28 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
+import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
-
 
 @Component
 public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOrderPaidCommandDto> {
 
     Logger logger = LogManager.getLogger(SetOrderPaidStatusUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final SessionManagerService sessionManager;
     private final PurchaseRepository purchaseRepository;
     private final CustomerRepository customerRepository;
-
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     private DtoDeserializer deserializer;
 
     public SetOrderPaidStatusUpdateHandler(ApplicationEventPublisher publisher,
-                                           SessionManagerService sessionManager,
                                            PurchaseRepository purchaseRepository,
-                                           CustomerRepository customerRepository) {
+                                           CustomerRepository customerRepository, PaymentRepository paymentRepository) {
         this.publisher = publisher;
-        this.sessionManager = sessionManager;
         this.purchaseRepository = purchaseRepository;
         this.customerRepository = customerRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -56,20 +53,21 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
     protected void handleCallback(Update update, SetOrderPaidCommandDto dto) {
         Session currentSession = dto.getSession();
         Long eventEmitterId = update.getCallbackQuery().getMessage().getChatId();
+
         logger.info("Command received: Payment Confirmation from user " +
                 eventEmitterId + ", session Id: " + currentSession.getId());
 
         Customer eventEmitter = customerRepository.getByChatId(eventEmitterId);
-        currentSession.setCompletePaymentsCount(currentSession.getCompletePaymentsCount() + 1);
-        sessionManager.saveSession(currentSession);
-
+        paymentRepository.registerPayment(currentSession, eventEmitter);
         for (Customer c : purchaseRepository.getSessionCustomers(currentSession)) {
-            publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
-                    .text("Пользователь " + eventEmitter + " оплатил свой заказ.\n" +
-                            "Оплачено заказов: " + currentSession.getCompletePaymentsCount() +
-                            " из " + currentSession.getCustomersCount())
-                    .chatId(c.getChatId().toString())
-                    .build()));
+            if (c.getSettings().isReceivePaymentConfirmationNotification()) {
+                publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                        .text("Пользователь " + eventEmitter + " оплатил свой заказ.\n" +
+                                "Оплачено заказов: " + paymentRepository.getCompletePaymentsCount(currentSession) +
+                                " из " + paymentRepository.getSessionCustomersCount(currentSession))
+                        .chatId(c.getChatId().toString())
+                        .build()));
+            }
         }
     }
 }

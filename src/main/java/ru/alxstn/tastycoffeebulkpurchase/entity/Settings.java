@@ -16,8 +16,11 @@ public class Settings {
     @OneToOne(optional = false, cascade = CascadeType.ALL)
     private Customer customer;
 
-    @Column(name = "discount_notification")
+    @Column(name = "discount_notification_notification")
     private boolean receiveDiscountNotification;
+
+    @Column(name = "payment_confirmation_notification")
+    private boolean receivePaymentConfirmationNotification;
 
     public Settings() {
         setDefaults();
@@ -25,6 +28,7 @@ public class Settings {
 
     private void setDefaults() {
         setReceiveDiscountNotification(true);
+        setReceivePaymentConfirmationNotification(true);
     }
 
     public Long getId() {
@@ -43,7 +47,7 @@ public class Settings {
         this.customer = customer;
     }
 
-    public boolean isReceiveDiscountNotification() {
+    public boolean getReceiveDiscountNotification() {
         return receiveDiscountNotification;
     }
 
@@ -51,4 +55,15 @@ public class Settings {
         this.receiveDiscountNotification = receiveDiscountNotification;
     }
 
+    public boolean isReceiveDiscountNotification() {
+        return receiveDiscountNotification;
+    }
+
+    public boolean isReceivePaymentConfirmationNotification() {
+        return receivePaymentConfirmationNotification;
+    }
+
+    public void setReceivePaymentConfirmationNotification(boolean receivePaymentConfirmationNotification) {
+        this.receivePaymentConfirmationNotification = receivePaymentConfirmationNotification;
+    }
 }

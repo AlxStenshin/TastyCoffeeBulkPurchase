@@ -25,6 +25,10 @@ public class Customer {
     @Column(name = "registration_timestamp")
     private LocalDateTime registrationTimestamp;
 
+    @OneToOne(mappedBy = "customer")
+    @PrimaryKeyJoinColumn
+    private Settings settings;
+
     public Long getChatId() {
         return chatId;
     }
@@ -63,6 +67,15 @@ public class Customer {
 
     public void setRegistrationTimestamp(LocalDateTime registeredAt) {
         this.registrationTimestamp = registeredAt;
+    }
+
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Settings settings) {
+        this.settings = settings;
     }
 
     @Override

@@ -6,12 +6,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Payment;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 
 
@@ -21,11 +23,14 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
     Logger logger = LogManager.getLogger(SavePurchaseUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final PurchaseRepository purchaseRepository;
+    private final PaymentRepository paymentRepository;
 
     public SavePurchaseUpdateHandler(ApplicationEventPublisher publisher,
-                                     PurchaseRepository purchaseRepository) {
+                                     PurchaseRepository purchaseRepository,
+                                     PaymentRepository paymentRepository) {
         this.publisher = publisher;
         this.purchaseRepository = purchaseRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -51,6 +56,11 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
 
         try {
             purchaseRepository.save(purchase);
+            if (paymentRepository.paymentRegistered(dto.getSession(), dto.getCustomer()).isEmpty()) {
+                Payment payment = new Payment(dto.getCustomer(), dto.getSession());
+                paymentRepository.save(payment);
+            }
+
             publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                     .cacheTime(10)
                     .text("Сохранено!")

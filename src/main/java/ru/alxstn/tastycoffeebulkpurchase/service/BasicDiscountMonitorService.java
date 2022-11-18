@@ -52,7 +52,8 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
 
     @Override
     public void checkDiscountSize() {
-        Double currentSessionDiscountSensitiveWeight = purchaseRepository.getTotalDiscountSensitiveWeightForCurrentSession();
+        Double currentSessionDiscountSensitiveWeight = purchaseRepository
+                .getTotalDiscountSensitiveWeightForCurrentSession().orElse(0d);
         sessionRepository.setCurrentSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
         logger.debug("Discount value: " + newDiscount + " Purchase Weight: " + currentSessionDiscountSensitiveWeight);
@@ -63,6 +64,7 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 
+            // ToDo: ?Do not send message for customers without any orders in current session?
             for (Settings settings : settingsRepository.findDiscountNotificationSubscribedUsers()) {
                 publisher.publishEvent(new SendMessageEvent(this,
                         SendMessage.builder()
