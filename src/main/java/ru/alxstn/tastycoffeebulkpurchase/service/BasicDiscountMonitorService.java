@@ -7,14 +7,17 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Settings;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.SettingsRepository;
 
+import java.util.List;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Component
 public class BasicDiscountMonitorService implements DiscountMonitorService {
@@ -22,20 +25,17 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
     Logger logger = LogManager.getLogger(DiscountMonitorService.class);
     private final ApplicationEventPublisher publisher;
     private final PurchaseRepository purchaseRepository;
-    private final SettingsRepository settingsRepository;
     private final SessionRepository sessionRepository;
     private final TreeMap<Integer, Integer> discounts;
 
     public BasicDiscountMonitorService(ApplicationEventPublisher publisher,
                                        PurchaseRepository purchaseRepository,
-                                       SessionRepository sessionRepository,
-                                       SettingsRepository settingsRepository) {
+                                       SessionRepository sessionRepository) {
         this.publisher = publisher;
         this.purchaseRepository = purchaseRepository;
         this.sessionRepository = sessionRepository;
-        this.settingsRepository = settingsRepository;
 
-        this.discounts =  new TreeMap<>();
+        this.discounts = new TreeMap<>();
         discounts.put(0, 0);
         discounts.put(10, 10);
         discounts.put(25, 20);
@@ -52,23 +52,31 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
 
     @Override
     public void checkDiscountSize() {
+
+        Session currentSession = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+
         Double currentSessionDiscountSensitiveWeight = purchaseRepository
                 .getTotalDiscountSensitiveWeightForCurrentSession().orElse(0d);
+
         sessionRepository.setCurrentSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
         logger.debug("Discount value: " + newDiscount + " Purchase Weight: " + currentSessionDiscountSensitiveWeight);
         int previousDiscount = sessionRepository.getCurrentSessionDiscountValue();
 
-        if (previousDiscount!= newDiscount) {
+        if (previousDiscount != newDiscount) {
             sessionRepository.setCurrentSessionDiscountValue(newDiscount);
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 
-            // ToDo: ?Do not send message for customers without any orders in current session?
-            for (Settings settings : settingsRepository.findDiscountNotificationSubscribedUsers()) {
+            List<Customer> currentSessionSubscribedCustomers = purchaseRepository.getSessionCustomers(currentSession)
+                    .stream()
+                    .filter(c -> c.getNotificationSettings().isReceiveDiscountNotification())
+                    .collect(Collectors.toList());
+
+            for (var c : currentSessionSubscribedCustomers) {
                 publisher.publishEvent(new SendMessageEvent(this,
                         SendMessage.builder()
-                                .chatId(settings.getId())
+                                .chatId(c.getChatId())
                                 .text("Изменился размер скидки на текущий заказ. " +
                                         "\nБыло: " + previousDiscount + "%" +
                                         "\nСтало: " + newDiscount + "%")

@@ -11,13 +11,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import ru.alxstn.tastycoffeebulkpurchase.bot.MainMenuKeyboard;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Settings;
+import ru.alxstn.tastycoffeebulkpurchase.entity.CustomerNotificationSettings;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.SettingsRepository;
 
 import java.util.Arrays;
 
@@ -25,7 +24,6 @@ import java.util.Arrays;
 public class StartCommandHandler implements CommandHandler {
     private final ApplicationEventPublisher publisher;
     private final CustomerRepository customerRepository;
-    private final SettingsRepository settingsRepository;
     private final DtoSerializer serializer;
 
     @Autowired
@@ -33,11 +31,9 @@ public class StartCommandHandler implements CommandHandler {
 
     public StartCommandHandler(ApplicationEventPublisher publisher,
                                CustomerRepository customerRepository,
-                               SettingsRepository settingsRepository,
                                DtoSerializer serializer) {
         this.publisher = publisher;
         this.customerRepository = customerRepository;
-        this.settingsRepository = settingsRepository;
         this.serializer = serializer;
     }
 
@@ -49,18 +45,15 @@ public class StartCommandHandler implements CommandHandler {
             welcomeMessage = "С возвращением";
         } else {
             Customer customer = new Customer();
+            CustomerNotificationSettings settings = new CustomerNotificationSettings();
+            customer.setNotificationSettings(settings);
             customer.setChatId(message.getChatId());
             customer.setFirstName(message.getChat().getFirstName());
             customer.setLastName(message.getChat().getLastName());
             customer.setUserName(message.getChat().getUserName());
-
-            Settings settings = new Settings();
-            settings.setId(customer.getChatId());
-            settings.setCustomer(customer);
-
             customerRepository.save(customer);
-            settingsRepository.save(settings);
         }
+
         publisher.publishEvent(new SendMessageEvent(this,
                 SendMessage.builder()
                         .text(welcomeMessage + ", " +

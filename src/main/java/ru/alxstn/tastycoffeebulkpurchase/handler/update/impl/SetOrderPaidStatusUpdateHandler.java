@@ -60,7 +60,7 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
         Customer eventEmitter = customerRepository.getByChatId(eventEmitterId);
         paymentRepository.registerPayment(currentSession, eventEmitter);
         for (Customer c : purchaseRepository.getSessionCustomers(currentSession)) {
-            if (c.getSettings().isReceivePaymentConfirmationNotification()) {
+            if (c.getNotificationSettings().isReceivePaymentConfirmationNotification()) {
                 publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
                         .text("Пользователь " + eventEmitter + " оплатил свой заказ.\n" +
                                 "Оплачено заказов: " + paymentRepository.getCompletePaymentsCount(currentSession) +

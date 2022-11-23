@@ -6,9 +6,12 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity(name = "customer")
+@SecondaryTable(name = "notification_settings",
+        pkJoinColumns = @PrimaryKeyJoinColumn(name = "customer_id"))
 public class Customer {
 
     @Id
+    @PrimaryKeyJoinColumn
     @Column(name = "id")
     private Long chatId;
 
@@ -25,9 +28,8 @@ public class Customer {
     @Column(name = "registration_timestamp")
     private LocalDateTime registrationTimestamp;
 
-    @OneToOne(mappedBy = "customer")
-    @PrimaryKeyJoinColumn
-    private Settings settings;
+    @Embedded
+    CustomerNotificationSettings notificationSettings;
 
     public Long getChatId() {
         return chatId;
@@ -65,17 +67,16 @@ public class Customer {
         return registrationTimestamp;
     }
 
-    public void setRegistrationTimestamp(LocalDateTime registeredAt) {
-        this.registrationTimestamp = registeredAt;
+    public void setRegistrationTimestamp(LocalDateTime registrationTimestamp) {
+        this.registrationTimestamp = registrationTimestamp;
     }
 
-
-    public Settings getSettings() {
-        return settings;
+    public CustomerNotificationSettings getNotificationSettings() {
+        return notificationSettings;
     }
 
-    public void setSettings(Settings settings) {
-        this.settings = settings;
+    public void setNotificationSettings(CustomerNotificationSettings notificationSettings) {
+        this.notificationSettings = notificationSettings;
     }
 
     @Override
@@ -83,3 +84,4 @@ public class Customer {
         return firstName + " " + lastName + " (" + userName + ")";
     }
 }
+

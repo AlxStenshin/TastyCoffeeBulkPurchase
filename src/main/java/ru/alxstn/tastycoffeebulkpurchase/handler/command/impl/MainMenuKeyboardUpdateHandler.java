@@ -7,13 +7,11 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MainMenuKeyboard;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
@@ -24,8 +22,7 @@ import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 @Component
@@ -139,8 +136,25 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
 
                 case SETTING:
+                    List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+                    CustomerNotificationSettings customerSettings = customerRepository
+                            .getByChatId(message.getChatId())
+                            .getNotificationSettings();
+
+                    buttons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                                            .text("Настройки уведомлений")
+                                            .callbackData(serializer.serialize(
+                                                    new SetCustomerNotificationSettingsDto(customerSettings)))
+                                            .build()));
+
                     publisher.publishEvent(new SendMessageEvent(this,
-                            SendMessage.builder().chatId(chatId).text("Settings Action").build()));
+                            SendMessage.builder()
+                            .text("Выбрерите категорию")
+                            .parseMode("html")
+                            .chatId(message.getChatId().toString())
+                            .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
+                            .build()));
+
                     break;
 
                 case STATISTIC:

@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
+import ru.alxstn.tastycoffeebulkpurchase.handler.command.parser.CommandParser;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
-import ru.alxstn.tastycoffeebulkpurchase.handler.command.parser.CommandParser;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.ParsedCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 

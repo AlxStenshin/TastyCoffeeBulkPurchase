@@ -33,6 +33,7 @@ public class MenuNavigationBotMessage <T>  {
 
     public MenuNavigationBotMessage(Update update) {
         this.update = update;
+        dataSource = new ArrayList<>();
         buttons = new ArrayList<>();
     }
 
