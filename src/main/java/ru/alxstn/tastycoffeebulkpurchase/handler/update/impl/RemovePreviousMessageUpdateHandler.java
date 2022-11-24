@@ -12,12 +12,12 @@ import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 
 @Component
-public class RemovePreviousMessageCommandUpdateHandler extends CallbackUpdateHandler<RemoveMessageCommandDto> {
+public class RemovePreviousMessageUpdateHandler extends CallbackUpdateHandler<RemoveMessageCommandDto> {
 
-    Logger logger = LogManager.getLogger(RemovePreviousMessageCommandUpdateHandler.class);
+    Logger logger = LogManager.getLogger(RemovePreviousMessageUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
 
-    public RemovePreviousMessageCommandUpdateHandler(ApplicationEventPublisher publisher) {
+    public RemovePreviousMessageUpdateHandler(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
     }
 

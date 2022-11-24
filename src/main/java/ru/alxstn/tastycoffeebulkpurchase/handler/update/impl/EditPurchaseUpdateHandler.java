@@ -43,6 +43,8 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
 
     @Override
     protected void handleCallback(Update update, EditPurchaseCommandDto dto) {
+        // ToDo: Reuse SetProductQuantityUpdateHandler
+
         Purchase purchase = dto.getPurchase();
         Product targetProduct = purchase.getProduct();
 

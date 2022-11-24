@@ -47,13 +47,12 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
     protected void handleCallback(Update update, SavePurchaseCommandDto dto) {
         logger.info("Save Purchase Command Received.");
 
-        Purchase purchase = new Purchase(
-                dto.getCustomer(),
-                dto.getProduct(),
-                dto.getSession(),
-                dto.getProductForm(),
-                dto.getProductCount());
-
+        Purchase purchase = purchaseRepository.getPurchaseIgnoringProductQuantity(
+                        dto.getCustomer(), dto.getProduct(), dto.getSession(), dto.getProductForm())
+                .orElse(new Purchase(dto.getCustomer(), dto.getProduct(), dto.getSession(), dto.getProductForm(), 0));
+        int previousCount = purchase.getCount();
+        int newCount = dto.getProductCount();
+        purchase.setCount(previousCount == 0 ? newCount : previousCount + newCount);
         try {
             purchaseRepository.save(purchase);
             if (paymentRepository.paymentRegistered(dto.getSession(), dto.getCustomer()).isEmpty()) {
