@@ -77,7 +77,8 @@ public class BasicSessionSummaryCustomerNotifierService implements SessionSummar
 
     private String buildMessage(List<Purchase> purchases, int discountValue, String paymentInstructions) {
         double totalPrice = 0;
-        double discountablePrice = 0;
+        double discountableTotal = 0;
+        double nonDiscountableTotal = 0;
 
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("Ваш заказ:\n\n");
@@ -88,22 +89,29 @@ public class BasicSessionSummaryCustomerNotifierService implements SessionSummar
             totalPrice += p.getCount() * targetProduct.getPrice();
 
             if (targetProduct.isDiscountable()) {
-                discountablePrice += p.getCount() * targetProduct.getPrice();
+                discountableTotal += p.getCount() * targetProduct.getPrice();
+            } else {
+                nonDiscountableTotal += p.getCount() * targetProduct.getPrice();
             }
 
             messageBuilder.append(p.getPurchaseSummary());
-            messageBuilder.append("\n\n");
+            messageBuilder.append("\n");
         }
 
-        double totalPriceWithDiscount = discountablePrice * ((double)(100 - discountValue) / 100);
+        double discountableTotalWithDiscount = discountableTotal * ((double)(100 - discountValue) / 100);
+        double totalPriceWithDiscount = discountableTotalWithDiscount + nonDiscountableTotal;
         messageBuilder.append("</code>");
-        messageBuilder.append("--- Итого ---\n");
-        messageBuilder.append("Без скидки: ").append(totalPrice).append("₽");
-        messageBuilder.append(discountValue > 0 ? "\nС учетом скидки " + discountValue + "% на кофе: " + totalPriceWithDiscount +"₽" : "");
+        messageBuilder.append("\n\n--- Итого ---\n");
+        messageBuilder.append("Всего: ").append(totalPrice).append("₽");
+        messageBuilder.append("\n   Кофе: ").append(discountableTotal).append("₽");
+        messageBuilder.append(discountValue > 0 ? "\n   Кофе с учетом скидки " + discountValue + "%: " + discountableTotalWithDiscount +"₽" : "");
+        messageBuilder.append("\n   Другие товары: ").append(nonDiscountableTotal).append("₽");
+        messageBuilder.append("\n\nВсего к оплате: ").append(totalPriceWithDiscount).append("₽");
         messageBuilder.append("\n\n");
-        messageBuilder.append("Оплата: ").append(paymentInstructions).append("\n\n");
         messageBuilder.append("Внесите оплату и нажмите кнопку \"Оплачено\"\n");
+        messageBuilder.append("Оплата: ").append(paymentInstructions).append("\n");
 
+        logger.info(messageBuilder.toString());
         return messageBuilder.toString();
     }
 }

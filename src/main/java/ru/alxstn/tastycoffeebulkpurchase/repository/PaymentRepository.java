@@ -21,7 +21,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> paymentRegistered(@Param(value = "session") Session session,
                                         @Param(value = "customer") Customer customer);
 
-
     @Modifying
     @Transactional
     @Query("UPDATE payment p SET p.paymentStatus = true")

@@ -120,6 +120,7 @@ public class TastyCoffeePage {
                 logger.info("Ignoring Price List Tab " + text);
             }
         }
+        // ToDo: Check total sum and product count by groups (counters in "nav-link active")
         return currentSessionPurchases;
     }
 

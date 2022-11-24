@@ -153,9 +153,13 @@ public class Product {
 
     public boolean isDiscountable() {
         return (!getSpecialMark().equals("Сорт недели") &&
-                getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
+                (getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
                 getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") ||
-                getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ"));
+                getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")));
+    }
+
+    public boolean isAvailable() {
+        return !getSpecialMark().equals("нет");
     }
 
     public String getDisplayName() {

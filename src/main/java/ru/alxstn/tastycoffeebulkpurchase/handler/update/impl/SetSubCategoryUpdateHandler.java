@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductSubCategoryCommandDto;
@@ -16,6 +17,9 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Component
 public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProductSubCategoryCommandDto> {
@@ -54,7 +58,12 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
 
         MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите продукт: ");
-        answer.setDataSource(productRepository.findDistinctActiveProductNamesBySubCategory(targetCategory));
+        answer.setDataSource(new ArrayList<>(productRepository.findDistinctActiveProductsBySubCategory(targetCategory)
+                .stream()
+                .filter(Product::isAvailable)
+                    .map(Product::getName)
+                .collect(Collectors.toSet())));
+
         answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)

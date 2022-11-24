@@ -105,22 +105,22 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
 
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Зерно") ? "Зерно *" : "Зерно")
+                    .text(currentForm.equals("Зерно") ? "Зерно ✅" : "Зерно")
                     .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Зерно")))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Крупный") ? "Крупный *" : "Крупный")
+                    .text(currentForm.equals("Крупный") ? "Крупный ✅" : "Крупный")
                     .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Крупный")))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Средний") ? "Средний *" : "Средний")
+                    .text(currentForm.equals("Средний") ? "Средний ✅" : "Средний")
                     .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Средний")))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Мелкий") ? "Мелкий *" : "Мелкий")
+                    .text(currentForm.equals("Мелкий") ? "Мелкий ✅" : "Мелкий")
                     .callbackData(serializer.serialize(new SetProductQuantityCommandDto(dto, "Мелкий")))
                     .build());
 
@@ -135,7 +135,7 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
                     .build());
 
         menuNavigationButtons.add(InlineKeyboardButton.builder()
-                .text("< Категории")
+                .text("<< Категории")
                 .callbackData(serializer.serialize(new PlaceOrderCommandDto("PlaceOrder")))
                 .build());
 

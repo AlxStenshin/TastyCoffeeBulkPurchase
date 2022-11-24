@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdater.webscrapper;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdater;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -36,6 +36,7 @@ public class WebScrapperPriceListUpdaterService implements PriceListUpdaterServi
     @Scheduled(fixedRate = 3 * 60 * 60 * 1000, initialDelay = 500)
     public void updatePriceList() {
         tastyCoffeeWebPage.login();
+        tastyCoffeeWebPage.resetOrder();
         List<Product> priceList = tastyCoffeeWebPage.buildPriceList();
         logger.info("Got " + priceList.size() + " items in price list");
 

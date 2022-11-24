@@ -5,12 +5,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ClearPurchasesCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 
@@ -54,8 +56,12 @@ public class ClearPurchasesUpdateHandler extends CallbackUpdateHandler<ClearPurc
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
 
-        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Clear"));
+        publisher.publishEvent(new RemoveMessageEvent(this,
+                DeleteMessage.builder()
+                        .messageId(update.getCallbackQuery().getMessage().getMessageId())
+                        .chatId(update.getCallbackQuery().getMessage().getChatId())
+                        .build()));
 
-        // ToDo: Show Main Menu After That
+        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Clear"));
     }
 }

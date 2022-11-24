@@ -100,7 +100,7 @@ public class MenuNavigationBotMessage <T>  {
 
         if (selectProductCategoryButtonCallback != null) {
             serviceButtonsRow.add(InlineKeyboardButton.builder()
-                            .text("< Категории")
+                            .text("<< Категории")
                             .callbackData(selectProductCategoryButtonCallback)
                             .build());
         }

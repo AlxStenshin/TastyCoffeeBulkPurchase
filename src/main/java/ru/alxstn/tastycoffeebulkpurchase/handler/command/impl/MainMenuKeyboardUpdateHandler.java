@@ -169,6 +169,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
     void sendNoActiveSessionFoundMessage(Update update) {
         publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                // ToDo: add polling
                 .text("Активная сессия не обнаружена. \n" +
                         "Заказы не принимаются.\n" +
                         "Для открытия новой сессии обратитесь к администратору бота или запустите <Голосование>")

@@ -15,8 +15,8 @@ public class CustomerNotificationSettings {
     private static final String receivePaymentConfirmationNotificationDescription = "Уведомления об оплате закзазов";
 
     public CustomerNotificationSettings() {
-        this.receiveDiscountNotification = true;
-        this.receivePaymentConfirmationNotification = true;
+        this.receiveDiscountNotification = false;
+        this.receivePaymentConfirmationNotification = false;
     }
 
     public CustomerNotificationSettings(CustomerNotificationSettings settings) {

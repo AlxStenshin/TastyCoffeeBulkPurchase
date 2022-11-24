@@ -60,18 +60,17 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
                 Payment payment = new Payment(dto.getCustomer(), dto.getSession());
                 paymentRepository.save(payment);
             }
-
-            publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
-                    .cacheTime(10)
-                    .text("Сохранено!")
-                    .showAlert(false)
-                    .callbackQueryId(update.getCallbackQuery().getId())
-                    .build()));
-
-            publisher.publishEvent(new DiscountCheckRequestEvent(this, "Save"));
         } catch (Exception e) {
             logger.error("Saving new purchase : " + purchase + " " + e.getMessage());
         }
-        // ToDo: Show Edit Purchase DTO After That
+
+        publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
+                .cacheTime(0)
+                .text("Сохранено!\n" + dto.getProduct().getDisplayName())
+                .showAlert(false)
+                .callbackQueryId(update.getCallbackQuery().getId())
+                .build()));
+
+        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Save"));
     }
 }
