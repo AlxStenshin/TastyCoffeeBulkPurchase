@@ -19,6 +19,8 @@ public enum SerializableInlineType {
 
     REMOVE_BOT_MESSAGE(13),
     REQUEST_PURCHASE_SUMMARY(14),
+    REQUEST_SESSION_SUMMARY(15),
+
     ;
 
     private final int index;

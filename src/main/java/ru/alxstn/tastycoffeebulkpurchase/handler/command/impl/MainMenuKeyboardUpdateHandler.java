@@ -71,67 +71,70 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
             switch (keyboardButton.get()) {
 
+                // ToDo: Separate DTO: PlaceOrder (Purchase)
                 case PLACE_ORDER:
                     try {
                         Session currentSession = sessionManager.getCurrentSession();
-                        // ToDo: Separate DTO: PlaceOrder (Purchase)
-                        MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
-                        placeOrderAnswer.setTitle("Выберите категорию: ");
-                        placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
-                        placeOrderAnswer.setButtonCreator(s -> InlineKeyboardButton.builder()
-                                .text(s)
-                                .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,
-                                        new PlaceOrderCommandDto("PlaceOrder"))))
-                                .build());
+                        if (!currentSession.isClosed()) {
+                            MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
+                            placeOrderAnswer.setTitle("Выберите категорию: ");
+                            placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
+                            placeOrderAnswer.setButtonCreator(s -> InlineKeyboardButton.builder()
+                                    .text(s)
+                                    .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,
+                                            new PlaceOrderCommandDto("PlaceOrder"))))
+                                    .build());
 
-                        publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
+                            publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
+                        }
                     } catch (SessionNotFoundException e) {
                         sendNoActiveSessionFoundMessage(update);
                     }
                     break;
 
+                // ToDo: Separate DTO: EditOrder (Purchase)
                 case EDIT_ORDER:
-                    // ToDo: Separate DTO: EditOrder (Purchase)
                     try {
                         Session currentSession = sessionManager.getCurrentSession();
-                        Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
+                        if (!currentSession.isClosed()) {
+                            Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
+                            List<Purchase> purchases = purchaseRepository
+                                    .findAllPurchasesInSessionByCustomer(currentSession, customer);
+                            if (purchases.size() > 0) {
+                                MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
+                                editOrderAnswer.setTitle("Выберите продукт из заказа: ");
+                                editOrderAnswer.setDataSource(purchases);
 
-                        List<Purchase> purchases = purchaseRepository
-                                .findAllPurchasesInSessionByCustomer(currentSession, customer);
+                                Function<Purchase, String> buttonTitleCreator = purchase -> {
+                                    Product product = purchase.getProduct();
+                                    String buttonTitle = product.getName();
+                                    buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
+                                    buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
+                                    buttonTitle += " x " + purchase.getCount() + " шт.";
+                                    return buttonTitle;
+                                };
 
-                        if (purchases.size() > 0) {
-                            MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
-                            editOrderAnswer.setTitle("Выберите продукт из заказа: ");
-                            editOrderAnswer.setDataSource(purchases);
+                                editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
+                                        .text(buttonTitleCreator.apply(p))
+                                        .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
+                                        .build());
 
-                            Function<Purchase, String> buttonTitleCreator = purchase -> {
-                                Product product = purchase.getProduct();
-                                String buttonTitle = product.getName();
-                                buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
-                                buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
-                                buttonTitle += " x " + purchase.getCount() + " шт.";
-                                return buttonTitle;
-                            };
+                                editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
+                                        .text("Очистить заказ")
+                                        .callbackData(serializer.serialize(new ClearPurchasesCommandDto(purchases)))
+                                        .build()));
 
-                            editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
-                                    .text(buttonTitleCreator.apply(p))
-                                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
-                                    .build());
-
-                            editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
-                                    .text("Очистить заказ")
-                                    .callbackData(serializer.serialize(new ClearPurchasesCommandDto(purchases)))
-                                    .build()));
-
-                            publisher.publishEvent(new SendMessageEvent(this, editOrderAnswer.newMessage()));
-
+                                publisher.publishEvent(new SendMessageEvent(this, editOrderAnswer.newMessage()));
+                            } else {
+                                publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                                        .text("Ваш заказ пуст")
+                                        .chatId(update.getMessage().getChatId().toString())
+                                        .build()));
+                            }
                         } else {
-                            publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
-                                    .text("Ваш заказ пуст")
-                                    .chatId(update.getMessage().getChatId().toString())
-                                    .build()));
+                            sendNoActiveSessionFoundMessage(update);
                         }
-                    } catch (SessionNotFoundException e){
+                    } catch (SessionNotFoundException e) {
                         sendNoActiveSessionFoundMessage(update);
                     }
                     break;
@@ -155,7 +158,6 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                     .chatId(message.getChatId().toString())
                                     .replyMarkup(InlineKeyboardMarkup.builder().keyboard(settingsButtons).build())
                                     .build()));
-
                     break;
 
                 case INFORMATION:
@@ -168,12 +170,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                     informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                             .text("Информация о текущей сессии")
-                            // Session discount value
-                            // Session payment info
-                            // Total customers
-                            // Total Coffee Weight
-                            // Current Paid Orders / Price
-                            .callbackData("none")
+                            .callbackData(serializer.serialize(new RequestSessionSummaryCommandDto()))
                             .build()));
 
                     informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()

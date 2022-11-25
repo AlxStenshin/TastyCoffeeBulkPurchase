@@ -33,4 +33,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("SELECT COUNT(p) FROM payment p WHERE p.session = :session")
     int getSessionCustomersCount(@Param(value = "session") Session session);
 
+    @Query("SELECT SUM(p.amount) FROM payment p WHERE p.session = :session")
+    long getSessionTotalAmountPrice(@Param(value = "session") Session session);
+
 }

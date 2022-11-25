@@ -23,16 +23,16 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class BasicSessionSummaryCustomerNotifierService implements SessionSummaryCustomerNotifierService {
+public class BasicCustomerPaymentRequestPublisherService implements CustomerPaymentRequestPublisherService {
 
-    Logger logger = LogManager.getLogger(BasicSessionSummaryCustomerNotifierService.class);
+    Logger logger = LogManager.getLogger(BasicCustomerPaymentRequestPublisherService.class);
     private final ApplicationEventPublisher publisher;
     private final DtoSerializer serializer;
     private final CustomerSummaryCreatorService customerSummaryCreatorService;
 
-    public BasicSessionSummaryCustomerNotifierService(ApplicationEventPublisher publisher,
-                                                      DtoSerializer serializer,
-                                                      CustomerSummaryCreatorService customerSummaryCreatorService) {
+    public BasicCustomerPaymentRequestPublisherService(ApplicationEventPublisher publisher,
+                                                       DtoSerializer serializer,
+                                                       CustomerSummaryCreatorService customerSummaryCreatorService) {
         this.publisher = publisher;
         this.serializer = serializer;
         this.customerSummaryCreatorService = customerSummaryCreatorService;
