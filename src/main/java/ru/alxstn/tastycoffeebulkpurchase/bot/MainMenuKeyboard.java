@@ -5,9 +5,9 @@ import java.util.Optional;
 
 public enum MainMenuKeyboard {
     PLACE_ORDER("Собрать заказ"),
-    STATISTIC("Статистика \uD83D\uDCCA"),
+    INFORMATION("Информация \uD83D\uDCCA"),
     SETTING("Настройки \uD83D\uDEE0"),
-    EDIT_ORDER("Редактировать заказ");
+    EDIT_ORDER("Изменить заказ");
 
     private final String label;
 

@@ -15,6 +15,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
@@ -71,7 +72,8 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
             switch (keyboardButton.get()) {
 
                 case PLACE_ORDER:
-                    if (sessionManager.activeSessionAvailable()) {
+                    try {
+                        Session currentSession = sessionManager.getCurrentSession();
                         // ToDo: Separate DTO: PlaceOrder (Purchase)
                         MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
                         placeOrderAnswer.setTitle("Выберите категорию: ");
@@ -83,19 +85,19 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                 .build());
 
                         publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
-                    } else {
+                    } catch (SessionNotFoundException e) {
                         sendNoActiveSessionFoundMessage(update);
                     }
                     break;
 
                 case EDIT_ORDER:
                     // ToDo: Separate DTO: EditOrder (Purchase)
-                    if (sessionManager.activeSessionAvailable()) {
+                    try {
                         Session currentSession = sessionManager.getCurrentSession();
                         Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
 
                         List<Purchase> purchases = purchaseRepository
-                                .findAllPurchasesInSessionByCustomerId(currentSession, customer);
+                                .findAllPurchasesInSessionByCustomer(currentSession, customer);
 
                         if (purchases.size() > 0) {
                             MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
@@ -129,37 +131,70 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                     .chatId(update.getMessage().getChatId().toString())
                                     .build()));
                         }
-                    } else {
+                    } catch (SessionNotFoundException e){
                         sendNoActiveSessionFoundMessage(update);
                     }
                     break;
 
 
                 case SETTING:
-                    List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+                    List<List<InlineKeyboardButton>> settingsButtons = new ArrayList<>();
                     CustomerNotificationSettings customerSettings = customerRepository
                             .getByChatId(message.getChatId())
                             .getNotificationSettings();
 
-                    buttons.add(Collections.singletonList(InlineKeyboardButton.builder()
-                                            .text("Настройки уведомлений")
-                                            .callbackData(serializer.serialize(
-                                                    new SetCustomerNotificationSettingsDto(customerSettings)))
-                                            .build()));
+                    settingsButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Настройки уведомлений")
+                            .callbackData(serializer.serialize(
+                                    new SetCustomerNotificationSettingsDto(customerSettings)))
+                            .build()));
 
                     publisher.publishEvent(new SendMessageEvent(this,
                             SendMessage.builder()
-                            .text("Выбрерите категорию")
-                            .parseMode("html")
-                            .chatId(message.getChatId().toString())
-                            .replyMarkup(InlineKeyboardMarkup.builder().keyboard(buttons).build())
-                            .build()));
+                                    .text("Выбрерите категорию")
+                                    .chatId(message.getChatId().toString())
+                                    .replyMarkup(InlineKeyboardMarkup.builder().keyboard(settingsButtons).build())
+                                    .build()));
 
                     break;
 
-                case STATISTIC:
+                case INFORMATION:
+                    List<List<InlineKeyboardButton>> informationButtons = new ArrayList<>();
+
+                    informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Скачать PriceList")
+                            .url("https://storage.yandexcloud.net/coffee-opt-static/media/TastyCoffee_pricelist.pdf")
+                            .build()));
+
+                    informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Информация о текущей сессии")
+                            // Session discount value
+                            // Session payment info
+                            // Total customers
+                            // Total Coffee Weight
+                            // Current Paid Orders / Price
+                            .callbackData("none")
+                            .build()));
+
+                    informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Информация о заказе")
+                            .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto()))
+                            .build()));
+
+                    informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Закрыть")
+                            // ToDo: Pass correct message id to delete (this)
+                            .callbackData(serializer.serialize(new RemoveMessageCommandDto(
+                                    update.getMessage().getMessageId(),
+                                    update.getMessage().getChatId())))
+                            .build()));
+
                     publisher.publishEvent(new SendMessageEvent(this,
-                            SendMessage.builder().chatId(chatId).text("Statistics Action").build()));
+                            SendMessage.builder()
+                                    .text("Выбрерите категорию")
+                                    .chatId(message.getChatId().toString())
+                                    .replyMarkup(InlineKeyboardMarkup.builder().keyboard(informationButtons).build())
+                                    .build()));
                     break;
             }
             return true;
@@ -170,9 +205,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     void sendNoActiveSessionFoundMessage(Update update) {
         publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
                 // ToDo: add polling
-                .text("Активная сессия не обнаружена. \n" +
-                        "Заказы не принимаются.\n" +
-                        "Для открытия новой сессии обратитесь к администратору бота или запустите <Голосование>")
+                .text(sessionManager.getSessionNotFoundMessage())
                 .chatId(update.getMessage().getChatId().toString())
                 .build()));
     }

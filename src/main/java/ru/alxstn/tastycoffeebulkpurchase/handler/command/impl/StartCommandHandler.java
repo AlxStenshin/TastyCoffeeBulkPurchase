@@ -78,7 +78,7 @@ public class StartCommandHandler implements CommandHandler {
                                                                         .text(MainMenuKeyboard.EDIT_ORDER.getLabel())
                                                                         .build(),
                                                                 KeyboardButton.builder()
-                                                                        .text(MainMenuKeyboard.STATISTIC.getLabel())
+                                                                        .text(MainMenuKeyboard.INFORMATION.getLabel())
                                                                         .build())))
                                         .build())
                         .chatId(message.getChatId().toString())

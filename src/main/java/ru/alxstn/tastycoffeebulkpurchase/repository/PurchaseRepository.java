@@ -18,7 +18,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     List<Purchase> findAllPurchasesInSession(@Param(value = "session") Session session);
 
     @Query("SELECT p FROM Purchase p WHERE p.session = :session AND p.customer = :customer")
-    List<Purchase> findAllPurchasesInSessionByCustomerId(
+    List<Purchase> findAllPurchasesInSessionByCustomer(
             @Param(value = "session") Session session,
             @Param(value = "customer") Customer customer);
 

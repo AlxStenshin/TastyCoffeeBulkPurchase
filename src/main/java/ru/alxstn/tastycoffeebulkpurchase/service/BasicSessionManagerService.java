@@ -52,12 +52,15 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public boolean activeSessionAvailable() {
-        try {
-            Session activeSession = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
-            return !activeSession.isClosed();
-        } catch (SessionNotFoundException e) {
-            return false;
-        }
+    public String getSessionNotFoundMessage() {
+        return "Активная сессия не обнаружена. \n" +
+                "Заказы не принимаются.\n" +
+                "Для открытия новой сессии обратитесь к администратору бота.";
+    }
+
+    @Override
+    public boolean activeSessionAvailable() throws SessionNotFoundException {
+        Session activeSession = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+        return !activeSession.isClosed();
     }
 }
