@@ -13,27 +13,24 @@ import java.util.Optional;
 public interface SessionRepository extends JpaRepository<Session, Long> {
     @Query("SELECT s FROM session s WHERE " +
             "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
-            "s.dateTimeClosed > CURRENT_TIMESTAMP")
-    Optional<Session> getCurrentSession();
+            "s.finished = false")
+    Optional<Session> getActiveSession();
 
     @Transactional
     @Modifying
     @Query("UPDATE session s SET s.discountPercentage = :discount WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
-            "s.dateTimeClosed > CURRENT_TIMESTAMP")
-    void setCurrentSessionDiscountValue(@Param(value = "discount") int value);
+            "s.dateTimeOpened < CURRENT_TIMESTAMP")
+    void setActiveSessionDiscountValue(@Param(value = "discount") int value);
 
     @Transactional
     @Modifying
     @Query("UPDATE session s SET s.discountableWeight = :weight WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
-            "s.dateTimeClosed > CURRENT_TIMESTAMP")
-    void setCurrentSessionDiscountableWeight(@Param(value = "weight") Double currentSessionDiscountSensitiveWeight);
+            "s.dateTimeOpened < CURRENT_TIMESTAMP")
+    void setActiveSessionDiscountableWeight(@Param(value = "weight") Double currentSessionDiscountSensitiveWeight);
 
 
     @Query("SELECT s.discountPercentage FROM session s WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
-            "s.dateTimeClosed > CURRENT_TIMESTAMP")
-    int getCurrentSessionDiscountValue();
+            "s.dateTimeOpened < CURRENT_TIMESTAMP")
+    int getActiveSessionDiscountValue();
 
 }

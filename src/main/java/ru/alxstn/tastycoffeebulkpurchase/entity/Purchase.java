@@ -67,6 +67,7 @@ public class Purchase {
                 '}';
     }
 
+    // ToDo: Do not show product form 'Зерно' for non-coffee product
     public String getPurchaseSummary() {
         String summary = product.getProductCategory() + " " + product.getDisplayName();
         summary += productForm.isEmpty() ? ", Зерно, " : " , " + productForm + " ";
@@ -74,6 +75,7 @@ public class Purchase {
         return summary;
     }
 
+    // ToDo: format price output, limit .xx values
     public String getProductCountAndTotalPrice() {
         return getCount() + " шт, " + getProduct().getPrice() * getCount() + "₽";
     }

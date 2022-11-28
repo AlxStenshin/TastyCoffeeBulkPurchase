@@ -74,7 +74,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                 // ToDo: Separate DTO: PlaceOrder (Purchase)
                 case PLACE_ORDER:
                     try {
-                        Session currentSession = sessionManager.getCurrentSession();
+                        Session currentSession = sessionManager.getActiveSession();
                         if (!currentSession.isClosed()) {
                             MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
                             placeOrderAnswer.setTitle("Выберите категорию: ");
@@ -86,6 +86,8 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                     .build());
 
                             publisher.publishEvent(new SendMessageEvent(this, placeOrderAnswer.newMessage()));
+                        } else {
+                            sendNoOpenSessionFoundMessage(update);
                         }
                     } catch (SessionNotFoundException e) {
                         sendNoActiveSessionFoundMessage(update);
@@ -95,7 +97,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                 // ToDo: Separate DTO: EditOrder (Purchase)
                 case EDIT_ORDER:
                     try {
-                        Session currentSession = sessionManager.getCurrentSession();
+                        Session currentSession = sessionManager.getActiveSession();
                         if (!currentSession.isClosed()) {
                             Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
                             List<Purchase> purchases = purchaseRepository
@@ -132,7 +134,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                         .build()));
                             }
                         } else {
-                            sendNoActiveSessionFoundMessage(update);
+                            sendNoOpenSessionFoundMessage(update);
                         }
                     } catch (SessionNotFoundException e) {
                         sendNoActiveSessionFoundMessage(update);
@@ -162,6 +164,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                 case INFORMATION:
                     List<List<InlineKeyboardButton>> informationButtons = new ArrayList<>();
+                    Session currentSession = sessionManager.getActiveSession();
 
                     informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                             .text("Скачать PriceList")
@@ -170,12 +173,12 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                     informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                             .text("Информация о текущей сессии")
-                            .callbackData(serializer.serialize(new RequestSessionSummaryCommandDto()))
+                            .callbackData(serializer.serialize(new RequestSessionSummaryCommandDto(currentSession)))
                             .build()));
 
                     informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                             .text("Информация о заказе")
-                            .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto()))
+                            .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto(currentSession)))
                             .build()));
 
                     informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
@@ -202,7 +205,13 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     void sendNoActiveSessionFoundMessage(Update update) {
         publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
                 // ToDo: add polling
-                .text(sessionManager.getSessionNotFoundMessage())
+                .text(sessionManager.getActiveSessionNotFoundMessage())
+                .chatId(update.getMessage().getChatId().toString())
+                .build()));
+    }
+    void sendNoOpenSessionFoundMessage(Update update) {
+        publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
+                .text(sessionManager.getOpenSessionNotFoundMessage())
                 .chatId(update.getMessage().getChatId().toString())
                 .build()));
     }

@@ -37,6 +37,7 @@
                     <th scope="col">Open Date</th>
                     <th scope="col">Close Date</th>
                     <th scope="col">Closed</th>
+                    <th scope="col">Finished</th>
                     <th scope="col">Discount Value</th>
                     <th scope="col">Discountable Weight</th>
                     <th scope="col">Total Weight</th>
@@ -55,6 +56,9 @@
                             <a th:if="${s.closed == false}"  class="fa-regular fa-square icon-dark"
                                 th:href="@{'/sessions/close/' + ${s.id}}" title="Close this session"></a>
                         </div>
+                    </td>                    <td>
+                        <div th:if="${s.finished == true}" class="fa-regular fa-square-check"></div>
+                        <div th:if="${s.finished == false}"  class="fa-regular fa-square icon-dark"></div>
                     </td>
                     <td>[[${s.discountPercentage}]]%</td>
                     <td>[[${s.discountableWeight}]] kg</td>

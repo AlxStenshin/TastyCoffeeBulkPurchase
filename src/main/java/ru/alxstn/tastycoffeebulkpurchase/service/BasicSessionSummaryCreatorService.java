@@ -21,13 +21,13 @@ public class BasicSessionSummaryCreatorService implements SessionSummaryCreatorS
         StringBuilder messageBuilder = new StringBuilder("<code>");
         messageBuilder.append("\nТекущая скидка на кофе: ").append(session.getDiscountPercentage()).append("%");
         messageBuilder.append("\nКофе в заказе: ").append(session.getDiscountableWeight()).append("кг.");
-        messageBuilder.append("\nДата открытия: ").append(session.getDateTimeOpened()).append("(UTC)");
-        messageBuilder.append("\nДата закрытия: ").append(session.getDateTimeClosed()).append("(UTC)");
+        messageBuilder.append("\nДата открытия: ").append(session.getDateTimeOpened());
+        messageBuilder.append("\nДата закрытия: ").append(session.getDateTimeClosed());
         messageBuilder.append("\nОплата: ").append(session.getPaymentInstruction());
-        messageBuilder.append("\n\nОбщая стоимость без скидки: ").append(paymentRepository.getSessionTotalAmountPrice(session));
+        messageBuilder.append("\n\nОбщая стоимость без скидки: ").append(paymentRepository.getSessionTotalAmountPrice(session).orElse(0d));
         //messageBuilder.append("\nОбщая стоимость со скидкой: ").append(getCustomersCount());
-        messageBuilder.append("\nКоличество участников: ").append(paymentRepository.getSessionCustomersCount(session));
-        messageBuilder.append("\nОплачено заказов: ").append(paymentRepository.getCompletePaymentsCount(session));
+        messageBuilder.append("\nКоличество участников: ").append(paymentRepository.getSessionCustomersCount(session).orElse(0));
+        messageBuilder.append("\nОплачено заказов: ").append(paymentRepository.getCompletePaymentsCount(session).orElse(0));
         messageBuilder.append("</code>");
 
         logger.debug(messageBuilder.toString());

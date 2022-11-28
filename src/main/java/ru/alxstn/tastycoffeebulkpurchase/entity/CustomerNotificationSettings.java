@@ -39,6 +39,4 @@ public class CustomerNotificationSettings {
     public void setReceivePaymentConfirmationNotification(boolean receivePaymentConfirmationNotification) {
         this.receivePaymentConfirmationNotification = receivePaymentConfirmationNotification;
     }
-
-
 }

@@ -86,7 +86,7 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
 
         long chatId = update.getCallbackQuery().getMessage().getChatId();
         Customer customer = customerRepository.getByChatId(chatId);
-        Session session = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+        Session session = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
 
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("Добавить")

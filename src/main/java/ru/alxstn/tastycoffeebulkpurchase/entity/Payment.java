@@ -21,6 +21,7 @@ public class Payment {
     @Column(name = "payment_status")
     private boolean paymentStatus;
 
+    // ToDo: integrate amount field
     @Column(name = "amount")
     private double amount;
 

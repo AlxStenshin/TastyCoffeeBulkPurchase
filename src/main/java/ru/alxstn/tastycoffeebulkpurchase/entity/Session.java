@@ -27,6 +27,9 @@ public class Session {
     @Column(name = "closed")
     private boolean closed;
 
+    @Column(name = "finished")
+    private boolean finished;
+
     @Column(name = "discount")
     private int discountPercentage;
 
@@ -86,6 +89,14 @@ public class Session {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     public int getDiscountPercentage() {

@@ -47,20 +47,31 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public Session getCurrentSession() {
-        return sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+    public Session getActiveSession() {
+        return sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
     }
 
     @Override
-    public String getSessionNotFoundMessage() {
+    public String getActiveSessionNotFoundMessage() {
         return "Активная сессия не обнаружена. \n" +
                 "Заказы не принимаются.\n" +
                 "Для открытия новой сессии обратитесь к администратору бота.";
     }
 
     @Override
-    public boolean activeSessionAvailable() throws SessionNotFoundException {
-        Session activeSession = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
-        return !activeSession.isClosed();
+    public String getOpenSessionNotFoundMessage() {
+        return "Текущая сессия закрыта. \n" +
+                "Заказы не принимаются.\n" +
+                "Дождитесь завершения сессии.";
+    }
+
+    @Override
+    public boolean newSessionAllowed() {
+        try {
+            sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
+            return false;
+        } catch (SessionNotFoundException e) {
+            return true;
+        }
     }
 }

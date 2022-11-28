@@ -12,24 +12,19 @@ import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import java.util.List;
 
 @Service
-public class BasicCustomerSummaryCreatorCreatorService implements CustomerSummaryCreatorService {
+public class BasicCustomerSummaryCreatorService implements CustomerSummaryCreatorService {
 
-    Logger logger = LogManager.getLogger(BasicCustomerSummaryCreatorCreatorService.class);
-    private final SessionManagerService sessionManagerService;
+    Logger logger = LogManager.getLogger(BasicCustomerSummaryCreatorService.class);
     private final PurchaseRepository purchaseRepository;
 
-    public BasicCustomerSummaryCreatorCreatorService(SessionManagerService sessionManagerService,
-                                                     PurchaseRepository purchaseRepository) {
-        this.sessionManagerService = sessionManagerService;
+    public BasicCustomerSummaryCreatorService(PurchaseRepository purchaseRepository) {
         this.purchaseRepository = purchaseRepository;
     }
 
     @Override
-    public String buildCustomerSummary(Customer customer) {
-        Session session = sessionManagerService.getCurrentSession();
+    public String buildCustomerSummary(Customer customer, Session session) {
         List<Purchase> currentSessionCustomerPurchases = purchaseRepository
                 .findAllPurchasesInSessionByCustomer(session, customer);
-
         return buildMessage(currentSessionCustomerPurchases, session.getDiscountPercentage());
     }
 

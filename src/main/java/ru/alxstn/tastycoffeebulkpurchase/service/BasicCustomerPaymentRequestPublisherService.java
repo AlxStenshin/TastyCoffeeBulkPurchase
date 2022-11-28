@@ -50,7 +50,7 @@ public class BasicCustomerPaymentRequestPublisherService implements CustomerPaym
                 .collect(Collectors.toSet());
 
         for (Customer c : currentSessionCustomers) {
-            String message = customerSummaryCreatorService.buildCustomerSummary(c) + "\n\n" +
+            String message = customerSummaryCreatorService.buildCustomerSummary(c, session) + "\n\n" +
                     "Внесите оплату и нажмите кнопку \"Оплачено\"\n" +
                     "Оплата: " + session.getPaymentInstruction() + "\n";
 

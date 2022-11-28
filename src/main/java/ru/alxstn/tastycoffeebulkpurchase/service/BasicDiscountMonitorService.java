@@ -53,18 +53,18 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
     @Override
     public void checkDiscountSize() {
 
-        Session currentSession = sessionRepository.getCurrentSession().orElseThrow(SessionNotFoundException::new);
+        Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
 
         Double currentSessionDiscountSensitiveWeight = purchaseRepository
                 .getTotalDiscountSensitiveWeightForCurrentSession().orElse(0d);
 
-        sessionRepository.setCurrentSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
+        sessionRepository.setActiveSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
         logger.debug("Discount value: " + newDiscount + " Purchase Weight: " + currentSessionDiscountSensitiveWeight);
-        int previousDiscount = sessionRepository.getCurrentSessionDiscountValue();
+        int previousDiscount = sessionRepository.getActiveSessionDiscountValue();
 
         if (previousDiscount != newDiscount) {
-            sessionRepository.setCurrentSessionDiscountValue(newDiscount);
+            sessionRepository.setActiveSessionDiscountValue(newDiscount);
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 

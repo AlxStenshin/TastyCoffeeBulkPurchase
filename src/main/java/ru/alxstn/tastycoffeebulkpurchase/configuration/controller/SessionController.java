@@ -40,7 +40,7 @@ public class SessionController {
 
     @GetMapping(value = "/sessions/new", produces = MediaType.TEXT_HTML_VALUE)
     public String addNewSession(Model model, RedirectAttributes redirectAttributes) {
-        if (!sessionManager.activeSessionAvailable()) {
+        if (sessionManager.newSessionAllowed()) {
             Session session = new Session();
             model.addAttribute("session", session);
             model.addAttribute("pageTitle", "Create new Session");
@@ -48,7 +48,7 @@ public class SessionController {
         }
         else {
             redirectAttributes.addFlashAttribute("message", "Only One Active Session Allowed.\n" +
-                    "Please close active session first.");
+                    "Please finish active session first.");
         }
         return "redirect:/sessions";
     }

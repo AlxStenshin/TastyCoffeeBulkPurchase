@@ -17,6 +17,7 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 
 @Component
 public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOrderPaidCommandDto> {
@@ -26,17 +27,20 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
     private final PurchaseRepository purchaseRepository;
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
+    private final SessionManagerService sessionManagerService;
 
     @Autowired
     private DtoDeserializer deserializer;
 
     public SetOrderPaidStatusUpdateHandler(ApplicationEventPublisher publisher,
                                            PurchaseRepository purchaseRepository,
-                                           CustomerRepository customerRepository, PaymentRepository paymentRepository) {
+                                           CustomerRepository customerRepository, PaymentRepository paymentRepository,
+                                           SessionManagerService sessionManagerService) {
         this.publisher = publisher;
         this.purchaseRepository = purchaseRepository;
         this.customerRepository = customerRepository;
         this.paymentRepository = paymentRepository;
+        this.sessionManagerService = sessionManagerService;
     }
 
     @Override
@@ -59,15 +63,24 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
 
         Customer eventEmitter = customerRepository.getByChatId(eventEmitterId);
         paymentRepository.registerPayment(currentSession, eventEmitter);
+        int paidOrders = paymentRepository.getCompletePaymentsCount(currentSession).orElse(0);
+        int totalOrders = paymentRepository.getSessionCustomersCount(currentSession).orElse(0);
+
         for (Customer c : purchaseRepository.getSessionCustomers(currentSession)) {
             if (c.getNotificationSettings().isReceivePaymentConfirmationNotification()) {
                 publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
                         .text("Пользователь " + eventEmitter + " оплатил свой заказ.\n" +
-                                "Оплачено заказов: " + paymentRepository.getCompletePaymentsCount(currentSession) +
-                                " из " + paymentRepository.getSessionCustomersCount(currentSession))
+                                "Оплачено заказов: " + paidOrders +
+                                " из " + totalOrders)
                         .chatId(c.getChatId().toString())
                         .build()));
             }
         }
+        if (paidOrders == totalOrders) {
+            currentSession.setFinished(true);
+            sessionManagerService.saveSession(currentSession);
+            // ToDo: Emit All Orders Paid Event Message
+        }
+
     }
 }

@@ -47,9 +47,9 @@ public class RequestSessionSummaryUpdateHandler extends CallbackUpdateHandler<Re
 
         String message;
         try {
-            message = sessionSummaryCreatorService.createSessionSummary(sessionManagerService.getCurrentSession());
+            message = sessionSummaryCreatorService.createSessionSummary(dto.getSession());
         } catch (SessionNotFoundException e) {
-            message = sessionManagerService.getSessionNotFoundMessage();
+            message = sessionManagerService.getActiveSessionNotFoundMessage();
         }
 
         publisher.publishEvent(new UpdateMessageEvent(this,

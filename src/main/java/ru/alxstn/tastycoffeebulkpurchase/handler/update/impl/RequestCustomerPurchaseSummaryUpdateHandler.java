@@ -51,9 +51,12 @@ public class RequestCustomerPurchaseSummaryUpdateHandler extends CallbackUpdateH
 
         String message;
         try {
-            message = customerSummaryService.buildCustomerSummary(customerRepository.getByChatId(customerID));
+            message = customerSummaryService.buildCustomerSummary(
+                    customerRepository.getByChatId(customerID),
+                    dto.getSession());
+
         } catch (SessionNotFoundException e) {
-            message = sessionManagerService.getSessionNotFoundMessage();
+            message = sessionManagerService.getActiveSessionNotFoundMessage();
         }
 
         publisher.publishEvent(new UpdateMessageEvent(this,

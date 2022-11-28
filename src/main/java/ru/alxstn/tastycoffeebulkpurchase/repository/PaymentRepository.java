@@ -28,12 +28,12 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
                          @Param(value = "customer") Customer customer);
 
     @Query("SELECT COUNT(p) FROM payment p WHERE p.session = :session AND p.paymentStatus = true")
-    int getCompletePaymentsCount(@Param(value = "session") Session session);
+    Optional<Integer> getCompletePaymentsCount(@Param(value = "session") Session session);
 
     @Query("SELECT COUNT(p) FROM payment p WHERE p.session = :session")
-    int getSessionCustomersCount(@Param(value = "session") Session session);
+    Optional<Integer> getSessionCustomersCount(@Param(value = "session") Session session);
 
     @Query("SELECT SUM(p.amount) FROM payment p WHERE p.session = :session")
-    long getSessionTotalAmountPrice(@Param(value = "session") Session session);
+    Optional<Double> getSessionTotalAmountPrice(@Param(value = "session") Session session);
 
 }

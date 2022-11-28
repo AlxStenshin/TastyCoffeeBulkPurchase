@@ -12,7 +12,8 @@ public interface SessionManagerService {
     void closeSession(Session session);
     List<Session> getAllSessions();
     Session getSessionById(long sessionId);
-    Session getCurrentSession() throws SessionNotFoundException;
-    String getSessionNotFoundMessage();
-    boolean activeSessionAvailable() throws SessionNotFoundException;
+    Session getActiveSession() throws SessionNotFoundException;
+    String getActiveSessionNotFoundMessage();
+    String getOpenSessionNotFoundMessage();
+    boolean newSessionAllowed();
 }
