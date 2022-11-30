@@ -1,6 +1,9 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
+import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
+
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "purchase")
@@ -67,17 +70,23 @@ public class Purchase {
                 '}';
     }
 
-    // ToDo: Do not show product form 'Зерно' for non-coffee product
+    // ToDo: Check: Do not show product form 'Зерно' for non-coffee product
     public String getPurchaseSummary() {
         String summary = product.getProductCategory() + " " + product.getDisplayName();
-        summary += productForm.isEmpty() ? ", Зерно, " : " , " + productForm + " ";
+        summary += productForm.isEmpty() ? ", " : " , " + productForm + " ";
         summary += getProductCountAndTotalPrice();
         return summary;
     }
 
     // ToDo: format price output, limit .xx values
     public String getProductCountAndTotalPrice() {
-        return getCount() + " шт, " + getProduct().getPrice() * getCount() + "₽";
+        return getCount() > 1 ?
+                getCount() + " шт, " + getTotalPrice() + "₽" :
+                getProduct().getPrice() + "₽";
+    }
+
+    public BigDecimal getTotalPrice() {
+        return BigDecimalUtil.multiplyByInt(getProduct().getPrice(), getCount());
     }
 
     public Long getId() {

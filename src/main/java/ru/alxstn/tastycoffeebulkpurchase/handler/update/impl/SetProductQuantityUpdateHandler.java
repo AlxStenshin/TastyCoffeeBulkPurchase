@@ -21,6 +21,7 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +75,8 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
                 .build());
 
         countButtonsRow.add(InlineKeyboardButton.builder()
-                .text(dto.getProductQuantity() + " шт, " + targetProduct.getPrice() * dto.getProductQuantity() + "₽")
+                .text(dto.getProductQuantity() + " шт, " +
+                        BigDecimalUtil.multiplyByInt(targetProduct.getPrice(), dto.getProductQuantity()) + "₽")
                 .callbackData(" ")
                 .build());
 

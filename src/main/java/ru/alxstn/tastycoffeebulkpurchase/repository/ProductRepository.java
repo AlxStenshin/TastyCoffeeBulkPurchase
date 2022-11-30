@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                     @Param(value = "subCat") String subCat,
                                     @Param(value = "pack") ProductPackage pack,
                                     @Param(value = "mark") String mark,
-                                    @Param(value = "price") Double price);
+                                    @Param(value = "price") BigDecimal price);
 
     @Transactional
     @Modifying
@@ -58,7 +59,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 @Param(value = "subCat") String subCat,
                 @Param(value = "pack") ProductPackage pack,
                 @Param(value = "mark") String mark,
-                @Param(value = "price") Double price,
+                @Param(value = "price") BigDecimal price,
                 @Param(value = "updateDateTime") LocalDateTime updateDateTime);
 
     @Transactional

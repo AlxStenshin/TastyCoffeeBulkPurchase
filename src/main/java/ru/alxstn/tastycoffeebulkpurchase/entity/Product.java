@@ -4,10 +4,11 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import ru.alxstn.tastycoffeebulkpurchase.entity.annotation.JsonExclude;
+import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
 import ru.alxstn.tastycoffeebulkpurchase.util.StringUtil;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 // ToDo: Normalize table, separate productCategory, productSubCategory and productMark entities.
@@ -35,7 +36,7 @@ public class Product {
     private LocalDateTime dateUpdated;
 
     @Column(name = "price")
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "mark")
     private String specialMark;
@@ -62,7 +63,7 @@ public class Product {
     public Product() { }
 
     public Product(String name,
-                   Double price,
+                   BigDecimal price,
                    String specialMark,
                    ProductPackage productPackage,
                    String productGroup,
@@ -90,11 +91,11 @@ public class Product {
         this.name = name;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal  price) {
         this.price = price;
     }
 
@@ -183,18 +184,18 @@ public class Product {
         private ProductPackage pack;
         private String specialMark;
         private String name;
-        private Double price;
+        private BigDecimal price;
         private boolean grindable;
 
         public ProductBuilder() {}
 
-        public ProductBuilder setGroup(String group) {
-            this.group = group;
+        public ProductBuilder setCategory(String cat) {
+            this.group = cat;
             return this;
         }
 
-        public ProductBuilder setSubGroup(String subGroup) {
-            this.subgroup = subGroup;
+        public ProductBuilder setSubCategory(String subCat) {
+            this.subgroup = subCat;
             return this;
         }
 
@@ -213,7 +214,7 @@ public class Product {
             return this;
         }
 
-        public ProductBuilder setPrice(Double price) {
+        public ProductBuilder setPrice(BigDecimal  price) {
             this.price = price;
             return this;
         }

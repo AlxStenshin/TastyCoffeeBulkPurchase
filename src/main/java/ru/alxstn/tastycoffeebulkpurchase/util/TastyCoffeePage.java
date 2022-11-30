@@ -18,6 +18,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -230,9 +231,9 @@ public class TastyCoffeePage {
         Product.ProductBuilder productBuilder = new Product.ProductBuilder();
 
         for (SelenideElement productGroup : getProductGroups()) {
-            productBuilder.setGroup(getGroupTitle(productGroup));
+            productBuilder.setCategory(getGroupTitle(productGroup));
             for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
-                productBuilder.setSubGroup(getSubGroupTitle(productSubgroup));
+                productBuilder.setSubCategory(getSubGroupTitle(productSubgroup));
                 for (SelenideElement product : getProductsListFromSubgroup(productSubgroup)) {
                     productBuilder.setName(getProductTitle(product));
                     try {
@@ -313,7 +314,7 @@ public class TastyCoffeePage {
         return specialMark.getAttribute("data-div");
     }
 
-    private double getProductPrice(SelenideElement product) {
+    private BigDecimal getProductPrice(SelenideElement product) {
         return getPriceFromTableCell(product.find("div.coffee-week-price").getAttribute("innerHTML"));
     }
 
@@ -321,10 +322,10 @@ public class TastyCoffeePage {
         return product.find("samp.mob").getAttribute("innerHTML");
     }
 
-    double getPriceFromTableCell(String src) {
+    BigDecimal getPriceFromTableCell(String src) {
         src = src.replace("&nbsp;", "");
         src = src.replace(",", ".");
-        return Double.parseDouble(src);
+        return BigDecimal.valueOf(Double.parseDouble(src));
     }
 
 }

@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
-import ru.alxstn.tastycoffeebulkpurchase.entity.annotation.AnnotationExclusionStrategy;
+import ru.alxstn.tastycoffeebulkpurchase.annotation.AnnotationExclusionStrategy;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
 import ru.alxstn.tastycoffeebulkpurchase.repository.TelegramCallbackRepository;
 
