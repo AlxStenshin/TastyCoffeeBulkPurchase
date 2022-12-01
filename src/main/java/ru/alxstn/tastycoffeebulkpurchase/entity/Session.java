@@ -39,6 +39,12 @@ public class Session {
     @Column(name = "discountable_weight")
     private double discountableWeight;
 
+    @Column(name = "coffee_weight")
+    private double coffeeWeight;
+
+    @Column(name = "tea_weight")
+    private double teaWeight;
+
     @Column(name = "payment_instruction")
     private String paymentInstruction;
 
@@ -121,6 +127,22 @@ public class Session {
 
     public void setTotalWeight(double totalWeight) {
         this.totalWeight = totalWeight;
+    }
+
+    public double getCoffeeWeight() {
+        return coffeeWeight;
+    }
+
+    public void setCoffeeWeight(double coffeeWeight) {
+        this.coffeeWeight = coffeeWeight;
+    }
+
+    public double getTeaWeight() {
+        return teaWeight;
+    }
+
+    public void setTeaWeight(double teaWeight) {
+        this.teaWeight = teaWeight;
     }
 
     public String getPaymentInstruction() {

@@ -81,7 +81,10 @@ public class Customer {
 
     @Override
     public String toString() {
-        return firstName + " " + lastName + " (" + userName + ")";
+        String customer =  firstName == null ? "" : firstName;
+        customer +=  lastName == null ? "" : " " + lastName;
+        customer +=  userName == null ? "" : " (" + userName + ")";
+        return customer;
     }
 }
 

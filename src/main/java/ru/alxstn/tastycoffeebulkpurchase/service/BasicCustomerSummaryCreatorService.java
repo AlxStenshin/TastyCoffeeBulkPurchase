@@ -24,6 +24,7 @@ public class BasicCustomerSummaryCreatorService implements CustomerSummaryCreato
 
     @Override
     public String buildCustomerSummary(Customer customer, Session session) {
+        logger.info("Building Customer Summary for " + customer);
         List<Purchase> currentSessionCustomerPurchases = purchaseRepository
                 .findAllPurchasesInSessionByCustomer(session, customer);
         return buildMessage(currentSessionCustomerPurchases, session.getDiscountPercentage());
@@ -53,16 +54,26 @@ public class BasicCustomerSummaryCreatorService implements CustomerSummaryCreato
                 messageBuilder.append("\n");
             }
 
-            BigDecimal discountableTotalWithDiscount = BigDecimalUtil.multiplyByDouble(discountableTotal, ((double) (100 - discountValue) / 100));
+            BigDecimal discountableTotalWithDiscount = BigDecimalUtil.multiplyByDouble(
+                    discountableTotal, ((double) (100 - discountValue) / 100));
             BigDecimal totalPriceWithDiscount = discountableTotalWithDiscount.add(nonDiscountableTotal);
 
             messageBuilder.append("</code>");
-            messageBuilder.append("\nИтог без скидки: ").append(totalPrice).append("₽");
-            messageBuilder.append(BigDecimalUtil.greaterThanZero(discountableTotal) ? "\nИз ни скидка применяется к  " + discountableTotal + "₽" : "");
-            messageBuilder.append(discountValue > 0 ? "\nТовары по скидке со скидкой " + discountValue + "%: " + discountableTotalWithDiscount + "₽" : "");
-            messageBuilder.append(BigDecimalUtil.greaterThanZero(nonDiscountableTotal) ? "\nДругие товары: " + nonDiscountableTotal + "₽" : "");
-            // ToDo: Calculate Discount Value
-            messageBuilder.append("\n\nВсего к оплате: ").append(totalPriceWithDiscount).append("₽");
+            if (discountValue > 0) {
+                messageBuilder.append("\nИтог без скидки: ").append(totalPrice).append(" ₽");
+                messageBuilder.append(BigDecimalUtil.greaterThanZero(discountableTotal) ?
+                        "\nАкционные товары в зазазе без скидки " + discountableTotal + " ₽" : "");
+
+                messageBuilder.append("\nАкционные товары со скидкой ").append(discountValue).append("%: ")
+                        .append(discountableTotalWithDiscount).append(" ₽");
+
+                messageBuilder.append(BigDecimalUtil.greaterThanZero(nonDiscountableTotal) ?
+                        "\nОстальные товары в заказе: " + nonDiscountableTotal + " ₽" : "");
+
+                messageBuilder.append("\nРазмер скидки: ")
+                        .append(totalPrice.subtract(totalPriceWithDiscount)).append(" ₽");
+            }
+            messageBuilder.append("\n\n<b>Всего к оплате: ").append(totalPriceWithDiscount).append(" ₽</b>");
             message = messageBuilder.toString();
         }
         else {

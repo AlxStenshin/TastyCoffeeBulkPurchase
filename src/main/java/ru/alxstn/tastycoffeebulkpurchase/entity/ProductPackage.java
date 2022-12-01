@@ -1,5 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
+import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -8,6 +10,7 @@ import java.util.Objects;
 public class ProductPackage {
 
     @Id
+    @JsonExclude
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;

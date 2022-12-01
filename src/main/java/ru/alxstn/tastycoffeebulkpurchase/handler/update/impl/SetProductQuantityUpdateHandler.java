@@ -17,7 +17,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
@@ -105,6 +105,7 @@ public class SetProductQuantityUpdateHandler extends CallbackUpdateHandler<SetPr
         if (targetProduct.isGrindable()) {
             String currentForm = dto.getProductForm();
 
+            // ToDo: Avoid Code Duplication with Edit Product Entity
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Зерно") ? "Зерно ✅" : "Зерно")

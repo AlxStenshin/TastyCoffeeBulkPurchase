@@ -9,27 +9,23 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RequestCustomerPurchaseSummaryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.CustomerSummaryCreatorService;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 
 @Component
 public class RequestCustomerPurchaseSummaryUpdateHandler extends CallbackUpdateHandler<RequestCustomerPurchaseSummaryCommandDto> {
 
     Logger logger = LogManager.getLogger(RequestCustomerPurchaseSummaryUpdateHandler.class);
     private final CustomerSummaryCreatorService customerSummaryService;
-    private final SessionManagerService sessionManagerService;
     private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher publisher;
 
     public RequestCustomerPurchaseSummaryUpdateHandler(CustomerSummaryCreatorService customerSummaryService,
-                                                       SessionManagerService sessionManagerService,
                                                        CustomerRepository customerRepository,
                                                        ApplicationEventPublisher publisher) {
         this.customerSummaryService = customerSummaryService;
-        this.sessionManagerService = sessionManagerService;
         this.customerRepository = customerRepository;
         this.publisher = publisher;
     }
@@ -56,7 +52,7 @@ public class RequestCustomerPurchaseSummaryUpdateHandler extends CallbackUpdateH
                     dto.getSession());
 
         } catch (SessionNotFoundException e) {
-            message = sessionManagerService.getActiveSessionNotFoundMessage();
+            message = e.getMessage();
         }
 
         publisher.publishEvent(new UpdateMessageEvent(this,

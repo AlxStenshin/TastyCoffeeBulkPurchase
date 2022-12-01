@@ -40,6 +40,8 @@
                     <th scope="col">Finished</th>
                     <th scope="col">Discount Value</th>
                     <th scope="col">Discountable Weight</th>
+                    <th scope="col">Coffee Weight</th>
+                    <th scope="col">Tea Weight</th>
                     <th scope="col">Total Weight</th>
                 </tr>
                 </thead>
@@ -62,6 +64,8 @@
                     </td>
                     <td>[[${s.discountPercentage}]]%</td>
                     <td>[[${s.discountableWeight}]] kg</td>
+                    <td>[[${s.coffeeWeight}]] kg</td>
+                    <td>[[${s.teaWeight}]] kg</td>
                     <td>[[${s.totalWeight}]] kg</td>
                     <td>
                         <a th:href="@{'/sessions/' + ${s.id}}"

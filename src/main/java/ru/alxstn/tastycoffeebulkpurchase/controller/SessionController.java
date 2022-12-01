@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.configuration.controller;
+package ru.alxstn.tastycoffeebulkpurchase.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
-
 
 // ToDo: Remove all logic from session controller, controllers should be simple and stupid.
 
@@ -30,8 +29,7 @@ public class SessionController {
     @GetMapping(value = "/sessions", produces = MediaType.TEXT_HTML_VALUE)
     public String getAllSessions(Model model) {
         try {
-            var result = sessionManager.getAllSessions();
-            model.addAttribute("sessions", result);
+            model.addAttribute("sessions", sessionManager.getAllSessions());
         } catch (Exception e) {
             model.addAttribute("message", e.getMessage());
         }
@@ -40,15 +38,12 @@ public class SessionController {
 
     @GetMapping(value = "/sessions/new", produces = MediaType.TEXT_HTML_VALUE)
     public String addNewSession(Model model, RedirectAttributes redirectAttributes) {
-        if (sessionManager.newSessionAllowed()) {
-            Session session = new Session();
-            model.addAttribute("session", session);
+        try {
+            model.addAttribute("session", sessionManager.addNewSession());
             model.addAttribute("pageTitle", "Create new Session");
             return "session_form";
-        }
-        else {
-            redirectAttributes.addFlashAttribute("message", "Only One Active Session Allowed.\n" +
-                    "Please finish active session first.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", e.getMessage());
         }
         return "redirect:/sessions";
     }

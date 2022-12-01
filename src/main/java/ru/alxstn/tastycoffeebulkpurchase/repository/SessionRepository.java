@@ -12,25 +12,31 @@ import java.util.Optional;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
     @Query("SELECT s FROM session s WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP AND " +
+            "s.closed = false AND " +
             "s.finished = false")
     Optional<Session> getActiveSession();
+
+    @Query("SELECT s FROM session s WHERE " +
+            "s.finished = false")
+    Optional<Session> getUnfinishedSession();
 
     @Transactional
     @Modifying
     @Query("UPDATE session s SET s.discountPercentage = :discount WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP")
+            "s.closed = false AND " +
+            "s.finished = false")
     void setActiveSessionDiscountValue(@Param(value = "discount") int value);
 
     @Transactional
     @Modifying
     @Query("UPDATE session s SET s.discountableWeight = :weight WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP")
+            "s.closed = false AND " +
+            "s.finished = false")
     void setActiveSessionDiscountableWeight(@Param(value = "weight") Double currentSessionDiscountSensitiveWeight);
 
 
     @Query("SELECT s.discountPercentage FROM session s WHERE " +
-            "s.dateTimeOpened < CURRENT_TIMESTAMP")
+            "s.finished = false")
     int getActiveSessionDiscountValue();
 
 }

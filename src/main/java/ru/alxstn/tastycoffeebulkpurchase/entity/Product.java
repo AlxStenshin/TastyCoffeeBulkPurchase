@@ -159,6 +159,18 @@ public class Product {
                 getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")));
     }
 
+    // ToDo: Count Total Session Coffee Weight
+    public boolean isPackagedCoffee() {
+        return (getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
+                getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") ||
+                getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ"));
+    }
+
+    // ToDo: Count Total Session Tea Weight
+    public boolean isTea() {
+        return getProductCategory().equals("Чай");
+    }
+
     public boolean isAvailable() {
         return !getSpecialMark().equals("нет");
     }

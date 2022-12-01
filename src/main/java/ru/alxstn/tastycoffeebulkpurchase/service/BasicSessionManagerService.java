@@ -2,8 +2,9 @@ package ru.alxstn.tastycoffeebulkpurchase.service;
 
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionCreationException;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
@@ -25,6 +26,16 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
+    public Session addNewSession() throws SessionCreationException {
+        try {
+            sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
+            throw new SessionCreationException(getOnlyOneActiveSessionAllowedMessage());
+        } catch (SessionNotFoundException e) {
+            return new Session();
+        }
+    }
+
+    @Override
     public void saveSession(Session session) throws SessionCreationException {
         sessionRepository.save(session);
     }
@@ -34,6 +45,11 @@ public class BasicSessionManagerService implements SessionManagerService {
         session.setDateTimeClosed(dateTimeProvider.getCurrentTimestamp());
         sessionRepository.save(session);
         orderCreator.createOrder(session);
+    }
+
+    public void checkSessionCustomerAccessible(Session session) {
+        if (session.isClosed())
+            throw new SessionIsNotOpenException(getOpenSessionNotFoundMessage());
     }
 
     @Override
@@ -48,30 +64,30 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     @Override
     public Session getActiveSession() {
-        return sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
+        return sessionRepository.getActiveSession().orElseThrow(() ->
+                new SessionNotFoundException(getActiveSessionNotFoundMessage()));
     }
 
     @Override
-    public String getActiveSessionNotFoundMessage() {
+    public Session getUnfinishedSession() throws SessionNotFoundException {
+        return sessionRepository.getUnfinishedSession().orElseThrow(() ->
+                new SessionNotFoundException(getActiveSessionNotFoundMessage()));
+    }
+
+    private String getOnlyOneActiveSessionAllowedMessage() {
+        return "Only One Active Session Allowed.\n" +
+                    "Please finish active session first.";
+    }
+
+    private String getActiveSessionNotFoundMessage() {
         return "Активная сессия не обнаружена. \n" +
                 "Заказы не принимаются.\n" +
                 "Для открытия новой сессии обратитесь к администратору бота.";
     }
 
-    @Override
-    public String getOpenSessionNotFoundMessage() {
+    private String getOpenSessionNotFoundMessage() {
         return "Текущая сессия закрыта. \n" +
                 "Заказы не принимаются.\n" +
                 "Дождитесь завершения сессии.";
-    }
-
-    @Override
-    public boolean newSessionAllowed() {
-        try {
-            sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
-            return false;
-        } catch (SessionNotFoundException e) {
-            return true;
-        }
     }
 }

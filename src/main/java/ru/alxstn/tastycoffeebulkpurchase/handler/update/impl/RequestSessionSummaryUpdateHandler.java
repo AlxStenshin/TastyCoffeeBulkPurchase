@@ -9,9 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RequestSessionSummaryCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionSummaryCreatorService;
 
 @Component
@@ -19,14 +18,11 @@ public class RequestSessionSummaryUpdateHandler extends CallbackUpdateHandler<Re
 
     Logger logger = LogManager.getLogger(RequestSessionSummaryUpdateHandler.class);
     private final SessionSummaryCreatorService sessionSummaryCreatorService;
-    private final SessionManagerService sessionManagerService;
     private final ApplicationEventPublisher publisher;
 
     public RequestSessionSummaryUpdateHandler(SessionSummaryCreatorService sessionSummaryCreatorService,
-                                              SessionManagerService sessionManagerService,
                                               ApplicationEventPublisher publisher) {
         this.sessionSummaryCreatorService = sessionSummaryCreatorService;
-        this.sessionManagerService = sessionManagerService;
         this.publisher = publisher;
     }
 
@@ -49,7 +45,7 @@ public class RequestSessionSummaryUpdateHandler extends CallbackUpdateHandler<Re
         try {
             message = sessionSummaryCreatorService.createSessionSummary(dto.getSession());
         } catch (SessionNotFoundException e) {
-            message = sessionManagerService.getActiveSessionNotFoundMessage();
+            message = e.getMessage();
         }
 
         publisher.publishEvent(new UpdateMessageEvent(this,

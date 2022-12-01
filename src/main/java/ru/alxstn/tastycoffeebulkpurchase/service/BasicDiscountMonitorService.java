@@ -11,7 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.exception.SessionNotFoundException;
+import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 
@@ -74,6 +74,7 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
                     .collect(Collectors.toList());
 
             for (var c : currentSessionSubscribedCustomers) {
+                logger.info("Sending New Discount Notification to " + c);
                 publisher.publishEvent(new SendMessageEvent(this,
                         SendMessage.builder()
                                 .chatId(c.getChatId())

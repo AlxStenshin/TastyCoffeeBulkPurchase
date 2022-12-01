@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.bot;
+package ru.alxstn.tastycoffeebulkpurchase.handler.update.impl;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -22,10 +22,6 @@ public class MenuNavigationBotMessage <T>  {
 
     private List<List<InlineKeyboardButton>> buttons;
     private List<InlineKeyboardButton> additionalButtons = new ArrayList<>();
-
-    public String getTitle() {
-        return title;
-    }
 
     public void setTitle(String title) {
         this.title = title;
