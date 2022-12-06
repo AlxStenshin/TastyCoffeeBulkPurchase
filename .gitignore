@@ -38,3 +38,4 @@ out/
 
 ### Secrets ###
 secrets.properties
+/src/test/resources/secrets-test.properties

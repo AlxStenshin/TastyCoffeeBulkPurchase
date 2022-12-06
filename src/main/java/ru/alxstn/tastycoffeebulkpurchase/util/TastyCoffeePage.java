@@ -17,6 +17,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
+import ru.alxstn.tastycoffeebulkpurchase.exception.webPage.WebPageElementException;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -44,98 +45,135 @@ public class TastyCoffeePage {
         Configuration.headless = true;
     }
 
-    public void login() {
-        open(tastyCoffeeConfig.getUrl());
-
-        Selenide.clearBrowserCookies();
-        Selenide.clearBrowserLocalStorage();
-
-        SelenideElement bulkPurchaseClientLoginButton = $(byText("Вход для оптовых клиентов"));
-        bulkPurchaseClientLoginButton.click();
-
-        Selenide.sleep(1_000);
-
-        SelenideElement usernameInput = $(byName("login"));
-        usernameInput.setValue(tastyCoffeeConfig.getUserName());
-
-        SelenideElement passwordInput = $(byName("password"));
-        passwordInput.setValue(tastyCoffeeConfig.getPassword());
-
-        SelenideElement loginButton = $(byText("Войти"));
-        loginButton.click();
-
-        Selenide.sleep(10_000);
-    }
-
     public List<Product> buildPriceList() {
 
+        login();
+        resetOrder();
+
         List<Product> allProducts = new ArrayList<>();
+        try {
+            SelenideElement tabsBar = $("ul.nav.tab-lk");
+            ElementsCollection tabs = tabsBar.$$("li.nav-item");
+            List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
 
-        SelenideElement tabsBar = $("ul.nav.tab-lk");
-        ElementsCollection tabs = tabsBar.$$("li.nav-item");
-        List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+            for (var tab : tabs) {
 
-        for (var tab : tabs) {
-            SelenideElement link = tab.$("a");
-            String text = link.innerHtml();
-            if (acceptedProductTypes.stream().anyMatch(text::contains)) {
-                logger.info("Now Parsing Tab " + text);
-                clickWebElement(link.getWrappedElement());
-                expandAllProductGroups();
-                allProducts.addAll(parseProductType());
-            } else {
-                logger.info("Ignoring Price List Tab " + text);
+                SelenideElement link = tab.$("a");
+                String text = link.innerHtml();
+                if (acceptedProductTypes.stream().anyMatch(text::contains)) {
+                    logger.info("Now Parsing Tab " + text);
+                    clickWebElement(link.getWrappedElement());
+                    expandAllProductGroups();
+                    allProducts.addAll(parseProductType());
+                } else {
+                    logger.info("Ignoring Price List Tab " + text.replace("\n", ""));
+                }
+
             }
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
         }
-
         return allProducts;
     }
-
-    public void resetOrder() {
-        SelenideElement resetButtonTextElement = $(byText("Сбросить заказ"));
-        SelenideElement resetOrderButton = resetButtonTextElement.find(By.xpath("./.."));
-        clickWebElement(resetOrderButton);
-        try {
-            SelenideElement confirmButtonText = $(byText("Да"));
-            SelenideElement confirmButton = confirmButtonText.find(By.xpath("./.."));
-            clickWebElement(confirmButton);
-        } catch (ElementNotFound ignored) {
-            logger.info("Confirm Reset Order button not found, is order empty already?");
-        }
-    }
-
     public List<Purchase> placeOrder(List<Purchase> currentSessionPurchases) {
-        SelenideElement tabsBar = $("ul.nav.tab-lk");
-        ElementsCollection tabs = tabsBar.$$("li.nav-item");
-        List<String> acceptedCategories = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+        try {
+            login();
+            resetOrder();
 
-        for (var tab : tabs) {
-            SelenideElement link = tab.$("a");
-            String text = link.innerHtml();
-            if (acceptedCategories.stream().anyMatch(text::contains)) {
-                logger.info("Now Filling Group " + text);
-                clickWebElement(link.getWrappedElement());
-                expandAllProductGroups();
-                fillPurchasesAvailableOnPage(currentSessionPurchases);
-            } else {
-                logger.info("Ignoring Price List Tab " + text);
+            SelenideElement tabsBar = $("ul.nav.tab-lk");
+            ElementsCollection tabs = tabsBar.$$("li.nav-item");
+            List<String> acceptedCategories = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+
+            for (var tab : tabs) {
+                SelenideElement link = tab.$("a");
+                String text = link.innerHtml();
+                if (acceptedCategories.stream().anyMatch(text::contains)) {
+                    logger.info("Now Filling Group " + text.replace("\n", ""));
+                    clickWebElement(link.getWrappedElement());
+                    expandAllProductGroups();
+                    fillPurchasesAvailableOnPage(currentSessionPurchases);
+                } else {
+                    logger.info("Ignoring Price List Tab " + text.replace("\n", ""));
+                }
             }
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
         }
+
         // ToDo: Check total sum and product count by groups (counters in "nav-link active")
         return currentSessionPurchases;
     }
 
+    private void login() {
+        try {
+            open(tastyCoffeeConfig.getUrl());
+
+            SelenideElement bulkPurchaseClientLoginButton = $(byText("Вход для оптовых клиентов"));
+            bulkPurchaseClientLoginButton.click();
+            Selenide.sleep(1_000);
+
+            try {
+                SelenideElement goToAccountButton = $(byText("Личный кабинет"));
+                goToAccountButton.click();
+                logger.info("User already logged in, login routine skipped");
+            } catch (ElementNotFound ignored) {
+                SelenideElement loginButton = $(byText("Войти"));
+
+                SelenideElement usernameInput = $(byName("login"));
+                usernameInput.setValue(tastyCoffeeConfig.getUserName());
+
+                SelenideElement passwordInput = $(byName("password"));
+                passwordInput.setValue(tastyCoffeeConfig.getPassword());
+
+                loginButton.click();
+            }
+            Selenide.sleep(10_000);
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
+        }
+    }
+
+    private void resetOrder() {
+        try {
+            SelenideElement resetButtonTextElement = $(byText("Сбросить заказ"));
+            SelenideElement resetOrderButton = resetButtonTextElement.find(By.xpath("./.."));
+            clickWebElement(resetOrderButton);
+            try {
+                SelenideElement confirmButtonText = $(byText("Да"));
+                SelenideElement confirmButton = confirmButtonText.find(By.xpath("./.."));
+                clickWebElement(confirmButton);
+            } catch (ElementNotFound ignored) {
+                logger.info("Confirm Reset Order button not found, is order empty already?");
+            }
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
+        }
+    }
 
     public void expandAllProductGroups() {
-        clickElements(byCssSelector("button.status.active"));
-        Selenide.sleep(1_000);
+        try {
+            clickElements(byCssSelector("button.status.active"));
+            Selenide.sleep(1_000);
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
+        }
     }
 
     // https://stackoverflow.com/questions/52720560/selenide-removing-displayedfalse-not-working
     public void clickElements(By locator) {
-        var driver = getWebDriver();
-        for (WebElement elementToClick : driver.findElements(locator)) {
-            clickWebElement(elementToClick);
+        try {
+            var driver = getWebDriver();
+            for (WebElement elementToClick : driver.findElements(locator)) {
+                clickWebElement(elementToClick);
+            }
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
         }
     }
 
@@ -226,7 +264,7 @@ public class TastyCoffeePage {
         }
     }
 
-    public List<Product> parseProductType() {
+    private List<Product> parseProductType() {
         List<Product> currentTypeProducts = new ArrayList<>();
         Product.ProductBuilder productBuilder = new Product.ProductBuilder();
 
@@ -265,7 +303,8 @@ public class TastyCoffeePage {
                 publisher.publishEvent(new ProductFoundEvent(this, newProduct));
                 categoryProducts.add(newProduct);
             } catch (RuntimeException e) {
-                logger.error("Error parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage());
+                logger.warn("Warning parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage() +
+                        " Product will be skipped.");
             }
         }
     }
@@ -286,6 +325,7 @@ public class TastyCoffeePage {
     private List<SelenideElement> getProductPacks(SelenideElement product) {
         return new ArrayList<>(product.findAll(By.cssSelector("td.price-count-1")));
     }
+
     private List<SelenideElement> getGrindableProductPacks(SelenideElement product) {
         return new ArrayList<>(product.findAll(By.cssSelector("td.price-count-2")));
     }
@@ -322,7 +362,7 @@ public class TastyCoffeePage {
         return product.find("samp.mob").getAttribute("innerHTML");
     }
 
-    BigDecimal getPriceFromTableCell(String src) {
+    private BigDecimal getPriceFromTableCell(String src) {
         src = src.replace("&nbsp;", "");
         src = src.replace(",", ".");
         return BigDecimal.valueOf(Double.parseDouble(src));

@@ -18,7 +18,6 @@ public class BasicSessionSummaryCreatorService implements SessionSummaryCreatorS
 
     @Override
     public String createSessionSummary(Session session) {
-
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append(session.isClosed() ? "\n<b>! Сессия закрыта для редактирования !</b>\n" : "");
         messageBuilder.append("<code>");

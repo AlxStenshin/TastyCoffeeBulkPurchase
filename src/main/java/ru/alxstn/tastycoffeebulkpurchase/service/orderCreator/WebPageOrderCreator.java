@@ -37,14 +37,10 @@ public class WebPageOrderCreator implements OrderCreatorService {
     public void createOrder(Session session) {
         logger.info("Now placing order from current session " + session.getId() + ":" + session.getTitle());
         List<Purchase> currentSessionPurchases = purchaseRepository.findAllPurchasesInSession(session);
-
         publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, session, currentSessionPurchases));
 
         executorService.execute(() -> {
-            tastyCoffeePage.login();
-            tastyCoffeePage.resetOrder();
             List<Purchase> unfinishedPurchases = tastyCoffeePage.placeOrder(currentSessionPurchases);
-
             publisher.publishEvent(new PurchasePlacementErrorEvent(this, unfinishedPurchases));
         });
         logger.info("Order Placed!");

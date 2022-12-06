@@ -16,6 +16,7 @@ import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 public class SessionController {
 
     private final SessionManagerService sessionManager;
+    // ToDo: add messageMapper(Builder) like kirya522
 
     public SessionController(SessionManagerService sessionManager) {
         this.sessionManager = sessionManager;

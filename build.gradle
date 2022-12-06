@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
 
+    testImplementation 'junit:junit:4.13.1'
     runtimeOnly 'org.postgresql:postgresql'
 
     implementation 'org.webjars:jquery:3.6.1'
@@ -36,10 +37,10 @@ dependencies {
     implementation 'org.telegram:telegrambots:6.1.0'
     implementation 'com.google.code.gson:gson:2.10'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.mockito:mockito-all:1.10.19'
-
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testAnnotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 tasks.named('test') {
