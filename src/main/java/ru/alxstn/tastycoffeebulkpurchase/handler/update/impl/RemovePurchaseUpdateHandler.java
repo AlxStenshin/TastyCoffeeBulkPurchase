@@ -10,7 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RemovePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 
@@ -50,7 +50,7 @@ public class RemovePurchaseUpdateHandler extends CallbackUpdateHandler<RemovePur
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
 
-        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Remove"));
+        publisher.publishEvent(new SessionSummaryCheckRequestEvent(this, "Remove"));
 
         // ToDo: Show Edit Purchase List After That
     }

@@ -11,7 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SavePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
@@ -77,6 +77,6 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
 
-        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Save"));
+        publisher.publishEvent(new SessionSummaryCheckRequestEvent(this, "Save"));
     }
 }

@@ -11,7 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ClearPurchasesCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
@@ -62,6 +62,6 @@ public class ClearPurchasesUpdateHandler extends CallbackUpdateHandler<ClearPurc
                         .chatId(update.getCallbackQuery().getMessage().getChatId())
                         .build()));
 
-        publisher.publishEvent(new DiscountCheckRequestEvent(this, "Clear"));
+        publisher.publishEvent(new SessionSummaryCheckRequestEvent(this, "Clear"));
     }
 }

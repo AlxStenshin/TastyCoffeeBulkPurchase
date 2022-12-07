@@ -8,8 +8,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
-import ru.alxstn.tastycoffeebulkpurchase.event.DiscountCheckRequestEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
@@ -20,17 +21,17 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Component
-public class BasicDiscountMonitorService implements DiscountMonitorService {
+public class BasicSessionMonitorService implements SessionSummaryMonitorService {
 
-    Logger logger = LogManager.getLogger(DiscountMonitorService.class);
+    Logger logger = LogManager.getLogger(SessionSummaryMonitorService.class);
     private final ApplicationEventPublisher publisher;
     private final PurchaseRepository purchaseRepository;
     private final SessionRepository sessionRepository;
     private final TreeMap<Integer, Integer> discounts;
 
-    public BasicDiscountMonitorService(ApplicationEventPublisher publisher,
-                                       PurchaseRepository purchaseRepository,
-                                       SessionRepository sessionRepository) {
+    public BasicSessionMonitorService(ApplicationEventPublisher publisher,
+                                      PurchaseRepository purchaseRepository,
+                                      SessionRepository sessionRepository) {
         this.publisher = publisher;
         this.purchaseRepository = purchaseRepository;
         this.sessionRepository = sessionRepository;
@@ -45,20 +46,35 @@ public class BasicDiscountMonitorService implements DiscountMonitorService {
 
     @Async
     @EventListener
-    public void handleDiscountEventRequest(DiscountCheckRequestEvent event) {
-        logger.info("Checking Discount Value because of purchase " + event.getReason());
-        checkDiscountSize();
+    public void handleDiscountEventRequest(SessionSummaryCheckRequestEvent event) {
+        logger.info("Checking Session Summary because of purchase " + event.getReason());
+        updateSessionSummary();
     }
 
     @Override
-    public void checkDiscountSize() {
+    public void updateSessionSummary() {
 
         Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
+        List<Purchase> currentSessionPurchases = purchaseRepository.findAllPurchasesInSession(currentSession);
 
-        Double currentSessionDiscountSensitiveWeight = purchaseRepository
-                .getTotalDiscountSensitiveWeightForCurrentSession().orElse(0d);
-
+        Double currentSessionDiscountSensitiveWeight = currentSessionPurchases.stream()
+                .filter(purchase -> purchase.getProduct().isDiscountable())
+                .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
+                .reduce(0d, Double::sum);
         sessionRepository.setActiveSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
+
+        Double currentSessionCoffeeProductsWeight = currentSessionPurchases.stream()
+                .filter(purchase -> purchase.getProduct().isWeightableCoffee())
+                .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
+                .reduce(0d, Double::sum);
+        sessionRepository.setActiveSessionCoffeeWeight(currentSessionCoffeeProductsWeight);
+
+        Double currentSessionTeaProductsWeight = currentSessionPurchases.stream()
+                .filter(purchase -> purchase.getProduct().isTea())
+                .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
+                .reduce(0d, Double::sum);
+        sessionRepository.setActiveSessionTeaWeight(currentSessionTeaProductsWeight);
+
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
         logger.debug("Discount value: " + newDiscount + " Purchase Weight: " + currentSessionDiscountSensitiveWeight);
         int previousDiscount = sessionRepository.getActiveSessionDiscountValue();

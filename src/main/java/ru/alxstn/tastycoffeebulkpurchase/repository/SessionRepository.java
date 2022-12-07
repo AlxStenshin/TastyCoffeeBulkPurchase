@@ -34,6 +34,19 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
             "s.finished = false")
     void setActiveSessionDiscountableWeight(@Param(value = "weight") Double currentSessionDiscountSensitiveWeight);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE session s SET s.coffeeWeight = :weight WHERE " +
+            "s.closed = false AND " +
+            "s.finished = false")
+    void setActiveSessionCoffeeWeight(@Param(value = "weight") Double currentSessionCoffeeWeight);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE session s SET s.teaWeight = :weight WHERE " +
+            "s.closed = false AND " +
+            "s.finished = false")
+    void setActiveSessionTeaWeight(@Param(value = "weight") Double currentSessionTeaWeight);
 
     @Query("SELECT s.discountPercentage FROM session s WHERE " +
             "s.finished = false")
