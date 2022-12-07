@@ -10,7 +10,7 @@ import java.util.List;
 public interface SessionManagerService {
     Session addNewSession() throws SessionCreationException;
     void saveSession(Session session) throws SessionCreationException;
-    void closeSession(Session session);
+    Session closeSession(Session session);
     void checkSessionCustomerAccessible(Session session) throws SessionIsNotOpenException;
     List<Session> getAllSessions();
     Session getSessionById(long sessionId);

@@ -197,8 +197,6 @@ public class TastyCoffeePage {
                         .filter(p -> p.getProduct().getProductSubCategory().equals(subgroupTitle))
                         .collect(Collectors.toList());
 
-                List<Purchase> successfullyPlacedPurchases = new ArrayList<>();
-
                 for (Purchase purchase : currentSubcategoryPurchases) {
                     try {
                         String productName = purchase.getProduct().getName();
@@ -220,7 +218,6 @@ public class TastyCoffeePage {
                         logger.warn("Could Not Find Element By Text: " + purchase.getProduct().getName());
                     }
                 }
-                currentSubcategoryPurchases.removeAll(successfullyPlacedPurchases);
             }
         }
     }

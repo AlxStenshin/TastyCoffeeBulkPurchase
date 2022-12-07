@@ -118,7 +118,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                             editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
                                     .text(buttonTitleCreator.apply(p))
-                                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
+                                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(p, true)))
                                     .build());
 
                             editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
@@ -137,7 +137,6 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                         sendSessionErrorMessage(update, e.getMessage());
                     }
                     break;
-
 
                 case SETTING:
                     List<List<InlineKeyboardButton>> settingsButtons = new ArrayList<>();

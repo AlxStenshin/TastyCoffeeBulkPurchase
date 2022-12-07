@@ -43,10 +43,9 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
 
     @Override
     protected void handleCallback(Update update, EditPurchaseCommandDto dto) {
-        // ToDo: Reuse SetProductQuantityUpdateHandler
-
         Purchase purchase = dto.getPurchase();
         Product targetProduct = purchase.getProduct();
+        boolean editMode = dto.isEditMode();
 
         logger.info("Edit Purchase Command Received: " + purchase);
 
@@ -58,7 +57,9 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("-")
                 .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                        new Purchase(purchase, purchase.getCount() > 1 ? purchase.getCount() - 1 : 1))))
+                        new Purchase(purchase,purchase.getCount() > 1 ? purchase.getCount() - 1 : 1),
+                        editMode,
+                        dto.getPrevious())))
                 .build());
 
         countButtonsRow.add(InlineKeyboardButton.builder()
@@ -69,7 +70,9 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("+")
                 .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                        new Purchase(purchase, purchase.getCount() < Integer.MAX_VALUE ? purchase.getCount() + 1 : Integer.MAX_VALUE))))
+                        new Purchase(purchase,  purchase.getCount() < Integer.MAX_VALUE ? purchase.getCount() + 1 : Integer.MAX_VALUE),
+                        editMode,
+                        dto.getPrevious())))
                 .build());
 
         countButtonsRow.add(InlineKeyboardButton.builder()
@@ -84,35 +87,59 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
 
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
             productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Зерно") ? "Зерно ✅" : "Зерно")
-                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Зерно"))))
+                    .text(currentForm.equals("Зерно") || currentForm.isEmpty() ? "Зерно ✅" : "Зерно")
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+                            new Purchase(purchase, "Зерно"),
+                            editMode)))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Крупный") ? "Крупный ✅" : "Крупный")
-                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Крупный"))))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+                            new Purchase(purchase, "Крупный"),
+                            editMode)))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Средний") ? "Средний ✅" : "Средний")
-                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Средний"))))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+                            new Purchase(purchase, "Средний"),
+                            editMode)))
                     .build());
 
             productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Мелкий") ? "Мелкий ✅" : "Мелкий")
-                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(new Purchase(purchase, "Мелкий"))))
+                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+                            new Purchase(purchase, "Мелкий"),
+                            editMode)))
                     .build());
 
             keyboardRows.add(productFormButtons);
         }
 
-        List<InlineKeyboardButton> deletePurchaseButtons = new ArrayList<>();
-        deletePurchaseButtons.add(InlineKeyboardButton.builder()
-                .text("Удалить из заказа")
-                .callbackData(serializer.serialize(new RemovePurchaseCommandDto(purchase)))
-                .build());
+        if (dto.isEditMode()) {
+            List<InlineKeyboardButton> deletePurchaseButtons = new ArrayList<>();
+            deletePurchaseButtons.add(InlineKeyboardButton.builder()
+                    .text("Удалить из заказа")
+                    .callbackData(serializer.serialize(new RemovePurchaseCommandDto(purchase)))
+                    .build());
 
-        keyboardRows.add(deletePurchaseButtons);
+            keyboardRows.add(deletePurchaseButtons);
+        } else {
+            List<InlineKeyboardButton> menuNavigationButtons = new ArrayList<>();
+            if (dto.getPrevious() != null)
+                menuNavigationButtons.add(InlineKeyboardButton.builder()
+                        .text("< Назад")
+                        .callbackData(serializer.serialize(dto.getPrevious()))
+                        .build());
+
+            menuNavigationButtons.add(InlineKeyboardButton.builder()
+                    .text("<< Категории")
+                    .callbackData(serializer.serialize(new PlaceOrderCommandDto("PlaceOrder")))
+                    .build());
+
+            keyboardRows.add(menuNavigationButtons);
+        }
 
         InlineKeyboardMarkup.InlineKeyboardMarkupBuilder builder = InlineKeyboardMarkup.builder();
         for (var row : keyboardRows) {

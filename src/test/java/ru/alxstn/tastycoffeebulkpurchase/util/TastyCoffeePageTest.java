@@ -52,7 +52,7 @@ class TastyCoffeePageTest {
     }
 
     @Test
-    void shouldCorrectlyObtainPriceList() {
+    void shouldCorrectlyObtainPriceListAndPlaceOrder() {
         // All functionality combined in one test because of parser high time-consuming behavior
         Assertions.assertDoesNotThrow(() -> {
             logger.info("Now Obtaining PriceList");
@@ -69,7 +69,7 @@ class TastyCoffeePageTest {
             List<Purchase> beansPurchases = obtainedPriceList.stream()
                     .filter(Product::isGrindable)
                     .map(product -> new Purchase(
-                            c, product, s, "Зерно", 1))
+                            c, product, s, "", 1))
                     .collect(Collectors.toList());
 
             purchases.addAll(beansPurchases);

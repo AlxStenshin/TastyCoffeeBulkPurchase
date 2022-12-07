@@ -48,8 +48,15 @@ public class SavePurchaseUpdateHandler extends CallbackUpdateHandler<SavePurchas
         logger.info("Save Purchase Command Received.");
 
         Purchase purchase = purchaseRepository.getPurchaseIgnoringProductQuantity(
-                        dto.getCustomer(), dto.getProduct(), dto.getSession(), dto.getProductForm())
-                .orElse(new Purchase(dto.getCustomer(), dto.getProduct(), dto.getSession(), dto.getProductForm(), 0));
+                        dto.getCustomer(),
+                        dto.getProduct(),
+                        dto.getSession(),
+                        dto.getProductForm())
+                .orElse(new Purchase(dto.getCustomer(),
+                        dto.getProduct(),
+                        dto.getSession(),
+                        dto.getProductForm(),
+                        0));
         int previousCount = purchase.getCount();
         int newCount = dto.getProductCount();
         purchase.setCount(previousCount == 0 ? newCount : previousCount + newCount);

@@ -41,10 +41,12 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public void closeSession(Session session) {
+    public Session closeSession(Session session) {
         session.setDateTimeClosed(dateTimeProvider.getCurrentTimestamp());
+        session.setClosed(true);
         sessionRepository.save(session);
         orderCreator.createOrder(session);
+        return session;
     }
 
     public void checkSessionCustomerAccessible(Session session) {

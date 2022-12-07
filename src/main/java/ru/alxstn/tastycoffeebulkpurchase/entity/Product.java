@@ -160,7 +160,7 @@ public class Product {
     }
 
     // ToDo: Count Total Session Coffee Weight
-    public boolean isPackagedCoffee() {
+    public boolean isWeightableCoffee() {
         return (getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
                 getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") ||
                 getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ"));

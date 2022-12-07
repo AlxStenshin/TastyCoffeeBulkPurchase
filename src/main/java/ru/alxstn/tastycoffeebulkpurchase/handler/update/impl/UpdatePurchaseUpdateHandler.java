@@ -41,7 +41,7 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
         Purchase purchase = dto.getPurchase();
         logger.info("Update Purchase Command Received: " + purchase);
 
-        purchaseRepository.updatePurchaseWithId(purchase.getId(), purchase.getCount(), purchase.getProductForm());
+        purchaseRepository.save(purchase);
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(10)

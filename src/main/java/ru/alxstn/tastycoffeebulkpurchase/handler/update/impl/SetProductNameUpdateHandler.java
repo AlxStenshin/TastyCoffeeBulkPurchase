@@ -7,21 +7,25 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.EditPurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.PlaceOrderCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductNameCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetProductQuantityCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 
 @Component
 public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProductNameCommandDto> {
@@ -29,6 +33,8 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
     Logger logger = LogManager.getLogger(SetProductNameUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
+    private final SessionManagerService sessionManagerService;
     private final DtoSerializer serializer;
 
     @Autowired
@@ -36,10 +42,14 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
 
     public SetProductNameUpdateHandler(ApplicationEventPublisher publisher,
                                        ProductRepository productRepository,
+                                       CustomerRepository customerRepository,
+                                       SessionManagerService sessionManagerService,
                                        DtoSerializer serializer) {
         super();
         this.publisher = publisher;
         this.productRepository = productRepository;
+        this.customerRepository = customerRepository;
+        this.sessionManagerService = sessionManagerService;
         this.serializer = serializer;
     }
 
@@ -63,10 +73,13 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
 
         Product targetProduct = availablePackages.get(0);
         String title = "Выберите параметры для \n" + targetProduct.getFullDisplayName();
-        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
+        Session session = sessionManagerService.getActiveSession();
+        Customer customer = customerRepository.getByChatId(update.getCallbackQuery().getMessage().getChatId());
 
+        List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         for (Product p : availablePackages) {
-            String callback = serializer.serialize(new SetProductQuantityCommandDto(p, 1, dto));
+            Purchase purchase = new Purchase(customer, p, session, 1);
+            String callback = serializer.serialize(new EditPurchaseCommandDto(purchase, false, dto));
 
             String packaging = p.getProductPackage().getDescription().isEmpty() ? "" : p.getProductPackage() + ", ";
             String buttonText = packaging + p.getPrice() + "₽";

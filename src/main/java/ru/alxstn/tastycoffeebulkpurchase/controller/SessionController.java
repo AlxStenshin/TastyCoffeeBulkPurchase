@@ -59,8 +59,7 @@ public class SessionController {
 
     @GetMapping(value = "/sessions/close/{id}", produces = MediaType.TEXT_HTML_VALUE)
     public String closeSession(@PathVariable("id") Integer id, Model model) {
-        Session session = sessionManager.getSessionById(id);
-        session.setClosed(true);
+        Session session = sessionManager.closeSession(sessionManager.getSessionById(id));
         model.addAttribute("session", session);
         model.addAttribute("pageTitle", "Close Session");
         return "session_close_form";
@@ -71,9 +70,6 @@ public class SessionController {
         try {
             sessionManager.saveSession(session);
             redirectAttributes.addFlashAttribute("message", "The Session has been saved successfully!");
-            if (session.isClosed()) {
-                sessionManager.closeSession(session);
-            }
         } catch (Exception e) {
             redirectAttributes.addAttribute("message", e.getMessage());
         }
