@@ -81,6 +81,6 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
             sessionManagerService.saveSession(currentSession);
             // ToDo: Emit All Orders Paid Event Message
         }
-
     }
+
 }

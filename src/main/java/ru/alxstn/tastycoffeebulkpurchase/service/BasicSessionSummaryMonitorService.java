@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-@Component
-public class BasicSessionMonitorService implements SessionSummaryMonitorService {
+@Service
+public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorService {
 
     Logger logger = LogManager.getLogger(SessionSummaryMonitorService.class);
     private final ApplicationEventPublisher publisher;
@@ -29,9 +29,9 @@ public class BasicSessionMonitorService implements SessionSummaryMonitorService 
     private final SessionRepository sessionRepository;
     private final TreeMap<Integer, Integer> discounts;
 
-    public BasicSessionMonitorService(ApplicationEventPublisher publisher,
-                                      PurchaseRepository purchaseRepository,
-                                      SessionRepository sessionRepository) {
+    public BasicSessionSummaryMonitorService(ApplicationEventPublisher publisher,
+                                             PurchaseRepository purchaseRepository,
+                                             SessionRepository sessionRepository) {
         this.publisher = publisher;
         this.purchaseRepository = purchaseRepository;
         this.sessionRepository = sessionRepository;
@@ -46,7 +46,7 @@ public class BasicSessionMonitorService implements SessionSummaryMonitorService 
 
     @Async
     @EventListener
-    public void handleDiscountEventRequest(SessionSummaryCheckRequestEvent event) {
+    public void handleSessionSummaryCheckRequest(SessionSummaryCheckRequestEvent event) {
         logger.info("Checking Session Summary because of purchase " + event.getReason());
         updateSessionSummary();
     }
@@ -76,7 +76,6 @@ public class BasicSessionMonitorService implements SessionSummaryMonitorService 
         sessionRepository.setActiveSessionTeaWeight(currentSessionTeaProductsWeight);
 
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
-        logger.debug("Discount value: " + newDiscount + " Purchase Weight: " + currentSessionDiscountSensitiveWeight);
         int previousDiscount = sessionRepository.getActiveSessionDiscountValue();
 
         if (previousDiscount != newDiscount) {

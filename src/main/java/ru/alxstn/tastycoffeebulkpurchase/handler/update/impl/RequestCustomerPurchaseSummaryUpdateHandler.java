@@ -12,17 +12,17 @@ import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.CustomerSummaryCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.CustomerSummaryMessageCreatorService;
 
 @Component
 public class RequestCustomerPurchaseSummaryUpdateHandler extends CallbackUpdateHandler<RequestCustomerPurchaseSummaryCommandDto> {
 
     Logger logger = LogManager.getLogger(RequestCustomerPurchaseSummaryUpdateHandler.class);
-    private final CustomerSummaryCreatorService customerSummaryService;
+    private final CustomerSummaryMessageCreatorService customerSummaryService;
     private final CustomerRepository customerRepository;
     private final ApplicationEventPublisher publisher;
 
-    public RequestCustomerPurchaseSummaryUpdateHandler(CustomerSummaryCreatorService customerSummaryService,
+    public RequestCustomerPurchaseSummaryUpdateHandler(CustomerSummaryMessageCreatorService customerSummaryService,
                                                        CustomerRepository customerRepository,
                                                        ApplicationEventPublisher publisher) {
         this.customerSummaryService = customerSummaryService;
@@ -47,7 +47,7 @@ public class RequestCustomerPurchaseSummaryUpdateHandler extends CallbackUpdateH
 
         String message;
         try {
-            message = customerSummaryService.buildCustomerSummary(
+            message = customerSummaryService.buildCustomerSummaryMessage(
                     customerRepository.getByChatId(customerID),
                     dto.getSession());
 

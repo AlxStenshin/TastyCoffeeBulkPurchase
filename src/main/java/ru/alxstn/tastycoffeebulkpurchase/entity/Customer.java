@@ -83,7 +83,7 @@ public class Customer {
     public String toString() {
         String customer =  firstName == null ? "" : firstName;
         customer +=  lastName == null ? "" : " " + lastName;
-        customer +=  userName == null ? "" : " (" + userName + ")";
+        customer +=  userName == null ? "" : " (@" + userName + ")";
         return customer;
     }
 }

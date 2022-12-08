@@ -21,21 +21,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Service
 public class BasicCustomerPaymentRequestPublisherService implements CustomerPaymentRequestPublisherService {
 
     Logger logger = LogManager.getLogger(BasicCustomerPaymentRequestPublisherService.class);
     private final ApplicationEventPublisher publisher;
     private final DtoSerializer serializer;
-    private final CustomerSummaryCreatorService customerSummaryCreatorService;
+    private final CustomerSummaryMessageCreatorService customerSummaryMessageCreatorService;
 
     public BasicCustomerPaymentRequestPublisherService(ApplicationEventPublisher publisher,
                                                        DtoSerializer serializer,
-                                                       CustomerSummaryCreatorService customerSummaryCreatorService) {
+                                                       CustomerSummaryMessageCreatorService customerSummaryMessageCreatorService) {
         this.publisher = publisher;
         this.serializer = serializer;
-        this.customerSummaryCreatorService = customerSummaryCreatorService;
+        this.customerSummaryMessageCreatorService = customerSummaryMessageCreatorService;
     }
 
     @EventListener
@@ -50,7 +49,7 @@ public class BasicCustomerPaymentRequestPublisherService implements CustomerPaym
                 .collect(Collectors.toSet());
 
         for (Customer c : currentSessionCustomers) {
-            String message = customerSummaryCreatorService.buildCustomerSummary(c, session) + "\n\n" +
+            String message = customerSummaryMessageCreatorService.buildCustomerSummaryMessage(c, session) + "\n\n" +
                     "Внесите оплату и нажмите кнопку \"Оплачено\"\n" +
                     "Оплата: " + session.getPaymentInstruction() + "\n";
 

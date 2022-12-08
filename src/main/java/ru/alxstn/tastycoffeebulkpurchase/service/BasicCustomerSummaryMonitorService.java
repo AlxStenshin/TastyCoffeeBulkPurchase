@@ -1,0 +1,83 @@
+package ru.alxstn.tastycoffeebulkpurchase.service;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Payment;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
+import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
+import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSummaryMonitorService {
+
+    Logger logger = LogManager.getLogger(BasicCustomerSummaryMonitorService.class);
+    private final PurchaseRepository purchaseRepository;
+    private final PaymentRepository paymentRepository;
+    private final SessionManagerService sessionManagerService;
+
+    public BasicCustomerSummaryMonitorService(PurchaseRepository purchaseRepository,
+                                              PaymentRepository paymentRepository,
+                                              SessionManagerService sessionManagerService) {
+        this.purchaseRepository = purchaseRepository;
+        this.paymentRepository = paymentRepository;
+        this.sessionManagerService = sessionManagerService;
+    }
+
+    @Async
+    @EventListener
+    public void handleCustomerSummaryCheckRequest(CustomerSummaryCheckRequestEvent event) {
+        // ToDo: Remove payment info after order clear or last item removed prom purchase list
+        logger.info("Checking Customer Purchase Summary because of purchase " + event.getReason());
+        updateCustomerSummary(event.getCustomer());
+    }
+
+    @Override
+    public void updateCustomerSummary(Customer customer) {
+        Session session = sessionManagerService.getUnfinishedSession();
+        Payment payment = paymentRepository.getCustomerSessionPayment(session, customer)
+                .orElse(new Payment(customer, session));
+        List<Purchase> purchases = purchaseRepository
+                .findAllPurchasesInSessionByCustomer(session, customer);
+
+        int discountValue = session.getDiscountPercentage();
+        BigDecimal totalPrice = new BigDecimal(0);
+        BigDecimal totalPriceWithDiscount = new BigDecimal(0);
+        BigDecimal discountableTotalWithDiscount = new BigDecimal(0);
+        BigDecimal discountableTotal = new BigDecimal(0);
+        BigDecimal nonDiscountableTotal = new BigDecimal(0);
+
+        if (purchases.size() > 0) {
+            for (var purchase : purchases) {
+                totalPrice = totalPrice.add(purchase.getTotalPrice());
+
+                if (purchase.getProduct().isDiscountable()) {
+                    discountableTotal = discountableTotal.add(purchase.getTotalPrice());
+                } else {
+                    nonDiscountableTotal = nonDiscountableTotal.add(purchase.getTotalPrice());
+                }
+            }
+
+            discountableTotalWithDiscount = BigDecimalUtil.multiplyByDouble(
+                    discountableTotal, ((double) (100 - discountValue) / 100));
+            totalPriceWithDiscount = discountableTotalWithDiscount.add(nonDiscountableTotal);
+        }
+
+        payment.setTotalAmountNoDiscount(totalPrice);
+        payment.setTotalAmountWithDiscount(totalPriceWithDiscount);
+        payment.setDiscountableAmountWithDiscount(discountableTotalWithDiscount);
+        payment.setDiscountableAmountNoDiscount(discountableTotal);
+        payment.setNonDiscountableAmount(nonDiscountableTotal);
+
+        paymentRepository.save(payment);
+    }
+}

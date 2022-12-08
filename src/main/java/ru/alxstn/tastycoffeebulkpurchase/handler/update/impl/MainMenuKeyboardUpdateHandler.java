@@ -123,7 +123,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                             editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()
                                     .text("Очистить заказ")
-                                    .callbackData(serializer.serialize(new ClearPurchasesCommandDto(purchases)))
+                                    .callbackData(serializer.serialize(new ClearPurchasesCommandDto(customer, purchases)))
                                     .build()));
 
                             publisher.publishEvent(new SendMessageEvent(this, editOrderAnswer.newMessage()));

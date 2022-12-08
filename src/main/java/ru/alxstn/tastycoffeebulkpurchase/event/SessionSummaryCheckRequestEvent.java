@@ -7,7 +7,7 @@ public class SessionSummaryCheckRequestEvent extends ApplicationEvent {
 
     public SessionSummaryCheckRequestEvent(Object source, String reason) {
         super(source);
-        this.reason =reason;
+        this.reason = reason;
     }
 
     public String getReason() {

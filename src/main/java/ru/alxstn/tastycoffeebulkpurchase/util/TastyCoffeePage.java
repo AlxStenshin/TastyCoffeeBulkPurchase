@@ -76,6 +76,7 @@ public class TastyCoffeePage {
         }
         return allProducts;
     }
+
     public List<Purchase> placeOrder(List<Purchase> currentSessionPurchases) {
         try {
             login();

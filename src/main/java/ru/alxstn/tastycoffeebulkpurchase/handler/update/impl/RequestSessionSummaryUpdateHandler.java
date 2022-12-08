@@ -11,18 +11,18 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RequestSessionSummaryCo
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionSummaryCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.SessionSummaryMessageCreatorService;
 
 @Component
 public class RequestSessionSummaryUpdateHandler extends CallbackUpdateHandler<RequestSessionSummaryCommandDto> {
 
     Logger logger = LogManager.getLogger(RequestSessionSummaryUpdateHandler.class);
-    private final SessionSummaryCreatorService sessionSummaryCreatorService;
+    private final SessionSummaryMessageCreatorService sessionSummaryMessageCreatorService;
     private final ApplicationEventPublisher publisher;
 
-    public RequestSessionSummaryUpdateHandler(SessionSummaryCreatorService sessionSummaryCreatorService,
+    public RequestSessionSummaryUpdateHandler(SessionSummaryMessageCreatorService sessionSummaryMessageCreatorService,
                                               ApplicationEventPublisher publisher) {
-        this.sessionSummaryCreatorService = sessionSummaryCreatorService;
+        this.sessionSummaryMessageCreatorService = sessionSummaryMessageCreatorService;
         this.publisher = publisher;
     }
 
@@ -43,7 +43,7 @@ public class RequestSessionSummaryUpdateHandler extends CallbackUpdateHandler<Re
 
         String message;
         try {
-            message = sessionSummaryCreatorService.createSessionSummary(dto.getSession());
+            message = sessionSummaryMessageCreatorService.createSessionSummaryMessage(dto.getSession());
         } catch (SessionNotFoundException e) {
             message = e.getMessage();
         }
