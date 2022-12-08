@@ -15,6 +15,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetCustomerNotification
 import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 
 import java.lang.reflect.Field;

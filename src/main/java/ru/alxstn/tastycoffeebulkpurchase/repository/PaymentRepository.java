@@ -16,8 +16,6 @@ import java.util.Optional;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    // ToDo: remove payment info if customer cleans order or removes last record from order
-
     @Query("SELECT p FROM payment p WHERE " +
             "p.session = :session AND " +
             "p.customer = :customer")

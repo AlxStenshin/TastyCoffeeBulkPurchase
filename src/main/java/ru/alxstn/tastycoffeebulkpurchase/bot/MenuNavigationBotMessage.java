@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.handler.update.impl;
+package ru.alxstn.tastycoffeebulkpurchase.bot;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
