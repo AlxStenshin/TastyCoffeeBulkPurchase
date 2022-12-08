@@ -147,6 +147,22 @@ public class Product {
         this.grindable = grindable;
     }
 
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public LocalDateTime getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(LocalDateTime dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
+
     @Override
     public String toString() {
         return name;

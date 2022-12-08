@@ -44,6 +44,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                     @Param(value = "mark") String mark,
                                     @Param(value = "price") BigDecimal price);
 
+    @Query("SELECT p FROM Product p WHERE " +
+            " p.name = :name AND" +
+            " p.productCategory = :cat AND" +
+            " p.productSubCategory = :subCat AND" +
+            " p.productPackage = :pack"
+    )
+    List<Product> getProductsByNameCategorySubcategoryAndPackage(
+                                    @Param(value = "name") String name,
+                                    @Param(value = "cat") String cat,
+                                    @Param(value = "subCat") String subCat,
+                                    @Param(value = "pack") ProductPackage pack);
+
     @Transactional
     @Modifying
     @Query("UPDATE Product p SET p.dateUpdated = :updateDateTime, p.actual = true WHERE" +

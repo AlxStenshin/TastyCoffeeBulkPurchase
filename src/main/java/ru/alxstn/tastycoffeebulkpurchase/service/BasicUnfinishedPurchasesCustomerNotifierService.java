@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class BasicUnfinishedPurchasesCustomerNotifierService implements UnfinishedPurchasesCoustomerNotifierService {
+public class BasicUnfinishedPurchasesCustomerNotifierService implements UnfinishedPurchasesCustomerNotifierService {
     Logger logger = LogManager.getLogger(BasicUnfinishedPurchasesCustomerNotifierService.class);
 
     private final ApplicationEventPublisher publisher;

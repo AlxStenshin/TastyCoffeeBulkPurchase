@@ -287,7 +287,7 @@ public class TastyCoffeePage {
             }
         }
 
-        logger.info("Price List Parsing Complete! Found: " + currentTypeProducts.size() + " items.");
+        logger.info("Price List Tab Parsing Complete! Found: " + currentTypeProducts.size() + " items.");
         return currentTypeProducts;
     }
 

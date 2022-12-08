@@ -14,6 +14,7 @@ import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.PriceListSaverService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +53,7 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
                 productPackageRepository.saveAndFlush(pack);
         }
 
+        List<Product> newProducts = new ArrayList<>();
         // Product Persistence
         for (var product : productsToSave) {
             ProductPackage productPackage =
@@ -70,10 +72,11 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
                         product.getPrice(),
                         dateTimeProvider.getCurrentTimestamp());
             } else {
+                newProducts.add(product);
                 productRepository.save(product);
                 logger.info("Saving new Product: " + product);
-                // ToDo: Check if new product updates only productMark or price and emit corresponding event.
             }
         }
+        // ToDo: something with newly obtained products newProducts
     }
 }

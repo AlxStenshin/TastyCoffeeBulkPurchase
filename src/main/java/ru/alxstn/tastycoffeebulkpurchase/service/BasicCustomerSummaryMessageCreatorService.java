@@ -14,6 +14,7 @@ import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BasicCustomerSummaryMessageCreatorService implements CustomerSummaryMessageCreatorService {
@@ -34,7 +35,10 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
         String message;
         try {
             List<Purchase> purchases = purchaseRepository
-                    .findAllPurchasesInSessionByCustomer(session, customer);
+                    .findAllPurchasesInSessionByCustomer(session, customer)
+                    .stream()
+                    .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
+                    .collect(Collectors.toList());
 
             Payment payment = paymentRepository.getCustomerSessionPayment(session, customer)
                     .orElseThrow(() -> new CustomerPaymentException("Payment Not Found!"));
@@ -60,17 +64,16 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                 if (discountValue > 0) {
                     messageBuilder.append("\nИтог без скидки: ").append(totalPrice).append("₽");
                     messageBuilder.append(BigDecimalUtil.greaterThanZero(discountableTotal) ?
-                            "\nАкционные товары в зазазе без скидки " + discountableTotal + "₽" : "");
+                            "\nАкционные товары без скидки " + discountableTotal + "₽" : "");
 
                     messageBuilder.append("\nАкционные товары со скидкой ").append(discountValue).append("%: ")
                             .append(discountableTotalWithDiscount).append(" ₽");
 
                     messageBuilder.append(BigDecimalUtil.greaterThanZero(nonDiscountableTotal) ?
-                            "\nОстальные товары в заказе: " + nonDiscountableTotal + " ₽" : "");
+                            "\nОстальные товары: " + nonDiscountableTotal + " ₽" : "");
 
                     messageBuilder.append("\nРазмер скидки: ")
                             .append(totalPrice.subtract(totalPriceWithDiscount)).append(" ₽");
-
                 }
                 messageBuilder.append("\n\n<b>Всего к оплате: ").append(totalPriceWithDiscount).append(" ₽</b>");
                 message = messageBuilder.toString();

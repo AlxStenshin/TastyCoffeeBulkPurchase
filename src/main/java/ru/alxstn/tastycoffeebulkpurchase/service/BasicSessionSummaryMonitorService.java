@@ -53,33 +53,38 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
 
     @Override
     public void updateSessionSummary() {
-
         Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
-        List<Purchase> currentSessionPurchases = purchaseRepository.findAllPurchasesInSession(currentSession);
+        List<Purchase> currentSessionPurchases = purchaseRepository
+                .findAllPurchasesInSession(currentSession).stream()
+                .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
+                .collect(Collectors.toList());
 
         Double currentSessionDiscountSensitiveWeight = currentSessionPurchases.stream()
                 .filter(purchase -> purchase.getProduct().isDiscountable())
                 .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
                 .reduce(0d, Double::sum);
-        sessionRepository.setActiveSessionDiscountableWeight(currentSessionDiscountSensitiveWeight);
+        sessionRepository.setSessionDiscountableWeight(currentSession,
+                currentSessionDiscountSensitiveWeight);
 
         Double currentSessionCoffeeProductsWeight = currentSessionPurchases.stream()
                 .filter(purchase -> purchase.getProduct().isWeightableCoffee())
                 .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
                 .reduce(0d, Double::sum);
-        sessionRepository.setActiveSessionCoffeeWeight(currentSessionCoffeeProductsWeight);
+        sessionRepository.setSessionCoffeeWeight(currentSession,
+                currentSessionCoffeeProductsWeight);
 
         Double currentSessionTeaProductsWeight = currentSessionPurchases.stream()
                 .filter(purchase -> purchase.getProduct().isTea())
                 .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
                 .reduce(0d, Double::sum);
-        sessionRepository.setActiveSessionTeaWeight(currentSessionTeaProductsWeight);
+        sessionRepository.setSessionTeaWeight(currentSession,
+                currentSessionTeaProductsWeight);
 
         int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
         int previousDiscount = sessionRepository.getActiveSessionDiscountValue();
 
         if (previousDiscount != newDiscount) {
-            sessionRepository.setActiveSessionDiscountValue(newDiscount);
+            sessionRepository.setSessionDiscountValue(currentSession, newDiscount);
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 

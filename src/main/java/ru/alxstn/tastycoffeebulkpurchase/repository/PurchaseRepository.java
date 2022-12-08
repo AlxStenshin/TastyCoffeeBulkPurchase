@@ -13,7 +13,14 @@ import java.util.Optional;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     @Query("SELECT p FROM Purchase p WHERE p.session = :session")
-    List<Purchase> findAllPurchasesInSession(@Param(value = "session") Session session);
+    List<Purchase> findAllPurchasesInSession(
+            @Param(value = "session") Session session);
+
+    @Query("SELECT p FROM Purchase p WHERE p.session = :session AND " +
+            "p.product = :product")
+    List<Purchase> findProductPurchasesInSession(
+            @Param(value = "session") Session session,
+            @Param(value = "product") Product product);
 
     @Query("SELECT p FROM Purchase p WHERE p.session = :session AND p.customer = :customer")
     List<Purchase> findAllPurchasesInSessionByCustomer(
