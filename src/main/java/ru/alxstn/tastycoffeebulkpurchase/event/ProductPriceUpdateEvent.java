@@ -5,5 +5,10 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 public class ProductPriceUpdateEvent extends ProductUpdateEvent {
     public ProductPriceUpdateEvent(Object source, Product oldProduct, Product newProduct) {
         super(source, oldProduct, newProduct);
+
+        super.setUpdateMessage("Изменилась цена на продукт из вашего заказа: \n" +
+                oldProduct.getDisplayName() + "\n" +
+                "Новая цена: " + newProduct.getPrice() +
+                "Сохранить с новой ценой или удалить продукт из заказа?");
     }
 }

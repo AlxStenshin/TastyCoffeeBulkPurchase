@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.event.NewProductDiscoveredEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductPriceUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductSpecialMarkUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
@@ -32,6 +33,7 @@ public class BasicProductAnalyzerService implements ProductAnalyzerService {
     public void analyzeNewProducts(List<Product> newProducts) {
         for (Product newProduct : newProducts) {
             logger.info("Analyzing New Product: " + newProduct);
+
             List<Product> similarProducts = productRepository.getProductsByNameCategorySubcategoryAndPackage(
                     newProduct.getName(),
                     newProduct.getProductCategory(),
@@ -55,6 +57,10 @@ public class BasicProductAnalyzerService implements ProductAnalyzerService {
                     logger.info("Product Special Mark Update Detected.");
                     publisher.publishEvent(new ProductSpecialMarkUpdateEvent(this, latestSimilar, newProduct));
                 }
+            }
+            else {
+                logger.info("New Product Detected.");
+                publisher.publishEvent(new NewProductDiscoveredEvent(this, newProduct));
             }
         }
     }

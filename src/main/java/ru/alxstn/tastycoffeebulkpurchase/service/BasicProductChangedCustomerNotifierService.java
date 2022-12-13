@@ -5,29 +5,35 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.entity.*;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RemoveProductFromCustomerPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ReplaceProductForCustomerPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class BasicProductChangedCustomerNotifierService implements ProductChangedCustomerNotifierService{
 
     Logger logger = LogManager.getLogger(BasicProductChangedCustomerNotifierService.class);
+    private final DtoSerializer serializer;
     private final SessionRepository sessionRepository;
     private final PurchaseRepository purchaseRepository;
     private final ApplicationEventPublisher publisher;
 
-    public BasicProductChangedCustomerNotifierService(SessionRepository sessionRepository,
+    public BasicProductChangedCustomerNotifierService(DtoSerializer serializer, SessionRepository sessionRepository,
                                                       PurchaseRepository purchaseRepository,
                                                       ApplicationEventPublisher publisher) {
+        this.serializer = serializer;
         this.sessionRepository = sessionRepository;
         this.purchaseRepository = purchaseRepository;
         this.publisher = publisher;
@@ -36,6 +42,7 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
     @Override
     public void handleChangedProducts(ProductUpdateEvent event) {
         Product oldProduct = event.getOldProduct();
+        Product newProduct = event.getNewProduct();
 
         Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
         List<Purchase> currentSessionProductPurchases = purchaseRepository.
@@ -48,11 +55,31 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
             publisher.publishEvent(new SendMessageEvent(this,
                     SendMessage.builder()
                             .chatId(customer.getChatId())
-                            .text("Обновился прайс-лист.\n" +
-                                    "Продукт из вашего заказа более не доступен:\n" +
-                                    oldProduct.getFullDisplayName()
-                            + "\nПожалуйста выберите замену.")
+                            .parseMode("html")
+                            .text("Обновился прайс-лист." + event.getUpdateMessage())
+                            .replyMarkup(InlineKeyboardMarkup.builder()
+                                    .keyboard(buildActionButtons(oldProduct, newProduct))
+                                    .build())
                             .build()));
         }
+    }
+
+    private List<List<InlineKeyboardButton>> buildActionButtons(Product oldProduct, Product newProduct) {
+
+        List<List<InlineKeyboardButton>> actionButtons = new ArrayList<>();
+
+        actionButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                .text("Удалить")
+                .callbackData(serializer.serialize(
+                        new RemoveProductFromCustomerPurchaseCommandDto(oldProduct)))
+                .build()));
+
+        actionButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                .text("Сохранить")
+                .callbackData(serializer.serialize(
+                        new ReplaceProductForCustomerPurchaseCommandDto(oldProduct, newProduct)))
+                .build()));
+
+        return actionButtons;
     }
 }

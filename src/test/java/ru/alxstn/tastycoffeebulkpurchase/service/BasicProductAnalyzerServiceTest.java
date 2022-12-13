@@ -136,6 +136,4 @@ class BasicProductAnalyzerServiceTest {
 
         verify(publisher, times(1)).publishEvent(any(ApplicationEvent.class));
     }
-
-
 }

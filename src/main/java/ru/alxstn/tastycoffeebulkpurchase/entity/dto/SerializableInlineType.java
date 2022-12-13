@@ -21,6 +21,9 @@ public enum SerializableInlineType {
     REQUEST_PURCHASE_SUMMARY(14),
     REQUEST_SESSION_SUMMARY(15),
 
+    REMOVE_PRODUCT_FOR_CUSTOMER(16),
+    REPLACE_PRODUCT_FOR_CUSTOMER(16),
+
     ;
 
     private final int index;
