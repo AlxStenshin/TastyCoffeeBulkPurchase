@@ -11,7 +11,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import java.math.BigDecimal;
@@ -21,14 +22,14 @@ import java.util.List;
 public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSummaryMonitorService {
 
     Logger logger = LogManager.getLogger(BasicCustomerSummaryMonitorService.class);
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final PaymentRepository paymentRepository;
     private final SessionManagerService sessionManagerService;
 
-    public BasicCustomerSummaryMonitorService(PurchaseRepository purchaseRepository,
+    public BasicCustomerSummaryMonitorService(PurchaseManagerService purchaseManagerService,
                                               PaymentRepository paymentRepository,
                                               SessionManagerService sessionManagerService) {
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.paymentRepository = paymentRepository;
         this.sessionManagerService = sessionManagerService;
     }
@@ -46,7 +47,7 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
         Session session = sessionManagerService.getUnfinishedSession();
         Payment payment = paymentRepository.getCustomerSessionPayment(session, customer)
                 .orElse(new Payment(customer, session));
-        List<Purchase> purchases = purchaseRepository
+        List<Purchase> purchases = purchaseManagerService
                 .findAllPurchasesInSessionByCustomer(session, customer);
 
         int discountValue = session.getDiscountPercentage();

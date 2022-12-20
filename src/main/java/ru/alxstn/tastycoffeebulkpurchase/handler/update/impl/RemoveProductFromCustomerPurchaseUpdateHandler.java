@@ -11,8 +11,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RemoveProductFromCustom
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 @Component
 public class RemoveProductFromCustomerPurchaseUpdateHandler
@@ -20,16 +20,16 @@ public class RemoveProductFromCustomerPurchaseUpdateHandler
 
     private final ApplicationEventPublisher publisher;
     private final SessionManagerService sessionManagerService;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final CustomerRepository customerRepository;
 
     public RemoveProductFromCustomerPurchaseUpdateHandler(ApplicationEventPublisher publisher,
                                                           SessionManagerService sessionManagerService,
-                                                          PurchaseRepository purchaseRepository,
+                                                          PurchaseManagerService purchaseRepository,
                                                           CustomerRepository customerRepository) {
         this.publisher = publisher;
         this.sessionManagerService = sessionManagerService;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseRepository;
         this.customerRepository = customerRepository;
     }
 
@@ -48,7 +48,7 @@ public class RemoveProductFromCustomerPurchaseUpdateHandler
         Customer customer = customerRepository.getByChatId(update.getMessage().getChatId());
         Session session = sessionManagerService.getUnfinishedSession();
 
-        purchaseRepository.removePurchaseForCustomerWithProductInSession(customer, session, dto.getOldProduct());
+        purchaseManagerService.removePurchaseForCustomerWithProductInSession(customer, session, dto.getOldProduct());
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(0)

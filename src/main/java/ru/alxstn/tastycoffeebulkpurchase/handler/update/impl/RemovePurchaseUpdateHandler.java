@@ -13,18 +13,18 @@ import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 @Component
 public class RemovePurchaseUpdateHandler extends CallbackUpdateHandler<RemovePurchaseCommandDto> {
 
     Logger logger = LogManager.getLogger(RemovePurchaseUpdateHandler.class);
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final ApplicationEventPublisher publisher;
 
-    public RemovePurchaseUpdateHandler(PurchaseRepository purchaseRepository,
+    public RemovePurchaseUpdateHandler(PurchaseManagerService purchaseManagerService,
                                        ApplicationEventPublisher publisher) {
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.publisher = publisher;
     }
 
@@ -43,7 +43,7 @@ public class RemovePurchaseUpdateHandler extends CallbackUpdateHandler<RemovePur
         Purchase purchase = dto.getPurchase();
         logger.info("Remove Purchase Command Received: " + purchase);
 
-        purchaseRepository.delete(purchase);
+        purchaseManagerService.delete(purchase);
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(10)
                 .text("Удалено!")

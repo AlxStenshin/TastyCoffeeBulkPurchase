@@ -14,8 +14,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,15 +27,15 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
     Logger logger = LogManager.getLogger(BasicProductChangedCustomerNotifierService.class);
     private final DtoSerializer serializer;
     private final SessionRepository sessionRepository;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final ApplicationEventPublisher publisher;
 
     public BasicProductChangedCustomerNotifierService(DtoSerializer serializer, SessionRepository sessionRepository,
-                                                      PurchaseRepository purchaseRepository,
+                                                      PurchaseManagerService purchaseManagerService,
                                                       ApplicationEventPublisher publisher) {
         this.serializer = serializer;
         this.sessionRepository = sessionRepository;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.publisher = publisher;
     }
 
@@ -45,7 +45,7 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
         Product newProduct = event.getNewProduct();
 
         Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
-        List<Purchase> currentSessionProductPurchases = purchaseRepository.
+        List<Purchase> currentSessionProductPurchases = purchaseManagerService.
                 findProductPurchasesInSession(currentSession, oldProduct);
 
         for (Purchase purchase : currentSessionProductPurchases) {

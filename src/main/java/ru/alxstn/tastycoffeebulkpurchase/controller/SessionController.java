@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 // ToDo: Remove all logic from session controller, controllers should be simple and stupid.
 
@@ -51,16 +51,14 @@ public class SessionController {
 
     @GetMapping(value = "/sessions/{id}", produces = MediaType.TEXT_HTML_VALUE)
     public String editSession(@PathVariable("id") Integer id, Model model) {
-        Session session = sessionManager.getSessionById(id);
-        model.addAttribute("session", session);
+        model.addAttribute("session", sessionManager.getSessionById(id));
         model.addAttribute("pageTitle", "Edit Session");
         return "session_form";
     }
 
     @GetMapping(value = "/sessions/close/{id}", produces = MediaType.TEXT_HTML_VALUE)
     public String closeSession(@PathVariable("id") Integer id, Model model) {
-        Session session = sessionManager.closeSession(sessionManager.getSessionById(id));
-        model.addAttribute("session", session);
+        model.addAttribute("session", sessionManager.closeSession(sessionManager.getSessionById(id)));
         model.addAttribute("pageTitle", "Close Session");
         return "session_close_form";
     }

@@ -13,8 +13,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -25,15 +25,15 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
 
     Logger logger = LogManager.getLogger(SessionSummaryMonitorService.class);
     private final ApplicationEventPublisher publisher;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final SessionRepository sessionRepository;
     private final TreeMap<Integer, Integer> discounts;
 
     public BasicSessionSummaryMonitorService(ApplicationEventPublisher publisher,
-                                             PurchaseRepository purchaseRepository,
+                                             PurchaseManagerService purchaseManagerService,
                                              SessionRepository sessionRepository) {
         this.publisher = publisher;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.sessionRepository = sessionRepository;
 
         this.discounts = new TreeMap<>();
@@ -54,7 +54,7 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
     @Override
     public void updateSessionSummary() {
         Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
-        List<Purchase> currentSessionPurchases = purchaseRepository
+        List<Purchase> currentSessionPurchases = purchaseManagerService
                 .findAllPurchasesInSession(currentSession).stream()
                 .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
                 .collect(Collectors.toList());
@@ -88,7 +88,7 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 
-            List<Customer> currentSessionSubscribedCustomers = purchaseRepository.getSessionCustomers(currentSession)
+            List<Customer> currentSessionSubscribedCustomers = purchaseManagerService.getSessionCustomers(currentSession)
                     .stream()
                     .filter(c -> c.getNotificationSettings().isReceiveDiscountNotification())
                     .collect(Collectors.toList());

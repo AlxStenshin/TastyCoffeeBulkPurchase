@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service;
+package ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager;
 
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
@@ -6,6 +6,7 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationExcept
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.OrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.List;
@@ -82,14 +83,16 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     private String getActiveSessionNotFoundMessage() {
-        return "Активная сессия не обнаружена. \n" +
-                "Заказы не принимаются.\n" +
-                "Для открытия новой сессии обратитесь к администратору бота.";
+        return """
+                Активная сессия не обнаружена.\s
+                Заказы не принимаются.
+                Для открытия новой сессии обратитесь к администратору бота.""";
     }
 
     private String getOpenSessionNotFoundMessage() {
-        return "Текущая сессия закрыта. \n" +
-                "Заказы не принимаются.\n" +
-                "Дождитесь завершения сессии.";
+        return """
+                Текущая сессия закрыта.\s
+                Заказы не принимаются.
+                Дождитесь завершения сессии.""";
     }
 }

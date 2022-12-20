@@ -11,8 +11,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ReplaceProductForCustom
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 @Component
 public class ReplaceProductForCustomerPurchaseUpdateHandler
@@ -20,16 +20,16 @@ public class ReplaceProductForCustomerPurchaseUpdateHandler
 
     private final ApplicationEventPublisher publisher;
     private final SessionManagerService sessionManagerService;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final CustomerRepository customerRepository;
 
     public ReplaceProductForCustomerPurchaseUpdateHandler(ApplicationEventPublisher publisher,
                                                           SessionManagerService sessionManagerService,
-                                                          PurchaseRepository purchaseRepository,
+                                                          PurchaseManagerService purchaseManagerService,
                                                           CustomerRepository customerRepository) {
         this.publisher = publisher;
         this.sessionManagerService = sessionManagerService;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.customerRepository = customerRepository;
     }
 
@@ -49,7 +49,7 @@ public class ReplaceProductForCustomerPurchaseUpdateHandler
         Customer customer = customerRepository.getByChatId(update.getMessage().getChatId());
         Session session = sessionManagerService.getUnfinishedSession();
 
-        purchaseRepository.replacePurchaseProductForCustomerInSession(customer, session,
+        purchaseManagerService.replacePurchaseProductForCustomerInSession(customer, session,
                 dto.getOldProduct(), dto.getNewProduct());
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()

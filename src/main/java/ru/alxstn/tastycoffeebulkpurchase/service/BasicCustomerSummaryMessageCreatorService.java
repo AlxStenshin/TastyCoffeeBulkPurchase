@@ -9,7 +9,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.exception.payment.CustomerPaymentException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import java.math.BigDecimal;
@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 public class BasicCustomerSummaryMessageCreatorService implements CustomerSummaryMessageCreatorService {
 
     Logger logger = LogManager.getLogger(BasicCustomerSummaryMessageCreatorService.class);
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final PaymentRepository paymentRepository;
 
-    public BasicCustomerSummaryMessageCreatorService(PurchaseRepository purchaseRepository,
+    public BasicCustomerSummaryMessageCreatorService(PurchaseManagerService purchaseManagerService,
                                                      PaymentRepository paymentRepository) {
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.paymentRepository = paymentRepository;
     }
 
@@ -34,7 +34,7 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
         logger.info("Building Customer Summary for " + customer);
         String message;
         try {
-            List<Purchase> purchases = purchaseRepository
+            List<Purchase> purchases = purchaseManagerService
                     .findAllPurchasesInSessionByCustomer(session, customer)
                     .stream()
                     .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())

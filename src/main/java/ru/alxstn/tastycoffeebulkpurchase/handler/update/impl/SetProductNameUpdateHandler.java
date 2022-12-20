@@ -22,7 +22,7 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 import java.util.ArrayList;
 import java.util.Collections;

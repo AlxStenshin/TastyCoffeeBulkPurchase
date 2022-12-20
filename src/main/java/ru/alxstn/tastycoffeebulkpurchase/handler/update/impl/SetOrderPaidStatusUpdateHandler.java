@@ -16,15 +16,15 @@ import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 @Component
 public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOrderPaidCommandDto> {
 
     Logger logger = LogManager.getLogger(SetOrderPaidStatusUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
     private final SessionManagerService sessionManagerService;
@@ -33,11 +33,11 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
     private DtoDeserializer deserializer;
 
     public SetOrderPaidStatusUpdateHandler(ApplicationEventPublisher publisher,
-                                           PurchaseRepository purchaseRepository,
+                                           PurchaseManagerService purchaseManagerService,
                                            CustomerRepository customerRepository, PaymentRepository paymentRepository,
                                            SessionManagerService sessionManagerService) {
         this.publisher = publisher;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.customerRepository = customerRepository;
         this.paymentRepository = paymentRepository;
         this.sessionManagerService = sessionManagerService;
@@ -66,7 +66,7 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
         int paidOrders = paymentRepository.getCompletePaymentsCount(currentSession).orElse(0);
         int totalOrders = paymentRepository.getSessionCustomersCount(currentSession).orElse(0);
 
-        for (Customer c : purchaseRepository.getSessionCustomers(currentSession)) {
+        for (Customer c : purchaseManagerService.getSessionCustomers(currentSession)) {
             if (c.getNotificationSettings().isReceivePaymentConfirmationNotification()) {
                 publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()
                         .text("Пользователь " + eventEmitter + " оплатил свой заказ.\n" +

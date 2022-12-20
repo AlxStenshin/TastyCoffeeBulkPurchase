@@ -15,7 +15,7 @@ import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 import java.util.List;
 
@@ -24,12 +24,12 @@ import java.util.List;
 public class ClearPurchasesUpdateHandler extends CallbackUpdateHandler<ClearPurchasesCommandDto> {
 
     Logger logger = LogManager.getLogger(ClearPurchasesUpdateHandler.class);
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final ApplicationEventPublisher publisher;
 
-    public ClearPurchasesUpdateHandler(PurchaseRepository purchaseRepository,
+    public ClearPurchasesUpdateHandler(PurchaseManagerService purchaseRepository,
                                        ApplicationEventPublisher publisher) {
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseRepository;
         this.publisher = publisher;
     }
 
@@ -48,7 +48,7 @@ public class ClearPurchasesUpdateHandler extends CallbackUpdateHandler<ClearPurc
         List<Purchase> purchaseList = dto.getPurchaseList();
 
         logger.info("Clear Purchases Command Received");
-        purchaseRepository.deleteAll(purchaseList);
+        purchaseManagerService.deleteAll(purchaseList);
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(10)

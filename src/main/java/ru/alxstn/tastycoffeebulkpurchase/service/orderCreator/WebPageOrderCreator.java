@@ -8,8 +8,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchaseSummaryNotificationEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.OrderCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
 
 import java.util.List;
@@ -23,21 +23,21 @@ public class WebPageOrderCreator implements OrderCreatorService {
 
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeePage tastyCoffeePage;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public WebPageOrderCreator(ApplicationEventPublisher publisher,
                                TastyCoffeePage tastyCoffeePage,
-                               PurchaseRepository purchaseRepository) {
+                               PurchaseManagerService purchaseManagerService) {
         this.publisher = publisher;
         this.tastyCoffeePage = tastyCoffeePage;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
     }
 
     public void createOrder(Session session) {
         logger.info("Now placing order from current session " + session.getId() + ":" + session.getTitle());
-        List<Purchase> currentSessionPurchases = purchaseRepository.findAllPurchasesInSession(session);
-        publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, session, currentSessionPurchases));
+        List<Purchase> currentSessionPurchases = purchaseManagerService.findAllPurchasesInSession(session);
+        publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, currentSessionPurchases));
 
         executorService.execute(() -> {
             List<Purchase> unfinishedPurchases = tastyCoffeePage.placeOrder(currentSessionPurchases);

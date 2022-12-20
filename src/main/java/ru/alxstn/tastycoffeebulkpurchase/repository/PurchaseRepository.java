@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
+
     @Query("SELECT p FROM Purchase p WHERE p.session = :session")
     List<Purchase> findAllPurchasesInSession(
             @Param(value = "session") Session session);

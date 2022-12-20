@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(TastyCoffeeConfigProperties.class)
-@TestPropertySource("classpath:application-test.properties")
+@TestPropertySource("classpath:application.properties")
 @TestPropertySource("classpath:secrets-test.properties")
 class TastyCoffeePageTest {
 

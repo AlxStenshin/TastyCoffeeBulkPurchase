@@ -21,8 +21,8 @@ import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.SessionManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 import java.util.*;
 import java.util.function.Function;
@@ -33,20 +33,20 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     Logger logger = LogManager.getLogger(MainMenuKeyboardUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final ProductRepository productRepository;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final SessionManagerService sessionManager;
     private final CustomerRepository customerRepository;
     private final DtoSerializer serializer;
 
     public MainMenuKeyboardUpdateHandler(ApplicationEventPublisher publisher,
                                          ProductRepository productRepository,
-                                         PurchaseRepository purchaseRepository,
+                                         PurchaseManagerService purchaseManagerService,
                                          SessionManagerService sessionManager,
                                          CustomerRepository customerRepository,
                                          DtoSerializer serializer) {
         this.publisher = publisher;
         this.productRepository = productRepository;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.sessionManager = sessionManager;
         this.customerRepository = customerRepository;
         this.serializer = serializer;
@@ -72,7 +72,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
             switch (keyboardButton.get()) {
 
                 // ToDo: Separate DTO: PlaceOrder (Purchase)
-                case PLACE_ORDER:
+                case PLACE_ORDER -> {
                     SendMessageEvent placeOrderAnswerEvent;
                     try {
                         Session currentSession = sessionManager.getActiveSession();
@@ -93,15 +93,15 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                     } catch (SessionNotFoundException | SessionIsNotOpenException e) {
                         sendSessionErrorMessage(update, e.getMessage());
                     }
-                    break;
+                }
 
                 // ToDo: Separate DTO: EditOrder (Purchase)
-                case EDIT_ORDER:
+                case EDIT_ORDER -> {
                     try {
                         Session currentSession = sessionManager.getActiveSession();
                         sessionManager.checkSessionCustomerAccessible(currentSession);
                         Customer customer = customerRepository.getByChatId(Long.parseLong(chatId));
-                        List<Purchase> purchases = purchaseRepository
+                        List<Purchase> purchases = purchaseManagerService
                                 .findAllPurchasesInSessionByCustomer(currentSession, customer);
                         if (purchases.size() > 0) {
                             MenuNavigationBotMessage<Purchase> editOrderAnswer = new MenuNavigationBotMessage<>(update);
@@ -137,31 +137,26 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                     } catch (SessionNotFoundException | SessionIsNotOpenException e) {
                         sendSessionErrorMessage(update, e.getMessage());
                     }
-                    break;
-
-                case SETTING:
+                }
+                case SETTING -> {
                     List<List<InlineKeyboardButton>> settingsButtons = new ArrayList<>();
                     CustomerNotificationSettings customerSettings = customerRepository
                             .getByChatId(message.getChatId())
                             .getNotificationSettings();
-
                     settingsButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                             .text("Настройки уведомлений")
                             .callbackData(serializer.serialize(
                                     new SetCustomerNotificationSettingsDto(customerSettings)))
                             .build()));
-
                     publisher.publishEvent(new SendMessageEvent(this,
                             SendMessage.builder()
                                     .text("Выбрерите категорию")
                                     .chatId(message.getChatId().toString())
                                     .replyMarkup(InlineKeyboardMarkup.builder().keyboard(settingsButtons).build())
                                     .build()));
-                    break;
-
-                case INFORMATION:
+                }
+                case INFORMATION -> {
                     List<List<InlineKeyboardButton>> informationButtons = new ArrayList<>();
-
                     try {
                         Session currentSession = sessionManager.getUnfinishedSession();
                         informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
@@ -199,7 +194,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                     } catch (SessionNotFoundException | SessionIsNotOpenException e) {
                         sendSessionErrorMessage(update, e.getMessage());
                     }
-                    break;
+                }
             }
             return true;
         }

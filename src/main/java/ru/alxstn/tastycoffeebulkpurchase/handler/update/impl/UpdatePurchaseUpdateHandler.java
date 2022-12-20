@@ -15,21 +15,21 @@ import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PurchaseRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 @Component
 public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePurchaseCommandDto> {
 
     Logger logger = LogManager.getLogger(UpdatePurchaseUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final PurchaseRepository purchaseRepository;
+    private final PurchaseManagerService purchaseManagerService;
     private final PaymentRepository paymentRepository;
 
     public UpdatePurchaseUpdateHandler(ApplicationEventPublisher publisher,
-                                       PurchaseRepository purchaseRepository,
+                                       PurchaseManagerService purchaseManagerService,
                                        PaymentRepository paymentRepository) {
         this.publisher = publisher;
-        this.purchaseRepository = purchaseRepository;
+        this.purchaseManagerService = purchaseManagerService;
         this.paymentRepository = paymentRepository;
     }
 
@@ -47,7 +47,7 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
     protected void handleCallback(Update update, UpdatePurchaseCommandDto dto) {
         logger.info("Update Purchase Command Received");
         Purchase newPurchase = dto.getPurchase();
-        Purchase purchase = purchaseRepository.getPurchaseIgnoringProductQuantity(
+        Purchase purchase = purchaseManagerService.getPurchaseIgnoringProductQuantity(
                         newPurchase.getCustomer(),
                         newPurchase.getProduct(),
                         newPurchase.getSession(),
@@ -62,7 +62,7 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
         int newCount = newPurchase.getCount();
         purchase.setCount(previousCount == 0 ? newCount : previousCount + newCount);
         try {
-            purchaseRepository.save(purchase);
+            purchaseManagerService.save(purchase);
             Payment payment = paymentRepository.getCustomerSessionPayment(
                     purchase.getSession(), purchase.getCustomer())
                     .orElse(new Payment(purchase.getCustomer(), purchase.getSession()));
