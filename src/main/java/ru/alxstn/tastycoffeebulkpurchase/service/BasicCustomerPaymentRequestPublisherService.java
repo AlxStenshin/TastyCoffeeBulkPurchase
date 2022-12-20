@@ -42,14 +42,14 @@ public class BasicCustomerPaymentRequestPublisherService implements CustomerPaym
     public void createAndPublishSummary(PurchaseSummaryNotificationEvent event) {
         logger.info("Now building and publishing per-customer session summary");
 
-        Session session = event.getSession();
+        Session session = event.getCurrentSessionPurchases().get(0).getSession();
         List<Purchase> currentSessionPurchases = event.getCurrentSessionPurchases();
         Set<Customer> currentSessionCustomers = currentSessionPurchases.stream()
                 .map(Purchase::getCustomer)
                 .collect(Collectors.toSet());
 
         for (Customer c : currentSessionCustomers) {
-            String message = customerSummaryMessageCreatorService.buildCustomerSummaryMessage(c, session) + "\n\n" +
+            String message = customerSummaryMessageCreatorService.buildCustomerSummaryMessage(session, c) + "\n\n" +
                     "Внесите оплату и нажмите кнопку \"Оплачено\"\n" +
                     "Оплата: " + session.getPaymentInstruction() + "\n";
 

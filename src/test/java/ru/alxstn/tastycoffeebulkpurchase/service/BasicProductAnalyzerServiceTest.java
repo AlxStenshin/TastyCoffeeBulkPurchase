@@ -6,15 +6,13 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
+import ru.alxstn.tastycoffeebulkpurchase.event.NewProductDiscoveredEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductPriceUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductSpecialMarkUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.repository.ProductPackageRepository;
@@ -28,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
-@EnableConfigurationProperties(TastyCoffeeConfigProperties.class)
-@TestPropertySource("classpath:application-test.properties")
 @DataJpaTest
 class BasicProductAnalyzerServiceTest {
 
@@ -61,14 +57,6 @@ class BasicProductAnalyzerServiceTest {
                 "Subgroup",
                 true);
 
-        Product productTwo = new Product("ProductTwo",
-                new BigDecimal(2),
-                "",
-                packages.get(0),
-                "Group",
-                "Subgroup",
-                true);
-
         Product productOneUpdated = new Product("ProductOne",
                 new BigDecimal(1),
                 "",
@@ -79,7 +67,6 @@ class BasicProductAnalyzerServiceTest {
 
         List<Product> sourceProducts = List.of(
                 productOne,
-                productTwo,
                 productOneUpdated
         );
 
@@ -112,7 +99,7 @@ class BasicProductAnalyzerServiceTest {
             assertTrue(value instanceof ProductSpecialMarkUpdateEvent);
             return null;
         }).when(publisher).publishEvent(argumentCaptor.capture());
-        verify(publisher, times(1)).publishEvent(any(ApplicationEvent.class));
+        verify(publisher, times(1)).publishEvent(any(ProductSpecialMarkUpdateEvent.class));
     }
 
     @Test
@@ -134,6 +121,29 @@ class BasicProductAnalyzerServiceTest {
             return null;
         }).when(publisher).publishEvent(argumentCaptor.capture());
 
-        verify(publisher, times(1)).publishEvent(any(ApplicationEvent.class));
+        verify(publisher, times(1)).publishEvent(any(ProductPriceUpdateEvent.class));
     }
+
+    @Test
+    void shouldInvokeNewProductDiscoveredEvent() {
+        ProductPackage pack = productPackageRepository.findAll().get(0);
+        service.analyzeNewProducts(List.of(
+                new Product("ProductTwo",
+                        new BigDecimal(2),
+                        "",
+                        pack,
+                        "Group",
+                        "Subgroup",
+                        true)));
+
+        ArgumentCaptor<ApplicationEvent> argumentCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
+        doAnswer(invocation -> {
+            ApplicationEvent value = argumentCaptor.getValue();
+            assertTrue(value instanceof NewProductDiscoveredEvent);
+            return null;
+        }).when(publisher).publishEvent(argumentCaptor.capture());
+
+        verify(publisher, times(1)).publishEvent(any(NewProductDiscoveredEvent.class));
+    }
+
 }

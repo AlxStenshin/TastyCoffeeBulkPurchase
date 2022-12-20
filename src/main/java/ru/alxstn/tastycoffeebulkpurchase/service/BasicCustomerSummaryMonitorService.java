@@ -10,7 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Payment;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
@@ -23,21 +23,21 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
 
     Logger logger = LogManager.getLogger(BasicCustomerSummaryMonitorService.class);
     private final PurchaseManagerService purchaseManagerService;
-    private final PaymentRepository paymentRepository;
+    private final PaymentManagerService paymentManagerService;
     private final SessionManagerService sessionManagerService;
 
     public BasicCustomerSummaryMonitorService(PurchaseManagerService purchaseManagerService,
-                                              PaymentRepository paymentRepository,
+                                              PaymentManagerService paymentManagerService,
                                               SessionManagerService sessionManagerService) {
         this.purchaseManagerService = purchaseManagerService;
-        this.paymentRepository = paymentRepository;
+        this.paymentManagerService = paymentManagerService;
         this.sessionManagerService = sessionManagerService;
     }
 
     @Async
     @EventListener
     public void handleCustomerSummaryCheckRequest(CustomerSummaryCheckRequestEvent event) {
-        // ToDo: Remove payment info after order clear or last item removed prom purchase list
+        // ToDo: Remove payment info after order clear or last item removed from purchase list
         logger.info("Checking Customer Purchase Summary because of purchase " + event.getReason());
         updateCustomerSummary(event.getCustomer());
     }
@@ -45,7 +45,7 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
     @Override
     public void updateCustomerSummary(Customer customer) {
         Session session = sessionManagerService.getUnfinishedSession();
-        Payment payment = paymentRepository.getCustomerSessionPayment(session, customer)
+        Payment payment = paymentManagerService.getCustomerSessionPayment(session, customer)
                 .orElse(new Payment(customer, session));
         List<Purchase> purchases = purchaseManagerService
                 .findAllPurchasesInSessionByCustomer(session, customer);
@@ -79,6 +79,6 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
         payment.setDiscountableAmountNoDiscount(discountableTotal);
         payment.setNonDiscountableAmount(nonDiscountableTotal);
 
-        paymentRepository.save(payment);
+        paymentManagerService.save(payment);
     }
 }

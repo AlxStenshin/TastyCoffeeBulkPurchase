@@ -14,7 +14,7 @@ import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 @Component
@@ -23,14 +23,14 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
     Logger logger = LogManager.getLogger(UpdatePurchaseUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
     private final PurchaseManagerService purchaseManagerService;
-    private final PaymentRepository paymentRepository;
+    private final PaymentManagerService paymentManagerService;
 
     public UpdatePurchaseUpdateHandler(ApplicationEventPublisher publisher,
                                        PurchaseManagerService purchaseManagerService,
-                                       PaymentRepository paymentRepository) {
+                                       PaymentManagerService paymentManagerService) {
         this.publisher = publisher;
         this.purchaseManagerService = purchaseManagerService;
-        this.paymentRepository = paymentRepository;
+        this.paymentManagerService = paymentManagerService;
     }
 
     @Override
@@ -63,10 +63,10 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
         purchase.setCount(previousCount == 0 ? newCount : previousCount + newCount);
         try {
             purchaseManagerService.save(purchase);
-            Payment payment = paymentRepository.getCustomerSessionPayment(
+            Payment payment = paymentManagerService.getCustomerSessionPayment(
                     purchase.getSession(), purchase.getCustomer())
                     .orElse(new Payment(purchase.getCustomer(), purchase.getSession()));
-            paymentRepository.save(payment);
+            paymentManagerService.save(payment);
         } catch (Exception e) {
             logger.error("Saving new purchase : " + purchase + " " + e.getMessage());
         }

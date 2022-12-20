@@ -8,7 +8,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Payment;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.exception.payment.CustomerPaymentException;
-import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
@@ -21,16 +21,16 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
 
     Logger logger = LogManager.getLogger(BasicCustomerSummaryMessageCreatorService.class);
     private final PurchaseManagerService purchaseManagerService;
-    private final PaymentRepository paymentRepository;
+    private final PaymentManagerService paymentManagerService;
 
     public BasicCustomerSummaryMessageCreatorService(PurchaseManagerService purchaseManagerService,
-                                                     PaymentRepository paymentRepository) {
+                                                     PaymentManagerService paymentManagerService) {
         this.purchaseManagerService = purchaseManagerService;
-        this.paymentRepository = paymentRepository;
+        this.paymentManagerService = paymentManagerService;
     }
 
     @Override
-    public String buildCustomerSummaryMessage(Customer customer, Session session) {
+    public String buildCustomerSummaryMessage(Session session, Customer customer ) {
         logger.info("Building Customer Summary for " + customer);
         String message;
         try {
@@ -40,7 +40,7 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                     .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
                     .collect(Collectors.toList());
 
-            Payment payment = paymentRepository.getCustomerSessionPayment(session, customer)
+            Payment payment = paymentManagerService.getCustomerSessionPayment(session, customer)
                     .orElseThrow(() -> new CustomerPaymentException("Payment Not Found!"));
 
             if (purchases.size() > 0) {
