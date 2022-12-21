@@ -20,7 +20,7 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
@@ -32,20 +32,20 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
     Logger logger = LogManager.getLogger(MainMenuKeyboardUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final ProductRepository productRepository;
+    private final ProductManagerService productManagerService;
     private final PurchaseManagerService purchaseManagerService;
     private final SessionManagerService sessionManager;
     private final CustomerRepository customerRepository;
     private final DtoSerializer serializer;
 
     public MainMenuKeyboardUpdateHandler(ApplicationEventPublisher publisher,
-                                         ProductRepository productRepository,
+                                         ProductManagerService productManagerService,
                                          PurchaseManagerService purchaseManagerService,
                                          SessionManagerService sessionManager,
                                          CustomerRepository customerRepository,
                                          DtoSerializer serializer) {
         this.publisher = publisher;
-        this.productRepository = productRepository;
+        this.productManagerService = productManagerService;
         this.purchaseManagerService = purchaseManagerService;
         this.sessionManager = sessionManager;
         this.customerRepository = customerRepository;
@@ -80,7 +80,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                         MenuNavigationBotMessage<String> placeOrderAnswer = new MenuNavigationBotMessage<>(update);
                         placeOrderAnswer.setTitle("Выберите категорию товара: ");
-                        placeOrderAnswer.setDataSource(productRepository.findAllActiveCategories());
+                        placeOrderAnswer.setDataSource(productManagerService.findAllActiveCategories());
                         placeOrderAnswer.setButtonCreator(s -> InlineKeyboardButton.builder()
                                 .text(s)
                                 .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,

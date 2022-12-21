@@ -15,24 +15,24 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 @Component
 public class SetProductCategoryUpdateHandler extends CallbackUpdateHandler<SetProductCategoryCommandDto> {
 
     Logger logger = LogManager.getLogger(SetProductCategoryUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final ProductRepository productRepository;
+    private final ProductManagerService productManagerService;
     private final DtoSerializer serializer;
 
     @Autowired
     private DtoDeserializer deserializer;
 
     public SetProductCategoryUpdateHandler(ApplicationEventPublisher publisher,
-                                           ProductRepository productRepository,
+                                           ProductManagerService productManagerService,
                                            DtoSerializer serializer) {
         this.publisher = publisher;
-        this.productRepository = productRepository;
+        this.productManagerService = productManagerService;
         this.serializer = serializer;
     }
 
@@ -54,7 +54,7 @@ public class SetProductCategoryUpdateHandler extends CallbackUpdateHandler<SetPr
 
         MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите подкатегорию: ");
-        answer.setDataSource(productRepository.findAllActiveSubCategories(message));
+        answer.setDataSource(productManagerService.findAllActiveSubCategories(message));
         answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
 
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()

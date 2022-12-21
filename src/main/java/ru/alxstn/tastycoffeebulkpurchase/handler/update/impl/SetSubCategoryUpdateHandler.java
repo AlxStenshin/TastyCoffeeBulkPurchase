@@ -16,7 +16,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -26,17 +26,17 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
 
     Logger logger = LogManager.getLogger(SetSubCategoryUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final ProductRepository productRepository;
+    private final ProductManagerService productManagerService;
     private final DtoSerializer serializer;
 
     @Autowired
     private DtoDeserializer deserializer;
 
     public SetSubCategoryUpdateHandler(ApplicationEventPublisher publisher,
-                                       ProductRepository productRepository,
+                                       ProductManagerService productManagerService,
                                        DtoSerializer serializer) {
         this.publisher = publisher;
-        this.productRepository = productRepository;
+        this.productManagerService = productManagerService;
         this.serializer = serializer;
     }
 
@@ -58,7 +58,7 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
 
         MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите продукт: ");
-        answer.setDataSource(new ArrayList<>(productRepository.findDistinctActiveProductsBySubCategory(targetCategory)
+        answer.setDataSource(new ArrayList<>(productManagerService.findDistinctActiveProductsBySubCategory(targetCategory)
                 .stream()
                 .filter(Product::isAvailable)
                     .map(Product::getName)

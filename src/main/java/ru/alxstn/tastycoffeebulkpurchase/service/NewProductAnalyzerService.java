@@ -4,6 +4,6 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 
 import java.util.List;
 
-public interface ProductAnalyzerService {
+public interface NewProductAnalyzerService {
     void analyzeNewProducts(List<Product> newProducts);
 }

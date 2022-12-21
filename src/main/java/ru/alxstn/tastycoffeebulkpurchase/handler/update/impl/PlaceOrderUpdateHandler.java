@@ -15,25 +15,25 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 @Component
 public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<PlaceOrderCommandDto> {
 
     Logger logger = LogManager.getLogger(PlaceOrderUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final ProductRepository productRepository;
+    private final ProductManagerService productManagerService;
     private final DtoSerializer serializer;
 
     @Autowired
     private DtoDeserializer deserializer;
 
     public PlaceOrderUpdateHandler(ApplicationEventPublisher publisher,
-                                   ProductRepository productRepository,
+                                   ProductManagerService productManagerService,
                                    DtoSerializer serializer) {
         super();
         this.publisher = publisher;
-        this.productRepository = productRepository;
+        this.productManagerService = productManagerService;
         this.serializer = serializer;
     }
 
@@ -55,7 +55,7 @@ public class PlaceOrderUpdateHandler extends CallbackUpdateHandler<PlaceOrderCom
 
         MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите категорию: ");
-        answer.setDataSource(productRepository.findAllActiveCategories());
+        answer.setDataSource(productManagerService.findAllActiveCategories());
         answer.setButtonCreator(s -> InlineKeyboardButton.builder()
                 .text(s)
                 .callbackData(serializer.serialize(new SetProductCategoryCommandDto(s,

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductPackageRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.PriceListSaverService;
+import ru.alxstn.tastycoffeebulkpurchase.service.NewProductAnalyzerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.ArrayList;
@@ -23,22 +23,22 @@ import java.util.Set;
 public class PriceListDatabaseSaverService implements PriceListSaverService {
     Logger logger = LogManager.getLogger(PriceListDatabaseSaverService.class);
 
-    private final ProductRepository productRepository;
-    private final ProductPackageRepository productPackageRepository;
+    private final ProductManagerService productManagerService;
+    private final NewProductAnalyzerService newProductAnalyzerService;
     private final DateTimeProvider dateTimeProvider;
 
-    public PriceListDatabaseSaverService(ProductRepository productRepository,
-                                         ProductPackageRepository productPackageRepository,
+    public PriceListDatabaseSaverService(ProductManagerService productManagerService,
+                                         NewProductAnalyzerService newProductAnalyzerService,
                                          DateTimeProvider dateTimeProvider) {
-        this.productRepository = productRepository;
-        this.productPackageRepository = productPackageRepository;
+        this.productManagerService = productManagerService;
+        this.newProductAnalyzerService = newProductAnalyzerService;
         this.dateTimeProvider = dateTimeProvider;
     }
 
     @EventListener
     @Override
     public void handlePriceList(final PriceListReceivedEvent event) {
-        productRepository.markAllNotActual();
+        productManagerService.markAllNotActual();
 
         List<Product> productsToSave = event.getPriceList();
         Set<ProductPackage> packagesToSave = new HashSet<>();
@@ -49,22 +49,22 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
         }
         for (var pack : packagesToSave) {
             Example<ProductPackage> example = Example.of(pack, ExampleMatcher.matchingAll().withIgnorePaths("id"));
-            if (!productPackageRepository.exists(example))
-                productPackageRepository.saveAndFlush(pack);
+            if (!productManagerService.productPackageExists(example))
+                productManagerService.save(pack);
         }
 
         List<Product> newProducts = new ArrayList<>();
         // Product Persistence
         for (var product : productsToSave) {
             ProductPackage productPackage =
-                    productPackageRepository.getProductPackageByDescription(product.getProductPackage().getDescription());
+                    productManagerService.getProductPackageByDescription(product.getProductPackage().getDescription());
             product.setProductPackage(productPackage);
 
-            if (productRepository.productExists(product.getName(), product.getProductCategory(), product.getProductSubCategory(),
+            if (productManagerService.productExists(product.getName(), product.getProductCategory(), product.getProductSubCategory(),
                     product.getProductPackage(), product.getSpecialMark(), product.getPrice()).isPresent()) {
                 logger.info("Product already exist, updating timestamp: " + product);
 
-                productRepository.update(product.getName(),
+                productManagerService.updateProduct(product.getName(),
                         product.getProductCategory(),
                         product.getProductSubCategory(),
                         product.getProductPackage(),
@@ -73,10 +73,11 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
                         dateTimeProvider.getCurrentTimestamp());
             } else {
                 newProducts.add(product);
-                productRepository.save(product);
+                productManagerService.save(product);
                 logger.info("Saving new Product: " + product);
             }
+
+            newProductAnalyzerService.analyzeNewProducts(newProducts);
         }
-        // ToDo: something with newly obtained products newProducts
     }
 }

@@ -4,11 +4,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,20 +27,18 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@EnableConfigurationProperties(TastyCoffeeConfigProperties.class)
-@TestPropertySource("classpath:application.properties")
-@TestPropertySource("classpath:secrets-test.properties")
+@SpringBootTest
 class TastyCoffeePageTest {
 
     Logger logger = LogManager.getLogger(TastyCoffeePageTest.class);
-
-    private TastyCoffeePage webPage;
 
     @Autowired
     TastyCoffeeConfigProperties tastyCoffeeTestConfig;
 
     @Mock
     ApplicationEventPublisher publisher;
+
+    private TastyCoffeePage webPage;
 
     @BeforeEach
     public void init() {

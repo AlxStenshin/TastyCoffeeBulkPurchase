@@ -21,7 +21,6 @@ import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -65,7 +64,7 @@ class BasicCustomerPaymentRequestPublisherServiceTest {
             return null;
         }).when(publisher).publishEvent(argumentCaptor.capture());
 
-        verify(publisher, times(1)).publishEvent(any(SendMessageEvent.class));
+        verify(publisher, times(1)).publishEvent(isA(SendMessageEvent.class));
     }
 
 }

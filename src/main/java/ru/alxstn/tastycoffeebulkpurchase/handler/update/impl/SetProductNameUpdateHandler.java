@@ -21,7 +21,7 @@ import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
 
     Logger logger = LogManager.getLogger(SetProductNameUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
-    private final ProductRepository productRepository;
+    private final ProductManagerService productManagerService;
     private final CustomerRepository customerRepository;
     private final SessionManagerService sessionManagerService;
     private final DtoSerializer serializer;
@@ -42,13 +42,13 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
     private DtoDeserializer deserializer;
 
     public SetProductNameUpdateHandler(ApplicationEventPublisher publisher,
-                                       ProductRepository productRepository,
+                                       ProductManagerService productManagerService,
                                        CustomerRepository customerRepository,
                                        SessionManagerService sessionManagerService,
                                        DtoSerializer serializer) {
         super();
         this.publisher = publisher;
-        this.productRepository = productRepository;
+        this.productManagerService = productManagerService;
         this.customerRepository = customerRepository;
         this.sessionManagerService = sessionManagerService;
         this.serializer = serializer;
@@ -69,7 +69,7 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         String productName = dto.getName();
         logger.info("Set Product Name Command Received: " + productName);
 
-        List<Product> availablePackages = productRepository.findAllActiveProductsByProductNameAndSubcategory(
+        List<Product> availablePackages = productManagerService.findAllActiveProductsByProductNameAndSubcategory(
                 dto.getName(), dto.getSubCategory());
 
         Product targetProduct = availablePackages.get(0);

@@ -4,9 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -15,80 +15,67 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewProductDiscoveredEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductPriceUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductSpecialMarkUpdateEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductPackageRepository;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
-class BasicProductAnalyzerServiceTest {
+@SpringBootTest
+class BasicNewProductAnalyzerServiceTest {
 
-    @Autowired
-    ProductRepository productRepository;
-
-    @Autowired
-    ProductPackageRepository productPackageRepository;
+    @Mock
+    static ProductManagerService productManagerService;
 
     @Mock
     ApplicationEventPublisher publisher;
 
-    BasicProductAnalyzerService service;
+    @InjectMocks
+    BasicNewProductAnalyzerService service;
+
+    private final ProductPackage productPackage = new ProductPackage("Упаковка 250 г");
 
     @BeforeEach
     void init() {
-        productPackageRepository.deleteAll();
-        productRepository.deleteAll();
-
-        List<ProductPackage> packages = List.of(
-                new ProductPackage("Упаковка 250 г"));
-        productPackageRepository.saveAllAndFlush(packages);
-
-        Product productOne = new Product("ProductOne",
+        Product firstSimilarProduct = new Product("ProductOne",
                 new BigDecimal(1),
                 "",
-                packages.get(0),
+                productPackage,
                 "Group",
                 "Subgroup",
                 true);
+        firstSimilarProduct.setActual(false);
+        firstSimilarProduct.setDateUpdated(LocalDateTime.MIN);
 
-        Product productOneUpdated = new Product("ProductOne",
+        Product secondSimilarProduct = new Product("ProductOne",
                 new BigDecimal(1),
                 "",
-                packages.get(0),
+                productPackage,
                 "Group",
                 "Subgroup",
                 true);
+        secondSimilarProduct.setActual(false);
+        secondSimilarProduct.setDateUpdated(LocalDateTime.MAX);
 
-        List<Product> sourceProducts = List.of(
-                productOne,
-                productOneUpdated
-        );
-
-        sourceProducts.forEach(p -> p.setActual(false));
-
-        productRepository.saveAllAndFlush(sourceProducts);
-        service = new BasicProductAnalyzerService(productRepository, publisher);
-    }
-
-    @Test
-    void shouldCorrectlyInjectRepo() {
-        assertThat(productRepository).isNotNull();
+        when(productManagerService.getProductsByNameCategorySubcategoryAndPackage(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(ProductPackage.class)))
+                .thenReturn(List.of(firstSimilarProduct, secondSimilarProduct));
     }
 
     @Test
     void shouldInvokeProductSpecialMarkChangedEvent() {
-        ProductPackage pack = productPackageRepository.findAll().get(0);
         service.analyzeNewProducts(List.of(
                 new Product("ProductOne",
                         new BigDecimal(1),
-                        "NEW SPECIAL MARK",
-                        pack,
+                        "NEW SPECIAL MARK", // <- Mark changed
+                        productPackage,
                         "Group",
                         "Subgroup",
                         true)));
@@ -99,17 +86,17 @@ class BasicProductAnalyzerServiceTest {
             assertTrue(value instanceof ProductSpecialMarkUpdateEvent);
             return null;
         }).when(publisher).publishEvent(argumentCaptor.capture());
-        verify(publisher, times(1)).publishEvent(any(ProductSpecialMarkUpdateEvent.class));
+
+        verify(publisher, times(1)).publishEvent(isA(ProductSpecialMarkUpdateEvent.class));
     }
 
     @Test
     void shouldInvokeProductPriceChangedEvent() {
-        ProductPackage pack = productPackageRepository.findAll().get(0);
         service.analyzeNewProducts(List.of(
                 new Product("ProductOne",
-                        new BigDecimal(7),
+                        new BigDecimal(7), // <- Price changed
                         "",
-                        pack,
+                        productPackage,
                         "Group",
                         "Subgroup",
                         true)));
@@ -121,17 +108,24 @@ class BasicProductAnalyzerServiceTest {
             return null;
         }).when(publisher).publishEvent(argumentCaptor.capture());
 
-        verify(publisher, times(1)).publishEvent(any(ProductPriceUpdateEvent.class));
+        verify(publisher, times(1)).publishEvent(isA(ProductPriceUpdateEvent.class));
     }
 
     @Test
     void shouldInvokeNewProductDiscoveredEvent() {
-        ProductPackage pack = productPackageRepository.findAll().get(0);
+
+        when(productManagerService.getProductsByNameCategorySubcategoryAndPackage(
+                any(String.class),
+                any(String.class),
+                any(String.class),
+                any(ProductPackage.class)))
+                .thenReturn(List.of());     // <- No similar products found
+
         service.analyzeNewProducts(List.of(
-                new Product("ProductTwo",
+                new Product("ProductTwo", // <- New Product Name
                         new BigDecimal(2),
                         "",
-                        pack,
+                        productPackage,
                         "Group",
                         "Subgroup",
                         true)));
@@ -143,7 +137,7 @@ class BasicProductAnalyzerServiceTest {
             return null;
         }).when(publisher).publishEvent(argumentCaptor.capture());
 
-        verify(publisher, times(1)).publishEvent(any(NewProductDiscoveredEvent.class));
+        verify(publisher, times(1)).publishEvent(isA(NewProductDiscoveredEvent.class));
     }
 
 }

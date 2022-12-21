@@ -8,7 +8,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewProductDiscoveredEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductPriceUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductSpecialMarkUpdateEvent;
-import ru.alxstn.tastycoffeebulkpurchase.repository.ProductRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,15 +17,15 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
-public class BasicProductAnalyzerService implements ProductAnalyzerService {
+public class BasicNewProductAnalyzerService implements NewProductAnalyzerService {
 
-    Logger logger = LogManager.getLogger(BasicProductAnalyzerService.class);
-    private final ProductRepository productRepository;
+    Logger logger = LogManager.getLogger(BasicNewProductAnalyzerService.class);
+    private final ProductManagerService productManagerService;
     private final ApplicationEventPublisher publisher;
 
-    public BasicProductAnalyzerService(ProductRepository productRepository,
-                                       ApplicationEventPublisher publisher) {
-        this.productRepository = productRepository;
+    public BasicNewProductAnalyzerService(ProductManagerService productManagerService,
+                                          ApplicationEventPublisher publisher) {
+        this.productManagerService = productManagerService;
         this.publisher = publisher;
     }
 
@@ -34,7 +34,7 @@ public class BasicProductAnalyzerService implements ProductAnalyzerService {
         for (Product newProduct : newProducts) {
             logger.info("Analyzing New Product: " + newProduct);
 
-            List<Product> similarProducts = productRepository.getProductsByNameCategorySubcategoryAndPackage(
+            List<Product> similarProducts = productManagerService.getProductsByNameCategorySubcategoryAndPackage(
                     newProduct.getName(),
                     newProduct.getProductCategory(),
                     newProduct.getProductSubCategory(),

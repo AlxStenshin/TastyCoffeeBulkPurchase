@@ -7,6 +7,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManagerService;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class BasicSessionSummaryMessageCreatorService implements SessionSummaryMessageCreatorService {
@@ -22,22 +23,22 @@ public class BasicSessionSummaryMessageCreatorService implements SessionSummaryM
     public String createSessionSummaryMessage(Session session) {
         logger.info("Building session summary.");
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return (session.isClosed() ? "\n<b>! Сессия закрыта. Заказы не принимаются. !</b>\n" : "") +
                 "<code>" +
                 "\nТекущая скидка: " + session.getDiscountPercentage() + "%" +
                 "\nТоваров по скидке в закупке: " + session.getDiscountableWeight() + "кг." +
                 "\nКофе в закупке: " + session.getCoffeeWeight() + "кг." +
                 "\nЧая в закупке: " + session.getTeaWeight() + "кг." + "\n" +
-                // ToDo: DateTime Formatter For Date Fields:
-                "\nДата открытия: " + session.getDateTimeOpened() +
-                "\nДата закрытия: " + session.getDateTimeClosed() +
+                "\nДата открытия: " + session.getDateTimeOpened().format(formatter) +
+                "\nДата закрытия: " + session.getDateTimeClosed().format(formatter) +
                 "\nОплата: " + session.getPaymentInstruction() + "\n" +
                 "\nОбщая стоимость без скидки: " +  paymentManagerService.getSessionTotalPrice(session).orElse(new BigDecimal(0)) +  "₽" +
                 "\nОбщая стоимость со скидкой: " + paymentManagerService.getSessionTotalPriceWithDiscount(session).orElse(new BigDecimal(0)) + "₽" +
                 "\nКоличество участников: " + paymentManagerService.getSessionCustomersCount(session).orElse(0) +
                 "\nОплачено заказов: " + paymentManagerService.getCompletePaymentsCount(session).orElse(0) +
-                "\nНа сумму: " +  paymentManagerService.getSessionTotalPaidAmount(session).orElse(new BigDecimal(0)) + "₽" + paymentManagerService.getSessionTotalUnpaidAmount(session).orElse(new BigDecimal(0)) +
-                "₽" +
+                "\nНа сумму: " +  paymentManagerService.getSessionTotalPaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
+                "\nОстлась оплатить: " +paymentManagerService.getSessionTotalUnpaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
                 "</code>";
     }
 }

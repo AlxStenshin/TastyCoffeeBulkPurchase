@@ -189,6 +189,8 @@ public class TastyCoffeePage {
     }
 
     private void fillPurchasesAvailableOnPage(List<Purchase> currentSessionPurchases) {
+    // ToDo: Use stream.gropingBy
+    //  https://www.baeldung.com/java-groupingby-collector
 
         for (SelenideElement productGroup : getProductGroups()) {
             for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
