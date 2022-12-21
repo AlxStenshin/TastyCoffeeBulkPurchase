@@ -1,6 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.handler.command.parser;
 
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.ParsedCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.ParsedCommandDto;
 
 import java.util.Optional;
 

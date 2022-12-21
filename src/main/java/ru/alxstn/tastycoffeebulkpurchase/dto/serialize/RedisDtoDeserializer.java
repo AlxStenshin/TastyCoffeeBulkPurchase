@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize;
+package ru.alxstn.tastycoffeebulkpurchase.dto.serialize;
 
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.repository.TelegramCallbackRepository;

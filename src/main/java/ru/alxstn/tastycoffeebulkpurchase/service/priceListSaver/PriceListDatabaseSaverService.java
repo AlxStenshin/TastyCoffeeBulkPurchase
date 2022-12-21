@@ -76,8 +76,7 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
                 productManagerService.save(product);
                 logger.info("Saving new Product: " + product);
             }
-
-            newProductAnalyzerService.analyzeNewProducts(newProducts);
         }
+        newProductAnalyzerService.analyzeNewProducts(newProducts);
     }
 }

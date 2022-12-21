@@ -79,16 +79,14 @@ public class Purchase {
     }
 
     public String getPurchaseSummary() {
-        String summary = product.getProductCategory() + " " + product.getName();
-        summary += productForm.isEmpty() ? ", " : " , " + productForm + " ";
+        String summary = product.getProductCategory() + " " + product.getName() + " " + product.getProductPackage();
+        summary += productForm.isEmpty() || productForm.isBlank() ? ", " : ", " + productForm + ", ";
         summary += getProductCountAndTotalPrice();
         return summary;
     }
 
     public String getProductCountAndTotalPrice() {
-        return getCount() > 1 ?
-                getCount() + " шт, " + getTotalPrice() + "₽" :
-                getProduct().getPrice() + "₽";
+        return getCount() + " шт, " + getTotalPrice() + "₽";
     }
 
     public BigDecimal getTotalPrice() {

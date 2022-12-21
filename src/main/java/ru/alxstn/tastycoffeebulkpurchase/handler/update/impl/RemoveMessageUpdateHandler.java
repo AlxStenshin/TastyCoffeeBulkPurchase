@@ -6,18 +6,18 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RemoveMessageCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemoveMessageCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 
 @Component
-public class RemovePreviousMessageUpdateHandler extends CallbackUpdateHandler<RemoveMessageCommandDto> {
+public class RemoveMessageUpdateHandler extends CallbackUpdateHandler<RemoveMessageCommandDto> {
 
-    Logger logger = LogManager.getLogger(RemovePreviousMessageUpdateHandler.class);
+    Logger logger = LogManager.getLogger(RemoveMessageUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
 
-    public RemovePreviousMessageUpdateHandler(ApplicationEventPublisher publisher) {
+    public RemoveMessageUpdateHandler(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
     }
 

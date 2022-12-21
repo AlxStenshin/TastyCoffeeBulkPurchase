@@ -3,14 +3,15 @@ package ru.alxstn.tastycoffeebulkpurchase.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RemoveProductFromCustomerPurchaseCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ReplaceProductForCustomerPurchaseCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemoveProductFromCustomerPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.ReplaceProductForCustomerPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
@@ -40,6 +41,7 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
     }
 
     @Override
+    @EventListener
     public void handleChangedProducts(ProductUpdateEvent event) {
         Product oldProduct = event.getOldProduct();
         Product newProduct = event.getNewProduct();
@@ -56,7 +58,7 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
                     SendMessage.builder()
                             .chatId(customer.getChatId())
                             .parseMode("html")
-                            .text("Обновился прайс-лист." + event.getUpdateMessage())
+                            .text("Обновился прайс-лист. \n" + event.getUpdateMessage())
                             .replyMarkup(InlineKeyboardMarkup.builder()
                                     .keyboard(buildActionButtons(oldProduct, newProduct))
                                     .build())
@@ -75,7 +77,7 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
                 .build()));
 
         actionButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
-                .text("Сохранить")
+                .text("Обновить")
                 .callbackData(serializer.serialize(
                         new ReplaceProductForCustomerPurchaseCommandDto(oldProduct, newProduct)))
                 .build()));

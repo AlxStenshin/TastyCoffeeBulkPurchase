@@ -3,12 +3,14 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.update.impl;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.ReplaceProductForCustomerPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.ReplaceProductForCustomerPurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
@@ -41,12 +43,12 @@ public class ReplaceProductForCustomerPurchaseUpdateHandler
 
     @Override
     protected SerializableInlineType getSerializableType() {
-        return SerializableInlineType.REMOVE_PRODUCT_FOR_CUSTOMER;
+        return SerializableInlineType.REPLACE_PRODUCT_FOR_CUSTOMER;
     }
 
     @Override
     protected void handleCallback(Update update, ReplaceProductForCustomerPurchaseCommandDto dto) {
-        Customer customer = customerRepository.getByChatId(update.getMessage().getChatId());
+        Customer customer = customerRepository.getByChatId(update.getCallbackQuery().getMessage().getChatId());
         Session session = sessionManagerService.getUnfinishedSession();
 
         purchaseManagerService.replacePurchaseProductForCustomerInSession(customer, session,
@@ -54,10 +56,16 @@ public class ReplaceProductForCustomerPurchaseUpdateHandler
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(0)
-                .text("Заменено!")
+                .text("Обновлено!")
                 .showAlert(false)
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
+
+        publisher.publishEvent(new RemoveMessageEvent(this,
+                DeleteMessage.builder()
+                        .messageId(update.getCallbackQuery().getMessage().getMessageId())
+                        .chatId(update.getCallbackQuery().getMessage().getChatId())
+                        .build()));
 
         // ToDo: remove previous message with buttons <Remove>, <Replace>
     }

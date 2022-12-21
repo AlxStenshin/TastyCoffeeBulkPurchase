@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity.dto;
+package ru.alxstn.tastycoffeebulkpurchase.dto;
 
 import org.springframework.data.redis.core.RedisHash;
 

@@ -14,7 +14,7 @@ This application being developed for simplifying bulk coffee purchase process fr
 - Session manager manually validates placed order, puts any required corrections and places order.
 
 # How to start using?
-First, create <code>secrets.properties</code> file, which contains your organization telegram bot token and name, you tastycoffee account name and password using provided template.
+First, create <code>secrets.properties</code> file, which contains your organization telegram bot token and name, your tastycoffee account name and password using provided template.
 
 Second, run this app using one of three available ways:
 

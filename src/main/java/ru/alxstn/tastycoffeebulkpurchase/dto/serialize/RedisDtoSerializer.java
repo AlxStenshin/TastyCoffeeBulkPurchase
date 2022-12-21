@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize;
+package ru.alxstn.tastycoffeebulkpurchase.dto.serialize;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.AnnotationExclusionStrategy;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineObject;
 import ru.alxstn.tastycoffeebulkpurchase.repository.TelegramCallbackRepository;
 
 import javax.xml.bind.DatatypeConverter;

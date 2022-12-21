@@ -31,6 +31,10 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
 
     @Override
     public void analyzeNewProducts(List<Product> newProducts) {
+        if (newProducts.size() > 0) {
+            logger.info("New Products discovered: " + newProducts);
+        }
+
         for (Product newProduct : newProducts) {
             logger.info("Analyzing New Product: " + newProduct);
 

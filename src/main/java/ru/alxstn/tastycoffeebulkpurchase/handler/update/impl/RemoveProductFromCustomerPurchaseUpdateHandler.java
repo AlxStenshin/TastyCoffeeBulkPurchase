@@ -3,12 +3,14 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.update.impl;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.RemoveProductFromCustomerPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemoveProductFromCustomerPurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
@@ -45,7 +47,7 @@ public class RemoveProductFromCustomerPurchaseUpdateHandler
 
     @Override
     protected void handleCallback(Update update, RemoveProductFromCustomerPurchaseCommandDto dto) {
-        Customer customer = customerRepository.getByChatId(update.getMessage().getChatId());
+        Customer customer = customerRepository.getByChatId(update.getCallbackQuery().getMessage().getChatId());
         Session session = sessionManagerService.getUnfinishedSession();
 
         purchaseManagerService.removePurchaseForCustomerWithProductInSession(customer, session, dto.getOldProduct());
@@ -56,6 +58,12 @@ public class RemoveProductFromCustomerPurchaseUpdateHandler
                 .showAlert(false)
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
+
+        publisher.publishEvent(new RemoveMessageEvent(this,
+                DeleteMessage.builder()
+                        .messageId(update.getCallbackQuery().getMessage().getMessageId())
+                        .chatId(update.getCallbackQuery().getMessage().getChatId())
+                        .build()));
 
         // ToDo: remove previous message with buttons <Remove>, <Replace>
     }

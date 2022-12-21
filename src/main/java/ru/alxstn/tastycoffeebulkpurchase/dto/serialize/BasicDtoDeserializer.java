@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize;
+package ru.alxstn.tastycoffeebulkpurchase.dto.serialize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

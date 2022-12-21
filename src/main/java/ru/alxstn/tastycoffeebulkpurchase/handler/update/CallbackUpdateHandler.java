@@ -5,9 +5,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoDeserializer;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineObject;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoDeserializer;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 
 import java.util.Optional;

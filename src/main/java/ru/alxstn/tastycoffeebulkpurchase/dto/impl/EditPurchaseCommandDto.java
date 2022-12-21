@@ -1,8 +1,8 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl;
+package ru.alxstn.tastycoffeebulkpurchase.dto.impl;
 
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineObject;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineObject;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 
 public class EditPurchaseCommandDto extends SerializableInlineObject {
 

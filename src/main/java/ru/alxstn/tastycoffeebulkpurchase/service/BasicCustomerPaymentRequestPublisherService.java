@@ -11,8 +11,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.SetOrderPaidCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.SetOrderPaidCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchaseSummaryNotificationEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 

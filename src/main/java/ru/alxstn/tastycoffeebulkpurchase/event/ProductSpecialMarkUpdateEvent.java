@@ -7,8 +7,8 @@ public class ProductSpecialMarkUpdateEvent extends ProductUpdateEvent {
     public ProductSpecialMarkUpdateEvent(Object source, Product oldProduct, Product newProduct) {
         super(source, oldProduct, newProduct);
 
-        super.setUpdateMessage("Изменилась метка продукта из вашего заказа: \n" +
-                oldProduct.getSpecialMark() + "\n" +
+        super.setUpdateMessage("Изменилась метка продукта из вашего заказа: \n<code>" +
+                oldProduct.getFullDisplayName() + "\n</code>" +
                 "Новая метка: " + newProduct.getSpecialMark() +
                 "\n\nЧто это значит?" +
                 "\nМетка 'нет' означает что продукт временно не доступен для заказа." +

@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity.dto;
+package ru.alxstn.tastycoffeebulkpurchase.dto;
 
 public enum SerializableInlineType {
     SET_MAIN_COMMAND(0),

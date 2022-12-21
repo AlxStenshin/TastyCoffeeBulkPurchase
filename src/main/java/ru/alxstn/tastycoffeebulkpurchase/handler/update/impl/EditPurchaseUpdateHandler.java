@@ -8,11 +8,14 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.EditPurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.PlaceOrderCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemovePurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.UpdatePurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.SerializableInlineType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.impl.*;
-import ru.alxstn.tastycoffeebulkpurchase.entity.dto.serialize.DtoSerializer;
+import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
+import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 
