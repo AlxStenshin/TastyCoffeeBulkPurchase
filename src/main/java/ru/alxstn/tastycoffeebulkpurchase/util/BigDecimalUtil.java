@@ -14,4 +14,10 @@ public class BigDecimalUtil {
     public static boolean greaterThanZero(BigDecimal inputValue) {
         return inputValue.compareTo(new BigDecimal(0)) > 0;
     }
+
+    public static boolean equals(BigDecimal firstValue, BigDecimal secondValue) {
+        return firstValue.compareTo(secondValue) == 0;
+    }
+
+
 }

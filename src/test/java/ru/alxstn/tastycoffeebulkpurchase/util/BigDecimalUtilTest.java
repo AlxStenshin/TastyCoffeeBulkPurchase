@@ -79,4 +79,40 @@ class BigDecimalUtilTest {
         BigDecimal inputValue = new BigDecimal("0.0");
         assertFalse(BigDecimalUtil.greaterThanZero(inputValue));
     }
+
+    @Test
+    void shouldBeEqualsWithRegularValues() {
+        BigDecimal firstValue = new BigDecimal("200.0");
+        BigDecimal secondValue = new BigDecimal("200.00");
+        assertTrue(BigDecimalUtil.equals(firstValue, secondValue));
+    }
+
+    @Test
+    void shouldBeEqualsWithZeros() {
+        BigDecimal firstValue = new BigDecimal("0.0");
+        BigDecimal secondValue = new BigDecimal("0.00");
+        assertTrue(BigDecimalUtil.equals(firstValue, secondValue));
+    }
+
+    @Test
+    void shouldNotBeEquals() {
+        BigDecimal firstValue = new BigDecimal("0.1");
+        BigDecimal secondValue = new BigDecimal("0.00");
+        assertFalse(BigDecimalUtil.equals(firstValue, secondValue));
+    }
+
+    @Test
+    void shouldNotBeEqualsWithVerySmallDiff() {
+        BigDecimal firstValue = new BigDecimal("0.1");
+        BigDecimal secondValue = new BigDecimal("0.1000000001");
+        assertFalse(BigDecimalUtil.equals(firstValue, secondValue));
+    }
+
+    @Test
+    void shouldNotBeEqualsWithVeryCloseValues() {
+        BigDecimal firstValue = new BigDecimal("1.0000001");
+        BigDecimal secondValue = new BigDecimal("1.0000002");
+        assertFalse(BigDecimalUtil.equals(firstValue, secondValue));
+    }
+
 }

@@ -66,7 +66,5 @@ public class ReplaceProductForCustomerPurchaseUpdateHandler
                         .messageId(update.getCallbackQuery().getMessage().getMessageId())
                         .chatId(update.getCallbackQuery().getMessage().getChatId())
                         .build()));
-
-        // ToDo: remove previous message with buttons <Remove>, <Replace>
     }
 }

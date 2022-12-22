@@ -9,6 +9,7 @@ import ru.alxstn.tastycoffeebulkpurchase.event.NewProductDiscoveredEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductPriceUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductSpecialMarkUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import java.util.Comparator;
 import java.util.List;
@@ -52,7 +53,7 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
             if (similarProducts.size() > 0) {
                 Product latestSimilar = similarProducts.get(0);
 
-                if (!Objects.equals(newProduct.getPrice(), latestSimilar.getPrice())) {
+                if (!BigDecimalUtil.equals(newProduct.getPrice(), latestSimilar.getPrice())) {
                     logger.info("Product Price Update Detected.");
                     publisher.publishEvent(new ProductPriceUpdateEvent(this, latestSimilar, newProduct));
                 }
