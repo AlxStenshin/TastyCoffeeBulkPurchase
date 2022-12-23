@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "product")
 public class Product {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -201,6 +202,14 @@ public class Product {
         String displayName = getDisplayName();
         displayName += productCategory.isEmpty() ? "" : "\nИз категории " + productCategory;
         displayName += productSubCategory.isEmpty() ? "" : "\nПодкатегории " + productSubCategory;
+        return displayName;
+    }
+
+    public String getShortName() {
+        String displayName = "";
+        displayName += productCategory.isEmpty() ? "" : productCategory + " ";
+        displayName += productSubCategory.isEmpty() ? "" : productSubCategory + " ";
+        displayName += name.isEmpty() ? "" : name;
         return displayName;
     }
 

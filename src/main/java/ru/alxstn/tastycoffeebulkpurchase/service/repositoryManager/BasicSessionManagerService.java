@@ -6,7 +6,8 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationExcept
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.OrderCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.WebPageOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.List;
@@ -19,14 +20,17 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     private final SessionRepository sessionRepository;
     private final DateTimeProvider dateTimeProvider;
-    private final OrderCreatorService orderCreator;
+    private final WebPageOrderCreatorService webPageOrderCreator;
+    private final TextFileOrderCreatorService textFileOrderCreator;
 
     public BasicSessionManagerService(SessionRepository sessionRepository,
                                       DateTimeProvider dateTimeProvider,
-                                      OrderCreatorService orderCreator) {
+                                      WebPageOrderCreatorService webPageOrderCreator,
+                                      TextFileOrderCreatorService textFileOrderCreator) {
         this.sessionRepository = sessionRepository;
         this.dateTimeProvider = dateTimeProvider;
-        this.orderCreator = orderCreator;
+        this.webPageOrderCreator = webPageOrderCreator;
+        this.textFileOrderCreator = textFileOrderCreator;
     }
 
     @Override
@@ -49,7 +53,8 @@ public class BasicSessionManagerService implements SessionManagerService {
         session.setDateTimeClosed(dateTimeProvider.getCurrentTimestamp());
         session.setClosed(true);
         sessionRepository.save(session);
-        orderCreator.createOrder(session);
+        webPageOrderCreator.createOrder(session);
+        textFileOrderCreator.createOrder(session);
         return session;
     }
 
@@ -81,8 +86,9 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     private String getOnlyOneActiveSessionAllowedMessage() {
-        return "Only One Active Session Allowed.\n" +
-                    "Please finish active session first.";
+        return """
+                Only One Active Session Allowed.
+                "Please finish active session first.""";
     }
 
     private String getActiveSessionNotFoundMessage() {

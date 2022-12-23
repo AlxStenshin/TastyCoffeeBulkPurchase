@@ -10,13 +10,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
-// ToDo: Remove all logic from session controller, controllers should be simple and stupid.
-
 @Controller
 public class SessionController {
 
     private final SessionManagerService sessionManager;
-    // ToDo: add messageMapper(Builder) like kirya522
 
     public SessionController(SessionManagerService sessionManager) {
         this.sessionManager = sessionManager;

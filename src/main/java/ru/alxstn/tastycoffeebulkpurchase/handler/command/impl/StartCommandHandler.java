@@ -44,13 +44,13 @@ public class StartCommandHandler implements CommandHandler {
         if (customerRepository.findById(message.getChatId()).isPresent()) {
             welcomeMessage = "С возвращением";
         } else {
-            Customer customer = new Customer();
+            Customer customer = new Customer(message.getChatId(),
+                    message.getChat().getFirstName(),
+                    message.getChat().getLastName(),
+                    message.getChat().getUserName());
+
             CustomerNotificationSettings settings = new CustomerNotificationSettings();
             customer.setNotificationSettings(settings);
-            customer.setChatId(message.getChatId());
-            customer.setFirstName(message.getChat().getFirstName());
-            customer.setLastName(message.getChat().getLastName());
-            customer.setUserName(message.getChat().getUserName());
             customerRepository.save(customer);
         }
 

@@ -31,6 +31,16 @@ public class Customer {
     @Embedded
     CustomerNotificationSettings notificationSettings;
 
+    public Customer() {
+    }
+
+    public Customer(Long chatId, String firstName, String lastName, String userName) {
+        this.chatId = chatId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+    }
+
     public Long getChatId() {
         return chatId;
     }

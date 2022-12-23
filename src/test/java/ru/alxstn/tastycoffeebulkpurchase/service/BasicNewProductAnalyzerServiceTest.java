@@ -70,6 +70,18 @@ class BasicNewProductAnalyzerServiceTest {
     }
 
     @Test
+    void shouldNotInvokeAnyEvent() {
+        service.analyzeNewProducts(List.of(new Product("ProductOne",
+                new BigDecimal(1),
+                "",
+                productPackage,
+                "Group",
+                "Subgroup",
+                true)));
+        verify(publisher, times(0)).publishEvent(isA(ApplicationEvent.class));
+    }
+
+    @Test
     void shouldInvokeProductSpecialMarkChangedEvent() {
         service.analyzeNewProducts(List.of(
                 new Product("ProductOne",

@@ -17,18 +17,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Service
-public class WebPageOrderCreator implements OrderCreatorService {
+public class WebPageOrderCreatorService implements OrderCreatorService {
 
-    Logger logger = LogManager.getLogger(WebPageOrderCreator.class);
+    Logger logger = LogManager.getLogger(WebPageOrderCreatorService.class);
 
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeePage tastyCoffeePage;
     private final PurchaseManagerService purchaseManagerService;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    public WebPageOrderCreator(ApplicationEventPublisher publisher,
-                               TastyCoffeePage tastyCoffeePage,
-                               PurchaseManagerService purchaseManagerService) {
+    public WebPageOrderCreatorService(ApplicationEventPublisher publisher,
+                                      TastyCoffeePage tastyCoffeePage,
+                                      PurchaseManagerService purchaseManagerService) {
         this.publisher = publisher;
         this.tastyCoffeePage = tastyCoffeePage;
         this.purchaseManagerService = purchaseManagerService;
@@ -36,7 +36,11 @@ public class WebPageOrderCreator implements OrderCreatorService {
 
     public void createOrder(Session session) {
         logger.info("Now placing order from current session " + session.getId() + ":" + session.getTitle());
-        List<Purchase> currentSessionPurchases = purchaseManagerService.findAllPurchasesInSession(session);
+        List<Purchase> currentSessionPurchases = purchaseManagerService.findAllPurchasesInSession(session)
+                .stream()
+                .filter(purchase -> purchase.getProduct().isActual() && purchase.getProduct().isAvailable())
+                .toList();
+
         publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, currentSessionPurchases));
 
         executorService.execute(() -> {

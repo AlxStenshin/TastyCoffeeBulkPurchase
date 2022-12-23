@@ -55,6 +55,7 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                 messageBuilder.append("Ваш заказ:\n");
                 messageBuilder.append("<code>");
 
+                // ToDo: Show inactive or unavailable products here! ❌⛔🚫
                 for (var purchase : purchases) {
                     messageBuilder.append(purchase.getPurchaseSummary());
                     messageBuilder.append("\n");
