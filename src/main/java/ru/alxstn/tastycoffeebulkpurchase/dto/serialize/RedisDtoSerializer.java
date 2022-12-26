@@ -1,8 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.dto.serialize;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
+import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -13,6 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.repository.TelegramCallbackRepository;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 
 @Component
 public class RedisDtoSerializer implements DtoSerializer {
@@ -29,6 +28,7 @@ public class RedisDtoSerializer implements DtoSerializer {
         try {
             Gson gson = new GsonBuilder()
                     .setExclusionStrategies(new AnnotationExclusionStrategy())
+                    .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
                     .setPrettyPrinting()
                     .serializeNulls()
                     .create();
@@ -44,7 +44,7 @@ public class RedisDtoSerializer implements DtoSerializer {
             repository.save(obj);
             return myHash;
         } catch (NoSuchAlgorithmException | RuntimeException e) {
-            logger.error("Error Serializing Redis Object: " + e.getMessage());
+            logger.error("Error Serializing Redis Object: " + o + e.getMessage());
             return null;
         }
     }

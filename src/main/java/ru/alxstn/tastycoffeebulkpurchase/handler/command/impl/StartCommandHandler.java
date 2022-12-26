@@ -13,7 +13,6 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.CustomerNotificationSettings;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoDeserializer;
-import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
@@ -24,17 +23,14 @@ import java.util.Arrays;
 public class StartCommandHandler implements CommandHandler {
     private final ApplicationEventPublisher publisher;
     private final CustomerRepository customerRepository;
-    private final DtoSerializer serializer;
 
     @Autowired
     private DtoDeserializer deserializer;
 
     public StartCommandHandler(ApplicationEventPublisher publisher,
-                               CustomerRepository customerRepository,
-                               DtoSerializer serializer) {
+                               CustomerRepository customerRepository) {
         this.publisher = publisher;
         this.customerRepository = customerRepository;
-        this.serializer = serializer;
     }
 
     @Override

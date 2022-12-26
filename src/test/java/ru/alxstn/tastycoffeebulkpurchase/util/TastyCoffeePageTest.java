@@ -27,7 +27,9 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@EnableConfigurationProperties(TastyCoffeeConfigProperties.class)
+@TestPropertySource("classpath:application.properties")
+@TestPropertySource("classpath:secrets.properties")
 class TastyCoffeePageTest {
 
     Logger logger = LogManager.getLogger(TastyCoffeePageTest.class);
