@@ -18,7 +18,6 @@ import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManag
 
 import java.util.List;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @Service
 public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorService {
@@ -57,7 +56,7 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
         List<Purchase> currentSessionPurchases = purchaseManagerService
                 .findAllPurchasesInSession(currentSession).stream()
                 .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
-                .collect(Collectors.toList());
+                .toList();
 
         Double currentSessionDiscountSensitiveWeight = currentSessionPurchases.stream()
                 .filter(purchase -> purchase.getProduct().isDiscountable())
@@ -91,7 +90,7 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
             List<Customer> currentSessionSubscribedCustomers = purchaseManagerService.getSessionCustomers(currentSession)
                     .stream()
                     .filter(c -> c.getNotificationSettings().isReceiveDiscountNotification())
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (var c : currentSessionSubscribedCustomers) {
                 logger.info("Sending New Discount Notification to " + c);

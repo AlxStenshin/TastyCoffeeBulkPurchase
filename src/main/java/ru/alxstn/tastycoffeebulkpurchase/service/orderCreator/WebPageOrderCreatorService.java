@@ -41,13 +41,15 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
                 .filter(purchase -> purchase.getProduct().isActual() && purchase.getProduct().isAvailable())
                 .toList();
 
-        publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, currentSessionPurchases));
+        if (currentSessionPurchases.size() > 0) {
+            publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, currentSessionPurchases));
 
-        executorService.execute(() -> {
-            List<Purchase> unfinishedPurchases = tastyCoffeePage.placeOrder(currentSessionPurchases);
-            publisher.publishEvent(new PurchasePlacementErrorEvent(this, unfinishedPurchases));
-        });
-        logger.info("Order Placed!");
+            executorService.execute(() -> {
+                List<Purchase> unfinishedPurchases = tastyCoffeePage.placeOrder(currentSessionPurchases);
+                publisher.publishEvent(new PurchasePlacementErrorEvent(this, unfinishedPurchases));
+            });
+            logger.info("Order Placed!");
+        }
     }
 
 }

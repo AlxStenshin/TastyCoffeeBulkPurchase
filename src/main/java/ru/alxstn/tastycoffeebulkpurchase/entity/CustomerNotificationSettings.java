@@ -14,14 +14,20 @@ public class CustomerNotificationSettings {
     private boolean receivePaymentConfirmationNotification;
     private static final String receivePaymentConfirmationNotificationDescription = "Уведомления об оплате закзазов";
 
+    @Column(name = "new_session", table = "notification_settings")
+    private boolean receiveNewSessionStartedNotification;
+    private static final String receiveNewSessionStartedNotificationDescription = "Уведомления об открытии новой сессии";
+
     public CustomerNotificationSettings() {
         this.receiveDiscountNotification = false;
         this.receivePaymentConfirmationNotification = false;
+        this.receiveNewSessionStartedNotification = true;
     }
 
     public CustomerNotificationSettings(CustomerNotificationSettings settings) {
         this.receiveDiscountNotification = settings.isReceiveDiscountNotification();
         this.receivePaymentConfirmationNotification = settings.isReceivePaymentConfirmationNotification();
+        this.receiveNewSessionStartedNotification = settings.isReceiveNewSessionStartedNotification();
     }
 
     public boolean isReceiveDiscountNotification() {
@@ -38,5 +44,13 @@ public class CustomerNotificationSettings {
 
     public void setReceivePaymentConfirmationNotification(boolean receivePaymentConfirmationNotification) {
         this.receivePaymentConfirmationNotification = receivePaymentConfirmationNotification;
+    }
+
+    public boolean isReceiveNewSessionStartedNotification() {
+        return receiveNewSessionStartedNotification;
+    }
+
+    public void setReceiveNewSessionStartedNotification(boolean receiveNewSessionStartedNotification) {
+        this.receiveNewSessionStartedNotification = receiveNewSessionStartedNotification;
     }
 }

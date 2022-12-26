@@ -61,7 +61,7 @@ That's it. All orders will be automatically placed after session being closed.
 # ToDo:
 1) Auto-close session by reaching session close date.
 2) "Session will be closed in 1 hour" customer notification.
-3) "New session started" customer notification.
+3) ~~"New session started" customer notification.~~
 4) "Session completely paid" (closed, finished) customer notification.
 5) ~~"Product changed" notification message.~~
 6) Do not parse products until there is closed, but non-finished session (this will clear purchases otherwise)

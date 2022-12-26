@@ -1,7 +1,9 @@
 package ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.event.NewSessionStartedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
@@ -18,15 +20,18 @@ public class BasicSessionManagerService implements SessionManagerService {
     // ToDo: Session closed developer notification with session stats.
     // ToDo: Refresh session summary button for usage in controller -> html form
 
+    private final ApplicationEventPublisher publisher;
     private final SessionRepository sessionRepository;
     private final DateTimeProvider dateTimeProvider;
     private final WebPageOrderCreatorService webPageOrderCreator;
     private final TextFileOrderCreatorService textFileOrderCreator;
 
-    public BasicSessionManagerService(SessionRepository sessionRepository,
+    public BasicSessionManagerService(ApplicationEventPublisher publisher,
+                                      SessionRepository sessionRepository,
                                       DateTimeProvider dateTimeProvider,
                                       WebPageOrderCreatorService webPageOrderCreator,
                                       TextFileOrderCreatorService textFileOrderCreator) {
+        this.publisher = publisher;
         this.sessionRepository = sessionRepository;
         this.dateTimeProvider = dateTimeProvider;
         this.webPageOrderCreator = webPageOrderCreator;
@@ -45,6 +50,9 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     @Override
     public void saveSession(Session session) throws SessionCreationException {
+        if (session.getId() == null) {
+            publisher.publishEvent(new NewSessionStartedEvent(this, session));
+        }
         sessionRepository.save(session);
     }
 
@@ -84,6 +92,7 @@ public class BasicSessionManagerService implements SessionManagerService {
         return sessionRepository.getUnfinishedSession().orElseThrow(() ->
                 new SessionNotFoundException(getActiveSessionNotFoundMessage()));
     }
+
 
     private String getOnlyOneActiveSessionAllowedMessage() {
         return """

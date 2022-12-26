@@ -16,5 +16,4 @@ public interface SessionManagerService {
     Session getSessionById(long sessionId);
     Session getActiveSession() throws SessionNotFoundException;
     Session getUnfinishedSession() throws SessionNotFoundException;
-
 }

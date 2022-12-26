@@ -70,8 +70,8 @@ class BasicNewProductAnalyzerServiceTest {
     }
 
     @Test
-    void shouldNotInvokeAnyEvent() {
-        service.analyzeNewProducts(List.of(new Product("ProductOne",
+    void shouldNotInvokeAnyEventWithUnchangedProduct() {
+        service.analyzeNewProducts(List.of(new Product("ProductOne", // <- Nothing Changed
                 new BigDecimal(1),
                 "",
                 productPackage,
