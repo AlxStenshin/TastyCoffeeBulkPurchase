@@ -1,21 +1,18 @@
 package ru.alxstn.tastycoffeebulkpurchase.util;
 
-import com.codeborne.selenide.Configuration;
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.Selenide;
-import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.*;
 import com.codeborne.selenide.ex.ElementNotFound;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.PurchaseEntry;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.webPage.WebPageElementException;
 
@@ -74,10 +71,21 @@ public class TastyCoffeePage {
             logger.error("WebPageElementError: " + e.getMessage());
             throw new WebPageElementException(e);
         }
+
+        List<Product> grindable = allProducts.stream().filter(Product::isGrindable).toList();
+        allProducts.removeAll(grindable);
+
+        List<String> productForms = List.of("Зерно", "Крупный", "Средний", "Мелкий");
+        for (Product p : grindable) {
+            for (String productForm : productForms) {
+                allProducts.add(p.createFormedProduct(productForm));
+            }
+        }
+
         return allProducts;
     }
 
-    public List<PurchaseEntry> placeOrder(List<PurchaseEntry> currentSessionPurchases) {
+    public List<Product> placeOrder(Map<Product, Integer> currentSessionPurchases) {
         try {
             login();
             resetOrder();
@@ -104,7 +112,7 @@ public class TastyCoffeePage {
         }
 
         // ToDo: Check total sum and product count by groups (counters in "nav-link active")
-        return currentSessionPurchases;
+        return new ArrayList<>(currentSessionPurchases.keySet());
     }
 
     private void login() {
@@ -188,38 +196,40 @@ public class TastyCoffeePage {
         }
     }
 
-    private void fillPurchasesAvailableOnPage(List<Purchase> currentSessionPurchases) {
-    // ToDo: Use stream.gropingBy
-    //  https://www.baeldung.com/java-groupingby-collector
+    private void fillPurchasesAvailableOnPage(Map<Product, Integer> currentSessionPurchases) {
 
         for (SelenideElement productGroup : getProductGroups()) {
             for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
                 String subgroupTitle = getSubGroupTitle(productSubgroup);
 
-                List<PurchaseEntry> currentSubcategoryPurchases = currentSessionPurchases.stream()
-                        .filter(p -> p.getProduct().getProductSubCategory().equals(subgroupTitle))
-                        .toList();
+                Map<Product, Integer> currentSubcategoryPurchases = currentSessionPurchases.entrySet().stream()
+                        .filter(p -> p.getKey().getProductSubCategory().equals(subgroupTitle))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-                for (PurchaseEntry purchase : currentSubcategoryPurchases) {
+                for (var purchase : currentSubcategoryPurchases.entrySet()) {
                     try {
-                        String productName = purchase.getProduct().getName();
-                        String productPackage = purchase.getProduct().getProductPackage().getDescription();
-                        String productForm = purchase.getProductForm();
-                        int productCount = purchase.getCount();
+                        String productName = purchase.getKey().getName();
+                        String productPackage = purchase.getKey().getProductPackage().getDescription();
+                        String productForm = purchase.getKey().getProductForm();
+                        int productCountIncrement = purchase.getValue();
 
                         SelenideElement correspondingProduct = productSubgroup.find(byText(productName));
                         SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
                         SelenideElement counter = getQuantityControlElement(correspondingProductTableRow, productPackage, productForm);
                         SelenideElement incrementButton = getIncrementButtonFromQuantityCounter(counter);
+                        int currentProductCount = getCurrentProductCountValue(counter);
+                        logger.info("Starting product count increase. Current count: " + currentProductCount + "  increments: " + productCountIncrement);
 
-                        while (productCount > 0) {
+                        while (productCountIncrement > 0) {
                             clickWebElement(incrementButton);
-                            productCount--;
-                            currentSessionPurchases.remove(purchase);
+                            productCountIncrement--;
+                            refresh();
+                            //logger.info("Increment button clicked. new product count:" + getCurrentCountForPurchase(product, productSubgroup));
                         }
-                    } catch (ElementNotFound ignored) {
-                        logger.warn("Could Not Find Element By Text: " + purchase.getProduct().getName());
+                    } catch (ElementNotFound e) {
+                        logger.warn("Could Not Find Element By Text: " + e.getMessage() + "\nFor product" + purchase.getKey().getName());
                     }
+                    currentSessionPurchases.remove(purchase.getKey());
                 }
             }
         }
@@ -280,6 +290,8 @@ public class TastyCoffeePage {
                         productBuilder.setSpecialMark("");
                     }
 
+                    productBuilder.setProductForm("");
+
                     productBuilder.setGrindable(false);
                     addProducts(currentTypeProducts, productBuilder, getProductPacks(product));
 
@@ -332,6 +344,25 @@ public class TastyCoffeePage {
 
     private SelenideElement getIncrementButtonFromQuantityCounter(SelenideElement counter) {
         return counter.find(By.cssSelector("div.input-group-append")).find(By.tagName("button"));
+    }
+
+    private SelenideElement getProductCountInput(SelenideElement counter) {
+        return counter.find(By.cssSelector("div.input-wrap")).find(By.tagName("input"));
+    }
+
+    private int getCurrentProductCountValue(SelenideElement counter) {
+        String value = getProductCountInput(counter).getAttribute("placeholder");
+        return Integer.parseInt(Objects.requireNonNull(value));
+    }
+
+    private void clearInput(SelenideElement input) {
+        input.sendKeys(Keys.CONTROL + "a");
+        input.sendKeys(Keys.BACK_SPACE);
+    }
+
+    private void setInputValue(SelenideElement input, int amount) {
+        String newValue = Integer.toString(amount);
+        input.sendKeys(newValue);
     }
 
     private String getGroupTitle(SelenideElement groupElement) {

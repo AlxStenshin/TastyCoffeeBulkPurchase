@@ -32,17 +32,14 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
 
     @Override
     public void analyzeNewProducts(List<Product> newProducts) {
-        if (newProducts.size() > 0) {
-            logger.info("New Products discovered: " + newProducts);
-        }
-
         for (Product newProduct : newProducts) {
             logger.info("Analyzing New Product: " + newProduct);
 
-            List<Product> similarProducts = productManagerService.getProductsByNameCategorySubcategoryAndPackage(
+            List<Product> similarProducts = productManagerService.getSimilarProducts(
                     newProduct.getName(),
                     newProduct.getProductCategory(),
                     newProduct.getProductSubCategory(),
+                    newProduct.getProductForm(),
                     newProduct.getProductPackage());
 
             similarProducts = similarProducts.stream()
@@ -64,7 +61,7 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
                 }
             }
             else {
-                logger.info("New Product Detected.");
+                logger.info("This is a New Product.");
                 publisher.publishEvent(new NewProductDiscoveredEvent(this, newProduct));
             }
         }

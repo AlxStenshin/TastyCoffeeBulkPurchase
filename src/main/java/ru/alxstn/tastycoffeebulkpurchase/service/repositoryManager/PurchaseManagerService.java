@@ -20,7 +20,7 @@ public interface PurchaseManagerService {
 
     List<Customer> getSessionCustomersWithProduct(Session session, Product product);
 
-    Optional<Purchase> getPurchaseIgnoringProductQuantity(Customer customer, Product product, Session session, String productForm);
+    Optional<Purchase> getPurchaseIgnoringProductQuantity(Customer customer, Product product, Session session);
 
     void removePurchaseForCustomerWithProductInSession(Customer customer, Session session, Product product);
 

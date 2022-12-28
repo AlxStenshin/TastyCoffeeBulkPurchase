@@ -45,8 +45,8 @@ public class BasicPurchaseManagerService implements PurchaseManagerService {
     }
 
     @Override
-    public Optional<Purchase> getPurchaseIgnoringProductQuantity(Customer customer, Product product, Session session, String productForm) {
-        return purchaseRepository.getPurchaseIgnoringProductQuantity(customer, product, session, productForm);
+    public Optional<Purchase> getPurchaseIgnoringProductQuantity(Customer customer, Product product, Session session ) {
+        return purchaseRepository.getPurchaseIgnoringProductQuantity(customer, product, session);
     }
 
     @Override

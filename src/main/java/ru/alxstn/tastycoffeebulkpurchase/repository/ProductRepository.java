@@ -26,8 +26,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.productSubCategory = ?1 AND p.actual = true")
     List<Product> findDistinctActiveProductsBySubCategory(String subCategory);
 
-    @Query("SELECT p FROM Product p WHERE p.name = ?1 AND p.productSubCategory = ?2 AND p.actual = true")
-    List<Product> findAllActiveProductsByProductNameAndSubcategory(String productName, String productSubCat);
+    @Query("SELECT p FROM Product p WHERE p.name = :name AND" +
+            " p.productSubCategory = :cat AND " +
+            "p.actual = true")
+    List<Product> findAllActiveProductsByProductNameAndSubcategory(
+            @Param(value = "name") String productName,
+            @Param(value = "cat") String productSubCat);
 
     @Query("SELECT p FROM Product p WHERE " +
             " p.name = :name AND" +
@@ -35,6 +39,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             " p.productSubCategory = :subCat AND" +
             " p.productPackage = :pack AND" +
             " p.specialMark = :mark AND" +
+            " p.productForm = :form AND" +
             " p.price = :price"
     )
     Optional<Product> productExists(@Param(value = "name") String name,
@@ -42,18 +47,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                     @Param(value = "subCat") String subCat,
                                     @Param(value = "pack") ProductPackage pack,
                                     @Param(value = "mark") String mark,
+                                    @Param(value = "form") String form,
                                     @Param(value = "price") BigDecimal price);
 
     @Query("SELECT p FROM Product p WHERE " +
             " p.name = :name AND" +
             " p.productCategory = :cat AND" +
             " p.productSubCategory = :subCat AND" +
+            " p.productForm = :form AND" +
             " p.productPackage = :pack"
     )
-    List<Product> getProductsByNameCategorySubcategoryAndPackage(
+    List<Product> getSimilarProducts(
                                     @Param(value = "name") String name,
                                     @Param(value = "cat") String cat,
                                     @Param(value = "subCat") String subCat,
+                                    @Param(value = "form") String form,
                                     @Param(value = "pack") ProductPackage pack);
 
     @Transactional
@@ -64,6 +72,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             " p.productSubCategory = :subCat AND" +
             " p.productPackage = :pack AND" +
             " p.specialMark = :mark AND" +
+            " p.productForm = :form AND" +
             " p.price = :price"
     )
     void update(@Param(value = "name") String name,
@@ -71,6 +80,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                 @Param(value = "subCat") String subCat,
                 @Param(value = "pack") ProductPackage pack,
                 @Param(value = "mark") String mark,
+                @Param(value = "form") String form,
                 @Param(value = "price") BigDecimal price,
                 @Param(value = "updateDateTime") LocalDateTime updateDateTime);
 

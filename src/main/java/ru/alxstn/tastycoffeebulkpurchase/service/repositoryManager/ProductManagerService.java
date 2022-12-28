@@ -19,11 +19,11 @@ public interface ProductManagerService {
 
     List<Product> findAllActiveProductsByProductNameAndSubcategory(String productName, String productSubCat);
 
-    Optional<Product> productExists(String name, String cat, String subCat, ProductPackage pack, String mark, BigDecimal price);
+    Optional<Product> productExists(String name, String cat, String subCat, ProductPackage pack, String mark, String form, BigDecimal price);
 
-    List<Product> getProductsByNameCategorySubcategoryAndPackage(String name, String cat, String subCat, ProductPackage pack);
+    List<Product> getSimilarProducts(String name, String cat, String subCat, String form, ProductPackage pack);
 
-    void updateProduct(String name, String cat, String subCat, ProductPackage pack, String mark, BigDecimal price, LocalDateTime updateDateTime);
+    void updateProduct(String name, String cat, String subCat, ProductPackage pack, String mark, String form, BigDecimal price, LocalDateTime updateDateTime);
 
     void markAllNotActual();
 

@@ -112,7 +112,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                 Product product = purchase.getProduct();
                                 String buttonTitle = product.getName();
                                 buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
-                                buttonTitle += purchase.getProductForm().isEmpty() ? "" : ", " + purchase.getProductForm();
+                                buttonTitle += purchase.getProduct().getProductForm().isEmpty() ? "" : ", " + purchase.getProduct().getProductForm();
                                 buttonTitle += " x " + purchase.getCount() + " шт.";
                                 return buttonTitle;
                             };

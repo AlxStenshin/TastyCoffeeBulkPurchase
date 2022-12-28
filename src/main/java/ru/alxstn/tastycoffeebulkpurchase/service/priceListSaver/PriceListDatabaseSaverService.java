@@ -14,9 +14,8 @@ import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManage
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PriceListDatabaseSaverService implements PriceListSaverService {
@@ -38,36 +37,41 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
     @Override
     public void handlePriceList(final PriceListReceivedEvent event) {
         productManagerService.markAllNotActual();
-
         List<Product> productsToSave = event.getPriceList();
-        Set<ProductPackage> packagesToSave = new HashSet<>();
 
         // Product Package Persistence
-        for (var product: productsToSave) {
-            packagesToSave.add(product.getProductPackage());
-        }
-        for (var pack : packagesToSave) {
+        for (var pack : productsToSave.stream().map(Product::getProductPackage).collect(Collectors.toSet())) {
             Example<ProductPackage> example = Example.of(pack, ExampleMatcher.matchingAll().withIgnorePaths("id"));
-            if (!productManagerService.productPackageExists(example))
+            if (!productManagerService.productPackageExists(example)) {
+                logger.info("Saving Product Package: " + pack);
                 productManagerService.save(pack);
+            }
         }
 
-        List<Product> newProducts = new ArrayList<>();
         // Product Persistence
+        List<Product> newProducts = new ArrayList<>();
         for (var product : productsToSave) {
             ProductPackage productPackage =
                     productManagerService.getProductPackageByDescription(product.getProductPackage().getDescription());
             product.setProductPackage(productPackage);
 
-            if (productManagerService.productExists(product.getName(), product.getProductCategory(), product.getProductSubCategory(),
-                    product.getProductPackage(), product.getSpecialMark(), product.getPrice()).isPresent()) {
+            if (productManagerService.productExists(
+                    product.getName(),
+                    product.getProductCategory(),
+                    product.getProductSubCategory(),
+                    product.getProductPackage(),
+                    product.getSpecialMark(),
+                    product.getProductForm(),
+                    product.getPrice()
+                    ).isPresent()) {
                 logger.info("Product already exist, updating timestamp: " + product);
-
-                productManagerService.updateProduct(product.getName(),
+                productManagerService.updateProduct(
+                        product.getName(),
                         product.getProductCategory(),
                         product.getProductSubCategory(),
                         product.getProductPackage(),
                         product.getSpecialMark(),
+                        product.getProductForm(),
                         product.getPrice(),
                         dateTimeProvider.getCurrentTimestamp());
             } else {
@@ -78,4 +82,5 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
         }
         newProductAnalyzerService.analyzeNewProducts(newProducts);
     }
+
 }

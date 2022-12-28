@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -47,6 +47,16 @@ class TextFileOrderCreatorServiceTest {
             firstPackage,
             "Group",
             "Subgroup",
+            "",
+            true);
+
+    private final Product firstProductCoarse = new Product("Product One",
+            new BigDecimal(1),
+            "",
+            firstPackage,
+            "Group",
+            "Subgroup",
+            "Coarse",
             true);
 
     private final Product secondProduct = new Product("Product Two",
@@ -55,14 +65,26 @@ class TextFileOrderCreatorServiceTest {
             secondPackage,
             "Group",
             "Subgroup",
+            "",
             true);
 
-    private final Product thirdProduct = new Product("Product Three",
+
+    private final Product thirdProductFine = new Product("Product Three",
             new BigDecimal(3),
             "",
             thirdPackage,
             "Group",
             "Subgroup2",
+            "Fine",
+            true);
+
+    private final Product thirdProductCoarse = new Product("Product Three",
+            new BigDecimal(3),
+            "",
+            thirdPackage,
+            "Group",
+            "Subgroup2",
+            "Coarse",
             true);
 
     @AfterEach
@@ -75,14 +97,14 @@ class TextFileOrderCreatorServiceTest {
     }
 
     @Test
-    void shouldCreateAndSavCorrectReport() {
+    void shouldCreateAndSaveCorrectReport() {
         when(sessionPurchaseReportCreatorService.createPerProductReport(session))
-                .thenReturn(List.of(
-                        new PurchaseEntry(firstProduct, "", 3),
-                        new PurchaseEntry(firstProduct, "Крупный", 1),
-                        new PurchaseEntry(secondProduct, "", 4),
-                        new PurchaseEntry(thirdProduct, "Крупный", 1),
-                        new PurchaseEntry(thirdProduct, "Мелкий", 3)));
+                .thenReturn(Map.of(
+                        firstProduct, 3,
+                        firstProductCoarse, 1,
+                        secondProduct, 4,
+                        thirdProductCoarse, 1,
+                        thirdProductFine, 3));
 
         assertDoesNotThrow(() -> textFileOrderCreator.createOrder(session));
 
@@ -92,10 +114,10 @@ class TextFileOrderCreatorServiceTest {
             String report = IOUtils.toString(reader);
             assertFalse(report.contains("Unavailable Product"));
             assertTrue(report.contains("Group Subgroup Product One - 3 шт."));
-            assertTrue(report.contains("Group Subgroup Product One, Крупный - 1 шт."));
+            assertTrue(report.contains("Group Subgroup Product One, Coarse - 1 шт."));
             assertTrue(report.contains("Group Subgroup Product Two - 4 шт."));
-            assertTrue(report.contains("Group Subgroup2 Product Three, Крупный - 1 шт."));
-            assertTrue(report.contains("Group Subgroup2 Product Three, Мелкий - 3 шт."));
+            assertTrue(report.contains("Group Subgroup2 Product Three, Coarse - 1 шт."));
+            assertTrue(report.contains("Group Subgroup2 Product Three, Fine - 3 шт."));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -104,7 +126,7 @@ class TextFileOrderCreatorServiceTest {
     @Test
     void shouldCreateBlankReport() {
         when(sessionPurchaseReportCreatorService.createPerProductReport(session))
-                .thenReturn(List.of());
+                .thenReturn(Map.of());
 
         assertDoesNotThrow(() -> {
             textFileOrderCreator.createOrder(session);

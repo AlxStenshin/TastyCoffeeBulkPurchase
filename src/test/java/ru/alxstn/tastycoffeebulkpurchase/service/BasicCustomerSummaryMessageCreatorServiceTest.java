@@ -39,6 +39,7 @@ class BasicCustomerSummaryMessageCreatorServiceTest {
             new ProductPackage(" "),
             "Кофе",
             "Кофе для фильтра",
+            "",
             false);
 
     @Test
@@ -51,7 +52,7 @@ class BasicCustomerSummaryMessageCreatorServiceTest {
         Customer customer = new Customer();
         Session session = new Session();
 
-        Purchase purchase = new Purchase(customer, discountableProduct, session , "", 1);
+        Purchase purchase = new Purchase(customer, discountableProduct, session, 1);
         when(purchaseManagerService.findAllPurchasesInSessionByCustomer(session, customer)).
                 thenReturn(List.of(purchase));
 
@@ -72,7 +73,7 @@ class BasicCustomerSummaryMessageCreatorServiceTest {
         Session session = new Session();
         session.setDiscountPercentage(20);
 
-        Purchase purchase = new Purchase(customer, discountableProduct, session , "", 1);
+        Purchase purchase = new Purchase(customer, discountableProduct, session, 1);
         when(purchaseManagerService.findAllPurchasesInSessionByCustomer(session, customer)).
                 thenReturn(List.of(purchase));
 

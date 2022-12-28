@@ -46,18 +46,18 @@ public class BasicProductManagerService implements ProductManagerService {
     }
 
     @Override
-    public Optional<Product> productExists(String name, String cat, String subCat, ProductPackage pack, String mark, BigDecimal price) {
-        return productRepository.productExists(name, cat, subCat, pack, mark, price);
+    public Optional<Product> productExists(String name, String cat, String subCat, ProductPackage pack, String mark, String form, BigDecimal price) {
+        return productRepository.productExists(name, cat, subCat, pack, mark, form, price);
     }
 
     @Override
-    public List<Product> getProductsByNameCategorySubcategoryAndPackage(String name, String cat, String subCat, ProductPackage pack) {
-        return productRepository.getProductsByNameCategorySubcategoryAndPackage(name, cat, subCat, pack);
+    public List<Product> getSimilarProducts(String name, String cat, String subCat, String form, ProductPackage pack) {
+        return productRepository.getSimilarProducts(name, cat, subCat, form, pack);
     }
 
     @Override
-    public void updateProduct(String name, String cat, String subCat, ProductPackage pack, String mark, BigDecimal price, LocalDateTime updateDateTime) {
-        productRepository.update(name, cat, subCat, pack, mark, price, updateDateTime);
+    public void updateProduct(String name, String cat, String subCat, ProductPackage pack, String mark, String form, BigDecimal price, LocalDateTime updateDateTime) {
+        productRepository.update(name, cat, subCat, pack, mark, form, price, updateDateTime);
     }
 
     @Override

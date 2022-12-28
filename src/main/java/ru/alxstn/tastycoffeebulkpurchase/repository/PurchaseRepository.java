@@ -43,13 +43,11 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     @Query("SELECT p FROM Purchase p WHERE " +
             "p.customer = :customer AND " +
             "p.product = :product AND " +
-            "p.session = :session AND " +
-            "p.productForm = :productForm")
+            "p.session = :session")
     Optional<Purchase> getPurchaseIgnoringProductQuantity(
             @Param(value = "customer") Customer customer,
             @Param(value = "product") Product product,
-            @Param(value = "session") Session session,
-            @Param(value = "productForm") String productForm);
+            @Param(value = "session") Session session);
 
     @Transactional
     @Modifying

@@ -50,12 +50,10 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
         Purchase purchase = purchaseManagerService.getPurchaseIgnoringProductQuantity(
                         newPurchase.getCustomer(),
                         newPurchase.getProduct(),
-                        newPurchase.getSession(),
-                        newPurchase.getProductForm())
+                        newPurchase.getSession())
                 .orElse(new Purchase(newPurchase.getCustomer(),
                         newPurchase.getProduct(),
                         newPurchase.getSession(),
-                        newPurchase.getProductForm(),
                         0));
 
         int previousCount = purchase.getCount();

@@ -38,7 +38,7 @@ class RedisDtoSerializerTest {
 
     private final Product testProduct = new Product(
             "TestProduct", new BigDecimal("1.0"), "",
-            productPackage, "Group", "Subgroup", true);
+            productPackage, "Group", "Subgroup", "", true);
 
     private final Purchase purchase = new Purchase(customer, testProduct, new Session(), 1);
 

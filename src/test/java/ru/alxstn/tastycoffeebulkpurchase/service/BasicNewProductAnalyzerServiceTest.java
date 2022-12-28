@@ -47,6 +47,7 @@ class BasicNewProductAnalyzerServiceTest {
                 productPackage,
                 "Group",
                 "Subgroup",
+                "",
                 true);
         firstSimilarProduct.setActual(false);
         firstSimilarProduct.setDateUpdated(LocalDateTime.MIN);
@@ -57,11 +58,13 @@ class BasicNewProductAnalyzerServiceTest {
                 productPackage,
                 "Group",
                 "Subgroup",
+                "",
                 true);
         secondSimilarProduct.setActual(false);
         secondSimilarProduct.setDateUpdated(LocalDateTime.MAX);
 
-        when(productManagerService.getProductsByNameCategorySubcategoryAndPackage(
+        when(productManagerService.getSimilarProducts(
+                any(String.class),
                 any(String.class),
                 any(String.class),
                 any(String.class),
@@ -77,6 +80,7 @@ class BasicNewProductAnalyzerServiceTest {
                 productPackage,
                 "Group",
                 "Subgroup",
+                "",
                 true)));
         verify(publisher, times(0)).publishEvent(isA(ApplicationEvent.class));
     }
@@ -90,6 +94,7 @@ class BasicNewProductAnalyzerServiceTest {
                         productPackage,
                         "Group",
                         "Subgroup",
+                        "",
                         true)));
 
         ArgumentCaptor<ApplicationEvent> argumentCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
@@ -111,6 +116,7 @@ class BasicNewProductAnalyzerServiceTest {
                         productPackage,
                         "Group",
                         "Subgroup",
+                        "",
                         true)));
 
         ArgumentCaptor<ApplicationEvent> argumentCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
@@ -126,7 +132,8 @@ class BasicNewProductAnalyzerServiceTest {
     @Test
     void shouldInvokeNewProductDiscoveredEvent() {
 
-        when(productManagerService.getProductsByNameCategorySubcategoryAndPackage(
+        when(productManagerService.getSimilarProducts(
+                any(String.class),
                 any(String.class),
                 any(String.class),
                 any(String.class),
@@ -140,6 +147,7 @@ class BasicNewProductAnalyzerServiceTest {
                         productPackage,
                         "Group",
                         "Subgroup",
+                        "",
                         true)));
 
         ArgumentCaptor<ApplicationEvent> argumentCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);

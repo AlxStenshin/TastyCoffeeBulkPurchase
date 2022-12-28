@@ -26,10 +26,6 @@ public class Purchase {
     @JoinColumn(name = "session_id", nullable = false)
     private Session session;
 
-    //ToDo: Product Form Should Be Product Property, Not Purchase
-    @Column(name = "product_form")
-    private String productForm;
-
     @Column(name = "count")
     private Integer count;
 
@@ -39,24 +35,15 @@ public class Purchase {
         this.customer = customer;
         this.product = product;
         this.session = session;
-        this.productForm = "";
         this.count = count;
     }
 
-    public Purchase(Customer customer, Product product, Session session, String productForm, Integer count) {
-        this.customer = customer;
-        this.product = product;
-        this.session = session;
-        this.productForm = productForm;
-        this.count = count;
-    }
 
     public Purchase(Purchase purchase, int newCount) {
         this.id = purchase.getId();
         this.customer = purchase.getCustomer();
         this.product = purchase.getProduct();
         this.session = purchase.getSession();
-        this.productForm = purchase.getProductForm();
         this.count = newCount;
     }
 
@@ -65,7 +52,7 @@ public class Purchase {
         this.customer = purchase.getCustomer();
         this.product = purchase.getProduct();
         this.session = purchase.getSession();
-        this.productForm = newForm;
+        purchase.getProduct().setProductForm(newForm);
         this.count = purchase.count;
     }
 
@@ -74,15 +61,13 @@ public class Purchase {
         return "Purchase{" +
                 "customer=" + customer +
                 ", product=" + product +
-                ", productForm='" + productForm + '\'' +
                 ", count=" + count +
                 '}';
     }
 
     public String getPurchaseSummary() {
-        String summary = product.getProductCategory() + " " + product.getName() + " " + product.getProductPackage();
-        summary += productForm.isEmpty() || productForm.isBlank() ? ", " : ", " + productForm + ", ";
-        summary += getProductCountAndTotalPrice();
+        String summary = product.getShortName();
+        summary += ", " + getProductCountAndTotalPrice();
         return summary;
     }
 
@@ -120,14 +105,6 @@ public class Purchase {
 
     public void setSession(Session session) {
         this.session = session;
-    }
-
-    public String getProductForm() {
-        return productForm;
-    }
-
-    public void setProductForm(String productForm) {
-        this.productForm = productForm;
     }
 
     public Integer getCount() {

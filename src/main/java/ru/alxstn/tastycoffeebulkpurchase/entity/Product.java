@@ -61,6 +61,9 @@ public class Product {
     @JsonExclude
     private boolean grindable;
 
+    @Column(name = "product_form")
+    private String productForm;
+
     public Product() { }
 
     public Product(String name,
@@ -69,6 +72,7 @@ public class Product {
                    ProductPackage productPackage,
                    String productGroup,
                    String productSubGroup,
+                   String productForm,
                    boolean grindable) {
         this.name = name;
         this.price = price;
@@ -76,8 +80,22 @@ public class Product {
         this.productPackage = productPackage;
         this.productCategory = productGroup;
         this.productSubCategory = productSubGroup;
+        this.productForm = productForm;
         this.grindable = grindable;
         this.actual = true;
+    }
+
+    public Product createFormedProduct(String form) {
+        return new Product(
+                this.getName(),
+                this.getPrice(),
+                this.getSpecialMark(),
+                this.getProductPackage(),
+                this.getProductCategory(),
+                this.getProductSubCategory(),
+                form,
+                this.grindable);
+
     }
 
     public long getId() {
@@ -132,6 +150,14 @@ public class Product {
         this.productSubCategory = productSubGroup;
     }
 
+    public String getProductForm() {
+        return productForm;
+    }
+
+    public void setProductForm(String productForm) {
+        this.productForm = productForm;
+    }
+
     public boolean isActual() {
         return actual;
     }
@@ -166,7 +192,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return name;
+        return getDisplayName();
     }
 
     public boolean isDiscountable() {
@@ -210,6 +236,7 @@ public class Product {
         displayName += productCategory.isEmpty() ? "" : productCategory + " ";
         displayName += productSubCategory.isEmpty() ? "" : productSubCategory + " ";
         displayName += name.isEmpty() ? "" : name;
+        displayName += productForm.isEmpty() ? "" : ", " + productForm;
         return displayName;
     }
 
@@ -220,6 +247,7 @@ public class Product {
         private String specialMark;
         private String name;
         private BigDecimal price;
+        private String productForm;
         private boolean grindable;
 
         public ProductBuilder() {}
@@ -254,13 +282,18 @@ public class Product {
             return this;
         }
 
+        public ProductBuilder setProductForm(String productForm) {
+            this.productForm = productForm;
+            return this;
+        }
+
         public ProductBuilder setGrindable(boolean grindable) {
             this.grindable = grindable;
             return this;
         }
 
         public Product build() {
-            return new Product(name, price, specialMark, pack, group, subgroup, grindable);
+            return new Product(name, price, specialMark, pack, group, subgroup, productForm, grindable);
         }
     }
 }

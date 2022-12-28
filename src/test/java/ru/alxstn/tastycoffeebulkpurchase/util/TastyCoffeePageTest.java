@@ -17,9 +17,9 @@ import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperti
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,17 +58,14 @@ class TastyCoffeePageTest {
                 new ProductPackage("Упаковка 250 г"),
                 "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
                 "Смеси для молочных напитков",
+                "",
                 true);
 
-        PurchaseEntry berryPurchase = new PurchaseEntry(berry, "", 10);
-        PurchaseEntry secondBerryPurchase = new PurchaseEntry(berry, "", 1);
-
-        List<PurchaseEntry> purchases = new ArrayList<>();
-        purchases.add(berryPurchase);
-        purchases.add(secondBerryPurchase);
+        Map<Product, Integer> purchases = new HashMap<>();
+        purchases.put(berry, 11);
 
         Assertions.assertDoesNotThrow(() -> {
-            List<PurchaseEntry> leftovers = webPage.placeOrder(purchases);
+            List<Product> leftovers = webPage.placeOrder(purchases);
             assertEquals(0, leftovers.size());
         });
     }
@@ -81,20 +78,12 @@ class TastyCoffeePageTest {
             logger.info("Now Obtaining PriceList");
             List<Product> obtainedPriceList = webPage.buildPriceList();
 
-            List<PurchaseEntry> purchases = obtainedPriceList.stream()
-                    .map(product -> new PurchaseEntry(
-                            product, product.isGrindable() ? "Мелкий" : "", 5))
-                    .collect(Collectors.toList());
 
-            List<PurchaseEntry> beansPurchases = obtainedPriceList.stream()
-                    .filter(Product::isGrindable)
-                    .map(product -> new PurchaseEntry(
-                            product, "", 5))
-                    .toList();
+            Map<Product, Integer> purchases = new HashMap<>();
+            obtainedPriceList.forEach(p -> purchases.put(p, 5));
 
-            purchases.addAll(beansPurchases);
             logger.info("Now Building Order");
-            List<PurchaseEntry> leftovers = webPage.placeOrder(purchases);
+            List<Product> leftovers = webPage.placeOrder(purchases);
             assertTrue(obtainedPriceList.size() > 0);
             assertEquals(0, leftovers.size());
         });

@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -45,6 +46,16 @@ class BasicSessionPurchaseReportCreatorServiceTest {
             firstPackage,
             "Group",
             "Subgroup",
+            "",
+            true);
+
+    private final Product firstProductCoarse = new Product("Product One",
+            new BigDecimal(1),
+            "",
+            firstPackage,
+            "Group",
+            "Subgroup",
+            "Coarse",
             true);
 
     private final Product secondProduct = new Product("Product Two",
@@ -53,14 +64,25 @@ class BasicSessionPurchaseReportCreatorServiceTest {
             secondPackage,
             "Group",
             "Subgroup",
+            "",
             true);
 
-    private final Product thirdProduct = new Product("Product Three",
+    private final Product thirdProductFine = new Product("Product Three",
             new BigDecimal(3),
             "",
             thirdPackage,
             "Group",
             "Subgroup2",
+            "Fine",
+            true);
+
+    private final Product thirdProductCoarse = new Product("Product Three",
+            new BigDecimal(3),
+            "",
+            thirdPackage,
+            "Group",
+            "Subgroup2",
+            "Coarse",
             true);
 
     private final Product unavailableProduct = new Product("Unavailable Product",
@@ -69,6 +91,7 @@ class BasicSessionPurchaseReportCreatorServiceTest {
             firstPackage,
             "Group3",
             "Subgroup3",
+            "",
             true);
 
     @AfterEach
@@ -86,41 +109,39 @@ class BasicSessionPurchaseReportCreatorServiceTest {
                 .thenReturn(List.of(
                         new Purchase(firstCustomer, unavailableProduct, session, 1),
 
-                        new Purchase(firstCustomer, firstProduct, session, "Крупный", 1),
+                        new Purchase(firstCustomer, firstProductCoarse, session, 1),
                         new Purchase(firstCustomer, secondProduct, session, 2),
-                        new Purchase(firstCustomer, thirdProduct, session, "Мелкий", 3),
+                        new Purchase(firstCustomer, thirdProductFine, session, 3),
 
                         new Purchase(secondCustomer, firstProduct, session, 3),
                         new Purchase(secondCustomer, secondProduct, session, 2),
-                        new Purchase(secondCustomer, thirdProduct, session, "Крупный", 1)));
+                        new Purchase(secondCustomer, thirdProductCoarse, session, 1)));
 
         assertDoesNotThrow(() -> {
-            List<PurchaseEntry> results = sessionPurchaseReportCreator.createPerProductReport(session);
+            Map<Product, Integer> results = sessionPurchaseReportCreator.createPerProductReport(session);
 
-            assertTrue(results.stream().noneMatch(pe -> pe.getProduct().getName().equals("Unavailable Product")));
+            assertTrue(results.entrySet().stream().noneMatch(pe -> pe.getKey().getName().equals("Unavailable Product")));
 
-            assertTrue(results.stream().anyMatch(pe ->
-                    pe.getProduct().getName().equals("Product Two")
-                            && pe.getCount() == 4));
+            assertTrue(results.entrySet().stream().anyMatch(pe ->
+                    pe.getKey().getName().equals("Product Two")
+                            && pe.getValue() == 4));
 
-            assertTrue(results.stream().anyMatch(pe ->
-                    pe.getProduct().getName().equals("Product One")
-                            && pe.getCount() == 3));
+            assertTrue(results.entrySet().stream().anyMatch(pe ->
+                    pe.getKey().getName().equals("Product One") &&
+                            pe.getKey().getProductForm().equals("Coarse") &&
+                            pe.getValue() == 1));
 
-            assertTrue(results.stream().anyMatch(pe ->
-                    pe.getProduct().getName().equals("Product One")
-                            && pe.getProductForm().equals("Крупный")
-                            && pe.getCount() == 1));
+            assertTrue(results.entrySet().stream().anyMatch(pe ->
+                    pe.getKey().getName().equals("Product One")
+                            && pe.getValue() == 3));
 
-            assertTrue(results.stream().anyMatch(pe ->
-                    pe.getProduct().getName().equals("Product Three")
-                            && pe.getProductForm().equals("Крупный")
-                            && pe.getCount() == 1));
+            assertTrue(results.entrySet().stream().anyMatch(pe ->
+                    pe.getKey().getName().equals("Product Three")
+                            && pe.getValue() == 1));
 
-            assertTrue(results.stream().anyMatch(pe ->
-                    pe.getProduct().getName().equals("Product Three")
-                            && pe.getProductForm().equals("Мелкий")
-                            && pe.getCount() == 3));
+            assertTrue(results.entrySet().stream().anyMatch(pe ->
+                    pe.getKey().getName().equals("Product Three")
+                            && pe.getValue() == 3));
         });
     }
 
@@ -130,7 +151,7 @@ class BasicSessionPurchaseReportCreatorServiceTest {
                 .thenReturn(List.of());
 
         assertDoesNotThrow(() -> {
-            List<PurchaseEntry> results = sessionPurchaseReportCreator.createPerProductReport(session);
+            Map<Product, Integer> results = sessionPurchaseReportCreator.createPerProductReport(session);
             assertTrue(results.isEmpty());
         });
     }

@@ -86,7 +86,7 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
         keyboardRows.add(countButtonsRow);
 
         if (targetProduct.isGrindable()) {
-            String currentForm = purchase.getProductForm();
+            String currentForm = purchase.getProduct().getProductForm();
 
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
             productFormButtons.add(InlineKeyboardButton.builder()

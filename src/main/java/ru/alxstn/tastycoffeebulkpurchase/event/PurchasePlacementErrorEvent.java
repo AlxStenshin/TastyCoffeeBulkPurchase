@@ -1,19 +1,19 @@
 package ru.alxstn.tastycoffeebulkpurchase.event;
 
 import org.springframework.context.ApplicationEvent;
-import ru.alxstn.tastycoffeebulkpurchase.entity.PurchaseEntry;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 
 import java.util.List;
 
 public class PurchasePlacementErrorEvent extends ApplicationEvent {
-    private final List<PurchaseEntry> unsuccessfulPurchases;
+    private final List<Product> unsuccessfulPurchases;
 
-    public PurchasePlacementErrorEvent(Object source, List<PurchaseEntry> unsuccessfulPurchases) {
+    public PurchasePlacementErrorEvent(Object source, List<Product> unsuccessfulPurchases) {
         super(source);
         this.unsuccessfulPurchases = unsuccessfulPurchases;
     }
 
-    public List<PurchaseEntry> getUnsuccessfulPurchases() {
+    public List<Product> getUnsuccessfulPurchases() {
         return unsuccessfulPurchases;
     }
 }

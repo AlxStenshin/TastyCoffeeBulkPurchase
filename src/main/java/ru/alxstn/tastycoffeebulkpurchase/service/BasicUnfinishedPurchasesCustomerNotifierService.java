@@ -7,7 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.PurchaseEntry;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
@@ -35,30 +35,29 @@ public class BasicUnfinishedPurchasesCustomerNotifierService implements Unfinish
     @EventListener
     @Override
     public void handleUnfinishedPurchases(final PurchasePlacementErrorEvent event) {
-        List<PurchaseEntry> unfinishedPurchases = event.getUnsuccessfulPurchases();
+        List<Product> skippedProducts = event.getUnsuccessfulPurchases();
 
-        if (unfinishedPurchases.size() > 0) {
-            logger.warn("Failed to Complete Some Purchases: " + unfinishedPurchases);
+        if (skippedProducts.size() > 0) {
+            logger.warn("Failed to Complete Some Purchases: " + skippedProducts);
             Session unfinishedSession = sessionManagerService.getUnfinishedSession();
 
-            for (var unfinishedPurchase : unfinishedPurchases) {
+            for (var product : skippedProducts) {
 
                 List<Customer> notificationReceivers = purchaseManagerService.getSessionCustomersWithProduct(
-                        unfinishedSession,
-                        unfinishedPurchase.getProduct());
+                        unfinishedSession, product);
 
                 StringBuilder notificationMessage = new StringBuilder("Не удалось обработать позицию из вашего заказа:\n\n");
-                notificationMessage.append(unfinishedPurchase.getProduct().getFullDisplayName());
+                notificationMessage.append(product.getFullDisplayName());
                 notificationMessage.append("\n");
                 notificationMessage.append("\nПожалуйста обратитесь к администратору сессии.");
 
                 for (var notificationReceiver : notificationReceivers) {
 
-                publisher.publishEvent(new SendMessageEvent(this,
-                        SendMessage.builder()
-                                .chatId(notificationReceiver.getChatId())
-                        .text(notificationMessage.toString()).build()));
-            }
+                    publisher.publishEvent(new SendMessageEvent(this,
+                            SendMessage.builder()
+                                    .chatId(notificationReceiver.getChatId())
+                                    .text(notificationMessage.toString()).build()));
+                }
             }
         }
     }

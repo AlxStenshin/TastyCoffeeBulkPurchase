@@ -2,10 +2,11 @@ package ru.alxstn.tastycoffeebulkpurchase.service;
 
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 
-import java.util.List;
+import java.util.Map;
 
 public interface SessionPurchaseReportCreatorService {
-    List<PurchaseEntry> createPerProductReport(Session session);
-    List<CustomerPurchaseEntry> createPerCustomerReport(Session session);
+    Map<Product, Integer> createPerProductReport(Session session);
+    // ToDo:
+    // List<CustomerPurchaseEntry> createPerCustomerReport(Session session);
 
 }

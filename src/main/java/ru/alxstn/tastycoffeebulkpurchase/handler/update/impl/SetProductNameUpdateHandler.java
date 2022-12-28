@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static ru.alxstn.tastycoffeebulkpurchase.util.Predicates.distinctByKey;
+
 @Component
 public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProductNameCommandDto> {
 
@@ -70,7 +72,10 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         logger.info("Set Product Name Command Received: " + productName);
 
         List<Product> availablePackages = productManagerService.findAllActiveProductsByProductNameAndSubcategory(
-                dto.getName(), dto.getSubCategory());
+                dto.getName(), dto.getSubCategory())
+                .stream()
+                .filter(distinctByKey(Product::getProductPackage))
+                .toList();
 
         Product targetProduct = availablePackages.get(0);
         String title = "Выберите параметры для \n" + targetProduct.getFullDisplayName();
