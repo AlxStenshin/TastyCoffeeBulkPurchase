@@ -13,8 +13,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
  */
 
 @Configuration
-public class SchedulerConfig implements SchedulingConfigurer
-{
+public class SchedulerConfig implements SchedulingConfigurer {
+
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar)
     {

@@ -33,6 +33,13 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     @Query("SELECT DISTINCT p.customer FROM Purchase p WHERE p.session = :session")
     List<Customer> getSessionCustomers(@Param(value = "session") Session session);
 
+    @Query("SELECT DISTINCT p.customer FROM Purchase p WHERE " +
+            "p.session = :session AND " +
+            "p.product = :product")
+    List<Customer> getSessionCustomersWithProduct(
+            @Param(value = "session") Session session,
+            @Param(value = "product") Product product);
+
     @Query("SELECT p FROM Purchase p WHERE " +
             "p.customer = :customer AND " +
             "p.product = :product AND " +
@@ -67,4 +74,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
             @Param(value = "session") Session session,
             @Param(value = "oldProduct") Product oldProduct,
             @Param(value = "newProduct") Product newProduct);
+
+
 }

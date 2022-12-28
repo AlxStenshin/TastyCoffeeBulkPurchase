@@ -40,6 +40,11 @@ public class BasicPurchaseManagerService implements PurchaseManagerService {
     }
 
     @Override
+    public List<Customer> getSessionCustomersWithProduct(Session session, Product product) {
+        return purchaseRepository.getSessionCustomersWithProduct(session, product);
+    }
+
+    @Override
     public Optional<Purchase> getPurchaseIgnoringProductQuantity(Customer customer, Product product, Session session, String productForm) {
         return purchaseRepository.getPurchaseIgnoringProductQuantity(customer, product, session, productForm);
     }
@@ -57,11 +62,6 @@ public class BasicPurchaseManagerService implements PurchaseManagerService {
     @Override
     public void deleteAll(List<Purchase> purchases) {
         purchaseRepository.deleteAll(purchases);
-    }
-
-    @Override
-    public void deleteAll() {
-        purchaseRepository.deleteAll();
     }
 
     @Override

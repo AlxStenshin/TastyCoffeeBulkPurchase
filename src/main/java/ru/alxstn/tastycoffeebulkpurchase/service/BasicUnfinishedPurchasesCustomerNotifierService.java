@@ -7,54 +7,60 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
+import ru.alxstn.tastycoffeebulkpurchase.entity.PurchaseEntry;
+import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class BasicUnfinishedPurchasesCustomerNotifierService implements UnfinishedPurchasesCustomerNotifierService {
     Logger logger = LogManager.getLogger(BasicUnfinishedPurchasesCustomerNotifierService.class);
 
     private final ApplicationEventPublisher publisher;
+    private final PurchaseManagerService purchaseManagerService;
+    private final SessionManagerService sessionManagerService;
 
-    public BasicUnfinishedPurchasesCustomerNotifierService(ApplicationEventPublisher publisher) {
+    public BasicUnfinishedPurchasesCustomerNotifierService(ApplicationEventPublisher publisher,
+                                                           PurchaseManagerService purchaseManagerService,
+                                                           SessionManagerService sessionManagerService) {
         this.publisher = publisher;
+        this.purchaseManagerService = purchaseManagerService;
+        this.sessionManagerService = sessionManagerService;
     }
 
     @EventListener
     @Override
     public void handleUnfinishedPurchases(final PurchasePlacementErrorEvent event) {
-        List<Purchase> unfinishedPurchases = event.getUnsuccessfulPurchases();
+        List<PurchaseEntry> unfinishedPurchases = event.getUnsuccessfulPurchases();
+
         if (unfinishedPurchases.size() > 0) {
             logger.warn("Failed to Complete Some Purchases: " + unfinishedPurchases);
+            Session unfinishedSession = sessionManagerService.getUnfinishedSession();
 
-            Set<Customer> notificationReceivers = unfinishedPurchases.stream()
-                    .map(Purchase::getCustomer)
-                    .collect(Collectors.toSet());
+            for (var unfinishedPurchase : unfinishedPurchases) {
 
-            for (Customer customer : notificationReceivers) {
-                List<Purchase> customerPurchases = unfinishedPurchases.stream()
-                        .filter(p -> p.getCustomer() == customer)
-                        .collect(Collectors.toList());
+                List<Customer> notificationReceivers = purchaseManagerService.getSessionCustomersWithProduct(
+                        unfinishedSession,
+                        unfinishedPurchase.getProduct());
 
-                StringBuilder notificationMessage = new StringBuilder("Не удалось обработать позиции из вашего заказа:\n\n");
-                for (Purchase p : customerPurchases) {
-                    notificationMessage.append(p.getProduct().getFullDisplayName());
-                    notificationMessage.append("\n");
-                    notificationMessage.append(p.getProductCountAndTotalPrice());
-                    notificationMessage.append("\n");
-                }
+                StringBuilder notificationMessage = new StringBuilder("Не удалось обработать позицию из вашего заказа:\n\n");
+                notificationMessage.append(unfinishedPurchase.getProduct().getFullDisplayName());
+                notificationMessage.append("\n");
                 notificationMessage.append("\nПожалуйста обратитесь к администратору сессии.");
+
+                for (var notificationReceiver : notificationReceivers) {
 
                 publisher.publishEvent(new SendMessageEvent(this,
                         SendMessage.builder()
-                                .chatId(customer.getChatId())
-                                .text(notificationMessage.toString()).build()));
+                                .chatId(notificationReceiver.getChatId())
+                        .text(notificationMessage.toString()).build()));
+            }
             }
         }
     }
 }
+

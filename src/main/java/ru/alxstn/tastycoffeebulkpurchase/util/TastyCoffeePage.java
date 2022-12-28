@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
+import ru.alxstn.tastycoffeebulkpurchase.entity.PurchaseEntry;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.webPage.WebPageElementException;
 
@@ -77,7 +77,7 @@ public class TastyCoffeePage {
         return allProducts;
     }
 
-    public List<Purchase> placeOrder(List<Purchase> currentSessionPurchases) {
+    public List<PurchaseEntry> placeOrder(List<PurchaseEntry> currentSessionPurchases) {
         try {
             login();
             resetOrder();
@@ -196,11 +196,11 @@ public class TastyCoffeePage {
             for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
                 String subgroupTitle = getSubGroupTitle(productSubgroup);
 
-                List<Purchase> currentSubcategoryPurchases = currentSessionPurchases.stream()
+                List<PurchaseEntry> currentSubcategoryPurchases = currentSessionPurchases.stream()
                         .filter(p -> p.getProduct().getProductSubCategory().equals(subgroupTitle))
-                        .collect(Collectors.toList());
+                        .toList();
 
-                for (Purchase purchase : currentSubcategoryPurchases) {
+                for (PurchaseEntry purchase : currentSubcategoryPurchases) {
                     try {
                         String productName = purchase.getProduct().getName();
                         String productPackage = purchase.getProduct().getProductPackage().getDescription();

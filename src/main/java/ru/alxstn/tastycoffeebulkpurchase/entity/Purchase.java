@@ -26,6 +26,7 @@ public class Purchase {
     @JoinColumn(name = "session_id", nullable = false)
     private Session session;
 
+    //ToDo: Product Form Should Be Product Property, Not Purchase
     @Column(name = "product_form")
     private String productForm;
 

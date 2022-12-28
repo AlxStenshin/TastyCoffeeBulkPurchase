@@ -18,6 +18,8 @@ public interface PurchaseManagerService {
 
     List<Customer> getSessionCustomers(Session session);
 
+    List<Customer> getSessionCustomersWithProduct(Session session, Product product);
+
     Optional<Purchase> getPurchaseIgnoringProductQuantity(Customer customer, Product product, Session session, String productForm);
 
     void removePurchaseForCustomerWithProductInSession(Customer customer, Session session, Product product);
@@ -25,8 +27,6 @@ public interface PurchaseManagerService {
     void replacePurchaseProductForCustomerInSession(Customer customer, Session session, Product oldProduct, Product newProduct);
 
     void deleteAll(List<Purchase> purchases);
-
-    void deleteAll();
 
     void delete(Purchase purchase);
 

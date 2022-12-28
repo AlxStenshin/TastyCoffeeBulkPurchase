@@ -39,7 +39,7 @@ public class CommandUpdateHandler implements UpdateHandler {
         if (command.isEmpty()) {
             return false;
         }
-        handleCommand(update, command.get().getCommand(), command.get().getText());
+        handleCommand(update, command.get().command(), command.get().text());
         return true;
     }
 
