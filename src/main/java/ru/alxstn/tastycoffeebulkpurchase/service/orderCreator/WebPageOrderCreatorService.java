@@ -8,7 +8,6 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchaseSummaryNotificationEvent;
-import ru.alxstn.tastycoffeebulkpurchase.service.OrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
 
@@ -36,6 +35,7 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
 
     public void createOrder(Session session) {
         logger.info("Now placing order from current session " + session.getId() + ":" + session.getTitle());
+        // ToDo: add not actual and not available products to unfinished purchases
         List<Purchase> currentSessionPurchases = purchaseManagerService.findAllPurchasesInSession(session)
                 .stream()
                 .filter(purchase -> purchase.getProduct().isActual() && purchase.getProduct().isAvailable())

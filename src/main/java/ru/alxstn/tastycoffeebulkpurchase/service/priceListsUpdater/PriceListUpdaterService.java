@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service;
+package ru.alxstn.tastycoffeebulkpurchase.service.priceListsUpdater;
 
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 

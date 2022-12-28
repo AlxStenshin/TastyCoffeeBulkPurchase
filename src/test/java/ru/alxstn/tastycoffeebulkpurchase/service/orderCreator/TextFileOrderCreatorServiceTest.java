@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
-import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.BasicSessionPurchaseReportCreatorService;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -29,19 +29,13 @@ import static org.mockito.Mockito.when;
 class TextFileOrderCreatorServiceTest {
 
     @Mock
-    PurchaseManagerService purchaseManager;
+    BasicSessionPurchaseReportCreatorService sessionPurchaseReportCreatorService;
 
     @InjectMocks
     TextFileOrderCreatorService textFileOrderCreator;
 
     private final Session session = new Session();
-    {
-        session.setId(1L);
-    }
-
-
-    private final Customer firstCustomer = new Customer(1L, "First", "Customer", null);
-    private final Customer secondCustomer = new Customer(2L, "Second", "Customer", null);
+    { session.setId(1L); }
 
     private final ProductPackage firstPackage = new ProductPackage("Упаковка 250 г");
     private final ProductPackage secondPackage = new ProductPackage("Упаковка 100 г");
@@ -71,14 +65,6 @@ class TextFileOrderCreatorServiceTest {
             "Subgroup2",
             true);
 
-    private final Product unavailableProduct = new Product("Unavailable Product",
-            new BigDecimal(0),
-            "нет",
-            firstPackage,
-            "Group3",
-            "Subgroup3",
-            true);
-
     @AfterEach
     void cleanup() {
         try {
@@ -89,18 +75,14 @@ class TextFileOrderCreatorServiceTest {
     }
 
     @Test
-    void shouldCreateCorrectReport() {
-        when(purchaseManager.findAllPurchasesInSession(session))
+    void shouldCreateAndSavCorrectReport() {
+        when(sessionPurchaseReportCreatorService.createPerProductReport(session))
                 .thenReturn(List.of(
-                        new Purchase(firstCustomer, unavailableProduct, session, 1),
-
-                        new Purchase(firstCustomer, firstProduct, session,  "Крупный", 1),
-                        new Purchase(firstCustomer, secondProduct, session, 2),
-                        new Purchase(firstCustomer, thirdProduct, session, "Мелкий", 3),
-
-                        new Purchase(secondCustomer, firstProduct, session, 3),
-                        new Purchase(secondCustomer, secondProduct, session, 2),
-                        new Purchase(secondCustomer, thirdProduct, session, "Крупный", 1)));
+                        new PurchaseEntry(firstProduct, "", 3),
+                        new PurchaseEntry(firstProduct, "Крупный", 1),
+                        new PurchaseEntry(secondProduct, "", 4),
+                        new PurchaseEntry(thirdProduct, "Крупный", 1),
+                        new PurchaseEntry(thirdProduct, "Мелкий", 3)));
 
         assertDoesNotThrow(() -> textFileOrderCreator.createOrder(session));
 
@@ -109,10 +91,10 @@ class TextFileOrderCreatorServiceTest {
         try (Reader reader = Files.newBufferedReader(filePath, Charset.forName("windows-1251"))) {
             String report = IOUtils.toString(reader);
             assertFalse(report.contains("Unavailable Product"));
-            assertTrue(report.contains("Group Subgroup Product Two - 4 шт."));
-            assertTrue(report.contains("Group Subgroup Product One, Крупный - 1 шт."));
-            assertTrue(report.contains("Group Subgroup2 Product Three, Крупный - 1 шт."));
             assertTrue(report.contains("Group Subgroup Product One - 3 шт."));
+            assertTrue(report.contains("Group Subgroup Product One, Крупный - 1 шт."));
+            assertTrue(report.contains("Group Subgroup Product Two - 4 шт."));
+            assertTrue(report.contains("Group Subgroup2 Product Three, Крупный - 1 шт."));
             assertTrue(report.contains("Group Subgroup2 Product Three, Мелкий - 3 шт."));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -121,7 +103,7 @@ class TextFileOrderCreatorServiceTest {
 
     @Test
     void shouldCreateBlankReport() {
-        when(purchaseManager.findAllPurchasesInSession(session))
+        when(sessionPurchaseReportCreatorService.createPerProductReport(session))
                 .thenReturn(List.of());
 
         assertDoesNotThrow(() -> {

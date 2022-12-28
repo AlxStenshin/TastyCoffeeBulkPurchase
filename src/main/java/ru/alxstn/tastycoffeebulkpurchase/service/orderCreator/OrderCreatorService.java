@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service;
+package ru.alxstn.tastycoffeebulkpurchase.service.orderCreator;
 
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 

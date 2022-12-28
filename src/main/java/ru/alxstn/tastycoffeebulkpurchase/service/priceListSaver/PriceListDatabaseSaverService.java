@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
-import ru.alxstn.tastycoffeebulkpurchase.service.PriceListSaverService;
 import ru.alxstn.tastycoffeebulkpurchase.service.NewProductAnalyzerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
