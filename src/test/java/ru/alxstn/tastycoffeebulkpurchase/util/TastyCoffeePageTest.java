@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -51,18 +50,91 @@ class TastyCoffeePageTest {
         assertNotNull(tastyCoffeeTestConfig.getPassword());
     }
 
+
     @Test
-    void shouldCorrectlyAddBerryToPurchaseList() {
-        Product berry = new Product("Бэрри", new BigDecimal(1),
+    void shouldCorrectlyLogin() {
+        Assertions.assertDoesNotThrow(() -> webPage.login());
+    }
+
+    @Test
+    void shouldCorrectlyAddDecaffToPurchaseList() {
+        Product decaf250Beans = new Product("Колумбия Декаф",
+                new BigDecimal(1),
                 "",
                 new ProductPackage("Упаковка 250 г"),
+                "КОФЕ ДЛЯ ЭСПРЕССО",
+                "Кофе без кофеина",
+                "Зерно",
+                true);
+
+        Map<Product, Integer> purchases = new HashMap<>();
+
+        purchases.put(decaf250Beans, 5);
+        Assertions.assertDoesNotThrow(() -> {
+            List<Product> leftovers = webPage.placeOrder(purchases);
+            assertEquals(0, leftovers.size());
+        });
+    }
+
+    @Test
+    void shouldCorrectlyAddBerryToPurchaseList() {
+        Product berry250Beans = new Product("Бэрри", new BigDecimal(1),
+                "",
+                new ProductPackage("Упаковка 250 г"),
+                "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
+                "Смеси для молочных напитков",
+                "Зерно",
+                true);
+
+        Product berry250Coarse = new Product("Бэрри", new BigDecimal(1),
+                "",
+                new ProductPackage("Упаковка 250 г"),
+                "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
+                "Смеси для молочных напитков",
+                "Крупный",
+                true);
+
+        Product berry250Fine = new Product("Бэрри", new BigDecimal(1),
+                "",
+                new ProductPackage("Упаковка 250 г"),
+                "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
+                "Смеси для молочных напитков",
+                "Мелкий",
+                true);
+
+        Product berry250Medium = new Product("Бэрри", new BigDecimal(1),
+                "",
+                new ProductPackage("Упаковка 250 г"),
+                "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
+                "Смеси для молочных напитков",
+                "Средний",
+                true);
+
+        Product berry2000 = new Product("Бэрри", new BigDecimal(1),
+                "",
+                new ProductPackage("Упаковка 2 кг"),
+                "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
+                "Смеси для молочных напитков",
+                "",
+                true);
+
+        Product berry1000 = new Product("Бэрри", new BigDecimal(1),
+                "",
+                new ProductPackage("Упаковка 1 кг"),
                 "КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ",
                 "Смеси для молочных напитков",
                 "",
                 true);
 
         Map<Product, Integer> purchases = new HashMap<>();
-        purchases.put(berry, 11);
+
+        purchases.put(berry2000, 1);
+        purchases.put(berry1000, 2);
+        purchases.put(berry250Beans, 3);
+
+        purchases.put(berry250Fine, 2);
+        purchases.put(berry250Medium, 1);
+        purchases.put(berry250Coarse, 1);
 
         Assertions.assertDoesNotThrow(() -> {
             List<Product> leftovers = webPage.placeOrder(purchases);
@@ -70,14 +142,12 @@ class TastyCoffeePageTest {
         });
     }
 
-    @Disabled
     @Test
     void shouldCorrectlyObtainPriceListAndPlaceOrder() {
         // All functionality combined in one test because of parser high time-consuming behavior
         Assertions.assertDoesNotThrow(() -> {
             logger.info("Now Obtaining PriceList");
             List<Product> obtainedPriceList = webPage.buildPriceList();
-
 
             Map<Product, Integer> purchases = new HashMap<>();
             obtainedPriceList.forEach(p -> purchases.put(p, 5));

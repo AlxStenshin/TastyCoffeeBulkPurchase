@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
+import static ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePageElementSelector.*;
 
 @Component
 public class TastyCoffeePage {
@@ -49,19 +50,20 @@ public class TastyCoffeePage {
 
         List<Product> allProducts = new ArrayList<>();
         try {
-            SelenideElement tabsBar = $("ul.nav.tab-lk");
-            ElementsCollection tabs = tabsBar.$$("li.nav-item");
             List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+            ElementsCollection tabs = new TastyCoffeeWebPageElement()
+                    .applySelector(PRODUCT_TYPE_BAR)
+                    .applySelector(PRODUCT_TYPES)
+                    .getElements();
 
             for (var tab : tabs) {
-
-                SelenideElement link = tab.$("a");
+                SelenideElement link = new TastyCoffeeWebPageElement(tab).applySelector(LINK).getElement();
                 String text = link.innerHtml();
                 if (acceptedProductTypes.stream().anyMatch(text::contains)) {
-                    logger.info("Now Parsing Tab " + text);
+                    logger.info("Now Parsing Tab: " + StringUtil.removeNonAlphanumeric(text));
                     clickWebElement(link.getWrappedElement());
-                    expandAllProductGroups();
-                    allProducts.addAll(parseProductType());
+                    expandAllProductSubCategories();
+                    allProducts.addAll(parseAllProductsOfType());
                 } else {
                     logger.info("Ignoring Price List Tab " + text.replace("\n", ""));
                 }
@@ -96,46 +98,56 @@ public class TastyCoffeePage {
 
             for (var tab : tabs) {
                 SelenideElement link = tab.$("a");
-                String text = link.innerHtml();
-                if (acceptedCategories.stream().anyMatch(text::contains)) {
-                    logger.info("Now Filling Group " + text.replace("\n", ""));
+                String productType = link.innerHtml();
+                if (acceptedCategories.stream().anyMatch(productType::contains)) {
+                    logger.info("Now Filling " + StringUtil.removeNonAlphanumeric(productType) + "-Type Purchases");
                     clickWebElement(link.getWrappedElement());
-                    expandAllProductGroups();
+                    Selenide.sleep(500);
+                    expandAllProductSubCategories();
                     fillPurchasesAvailableOnPage(currentSessionPurchases);
                 } else {
-                    logger.info("Ignoring Price List Tab " + text.replace("\n", ""));
+                    logger.info("Ignoring Price List Tab " + StringUtil.removeNonAlphanumeric(productType));
                 }
             }
+
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
             throw new WebPageElementException(e);
         }
-
-        // ToDo: Check total sum and product count by groups (counters in "nav-link active")
         return new ArrayList<>(currentSessionPurchases.keySet());
     }
 
-    private void login() {
+    public void login() {
         try {
             open(tastyCoffeeConfig.getUrl());
 
-            SelenideElement bulkPurchaseClientLoginButton = $(byText("Вход для оптовых клиентов"));
+            SelenideElement bulkPurchaseClientLoginButton = new TastyCoffeeWebPageElement()
+                    .applySelector(BULK_PURCHASE_SECTION)
+                    .getElement();
+
             bulkPurchaseClientLoginButton.click();
             Selenide.sleep(1_000);
 
             try {
-                SelenideElement goToAccountButton = $(byText("Личный кабинет"));
+                SelenideElement goToAccountButton = new TastyCoffeeWebPageElement()
+                        .applySelector(PERSONAL_ACCOUNT_SECTION)
+                        .getElement();
                 goToAccountButton.click();
                 logger.info("User already logged in, login routine skipped");
             } catch (ElementNotFound ignored) {
-                SelenideElement loginButton = $(byText("Войти"));
-
-                SelenideElement usernameInput = $(byName("login"));
+                SelenideElement usernameInput = new TastyCoffeeWebPageElement()
+                        .applySelector(USERNAME_INPUT)
+                        .getElement();
                 usernameInput.setValue(tastyCoffeeConfig.getUserName());
 
-                SelenideElement passwordInput = $(byName("password"));
+                SelenideElement passwordInput = new TastyCoffeeWebPageElement()
+                        .applySelector(PASSWORD_INPUT)
+                        .getElement();
                 passwordInput.setValue(tastyCoffeeConfig.getPassword());
 
+                SelenideElement loginButton = new TastyCoffeeWebPageElement()
+                        .applySelector(ACCOUNT_LOGIN_BUTTON)
+                        .getElement();
                 loginButton.click();
             }
             Selenide.sleep(10_000);
@@ -147,12 +159,16 @@ public class TastyCoffeePage {
 
     private void resetOrder() {
         try {
-            SelenideElement resetButtonTextElement = $(byText("Сбросить заказ"));
-            SelenideElement resetOrderButton = resetButtonTextElement.find(By.xpath("./.."));
+            SelenideElement resetOrderButton = new TastyCoffeeWebPageElement()
+                    .applySelector(RESET_ORDER_BUTTON_TEXT)
+                    .applySelector(ONE_LEVEL_UP)
+                    .getElement();
             clickWebElement(resetOrderButton);
             try {
-                SelenideElement confirmButtonText = $(byText("Да"));
-                SelenideElement confirmButton = confirmButtonText.find(By.xpath("./.."));
+                SelenideElement confirmButton = new TastyCoffeeWebPageElement()
+                        .applySelector(CONFIRM_BUTTON_TEXT)
+                        .applySelector(ONE_LEVEL_UP)
+                        .getElement();
                 clickWebElement(confirmButton);
             } catch (ElementNotFound ignored) {
                 logger.info("Confirm Reset Order button not found, is order empty already?");
@@ -163,9 +179,11 @@ public class TastyCoffeePage {
         }
     }
 
-    public void expandAllProductGroups() {
+    public void expandAllProductSubCategories() {
         try {
-            clickElements(byCssSelector("button.status.active"));
+            clickElements(new TastyCoffeeWebPageElement()
+                    .applySelector(PRODUCT_SUBCATEGORY_EXPAND_BUTTON)
+                    .getElements());
             Selenide.sleep(1_000);
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
@@ -174,11 +192,10 @@ public class TastyCoffeePage {
     }
 
     // https://stackoverflow.com/questions/52720560/selenide-removing-displayedfalse-not-working
-    public void clickElements(By locator) {
+    public void clickElements(ElementsCollection collection) {
         try {
-            var driver = getWebDriver();
-            for (WebElement elementToClick : driver.findElements(locator)) {
-                clickWebElement(elementToClick);
+            for (SelenideElement element : collection) {
+                clickWebElement(element);
             }
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
@@ -196,39 +213,63 @@ public class TastyCoffeePage {
         }
     }
 
+    private void addProducts(List<Product> categoryProducts, Product.ProductBuilder productBuilder, List<SelenideElement> products) {
+        for (var product : products) {
+            try {
+                productBuilder.setPrice(getProductPrice(product));
+                productBuilder.setPackage(new ProductPackage(getProductPackage(product)));
+
+                Product newProduct = productBuilder.build();
+                publisher.publishEvent(new ProductFoundEvent(this, newProduct));
+                categoryProducts.add(newProduct);
+            } catch (RuntimeException e) {
+                logger.warn("Warning parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage() +
+                        " Product will be skipped.");
+            }
+        }
+    }
+
     private void fillPurchasesAvailableOnPage(Map<Product, Integer> currentSessionPurchases) {
 
-        for (SelenideElement productGroup : getProductGroups()) {
-            for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
-                String subgroupTitle = getSubGroupTitle(productSubgroup);
+        for (SelenideElement productCategory : getProductCategories()) {
+            for (SelenideElement productSubgroup : getProductSubCategoriesFromCategory(productCategory)) {
 
+                String subgroupTitle = getSubGroupTitle(productSubgroup);
                 Map<Product, Integer> currentSubcategoryPurchases = currentSessionPurchases.entrySet().stream()
                         .filter(p -> p.getKey().getProductSubCategory().equals(subgroupTitle))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
                 for (var purchase : currentSubcategoryPurchases.entrySet()) {
-                    try {
-                        String productName = purchase.getKey().getName();
-                        String productPackage = purchase.getKey().getProductPackage().getDescription();
-                        String productForm = purchase.getKey().getProductForm();
-                        int productCountIncrement = purchase.getValue();
+                    Product product = purchase.getKey();
+                    int productCountIncrement = purchase.getValue();
 
-                        SelenideElement correspondingProduct = productSubgroup.find(byText(productName));
-                        SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
-                        SelenideElement counter = getQuantityControlElement(correspondingProductTableRow, productPackage, productForm);
+                    try {
+                        SelenideElement counter = findProductCounter(product);
                         SelenideElement incrementButton = getIncrementButtonFromQuantityCounter(counter);
                         int currentProductCount = getCurrentProductCountValue(counter);
-                        logger.info("Starting product count increase. Current count: " + currentProductCount + "  increments: " + productCountIncrement);
 
+                        logger.info(
+                                "Starting product count increase for product: " + product.getShortName() +
+                                ". Current count: " + currentProductCount +
+                                "  increments: " + productCountIncrement);
+                        int retries = 0;
                         while (productCountIncrement > 0) {
                             clickWebElement(incrementButton);
-                            productCountIncrement--;
-                            refresh();
-                            //logger.info("Increment button clicked. new product count:" + getCurrentCountForPurchase(product, productSubgroup));
+                            if (getCurrentProductCountValue(locateProductCounter(product)) == currentProductCount + 1) {
+                                logger.info(product.getShortName() + " Increment Succeed!");
+                                productCountIncrement--;
+                                currentProductCount++;
+                            } else {
+                                logger.warn(product.getShortName() + " Increment Failed. Retries: " + retries);
+                                retries++;
+                            }
+                            if (retries > 5)
+                                break;
                         }
                     } catch (ElementNotFound e) {
-                        logger.warn("Could Not Find Element By Text: " + e.getMessage() + "\nFor product" + purchase.getKey().getName());
+                        logger.warn("Could Not Find Element By Text: " + e.getMessage() + "\nFor product" + product);
                     }
+
                     currentSessionPurchases.remove(purchase.getKey());
                 }
             }
@@ -265,7 +306,7 @@ public class TastyCoffeePage {
         int priceElementIndex = availableElements
                 .indexOf(targetProductPrice.orElseThrow(() -> new RuntimeException("product not found")));
 
-        if (productForm.isEmpty())
+        if (productForm.isEmpty() || productForm.equals("Зерно"))
             // Beans or other non-grindable package
             return availableElements.get(priceElementIndex + 1);
         else {
@@ -274,15 +315,23 @@ public class TastyCoffeePage {
         }
     }
 
-    private List<Product> parseProductType() {
+    private List<Product> parseAllProductsOfType() {
         List<Product> currentTypeProducts = new ArrayList<>();
         Product.ProductBuilder productBuilder = new Product.ProductBuilder();
+        for (SelenideElement productCategory : new TastyCoffeeWebPageElement()
+                .applySelector(PRODUCT_CATEGORIES)
+                .getElements()) {
+            productBuilder.setCategory(getCategoryTitle(productCategory));
 
-        for (SelenideElement productGroup : getProductGroups()) {
-            productBuilder.setCategory(getGroupTitle(productGroup));
-            for (SelenideElement productSubgroup : getProductSubgroupsFromGroup(productGroup)) {
-                productBuilder.setSubCategory(getSubGroupTitle(productSubgroup));
-                for (SelenideElement product : getProductsListFromSubgroup(productSubgroup)) {
+            for (SelenideElement productSubCategory : new TastyCoffeeWebPageElement(productCategory)
+                    .applySelector(PRODUCT_SUBCATEGORIES)
+                    .getElements()) {
+                productBuilder.setSubCategory(getSubGroupTitle(productSubCategory));
+
+                for (SelenideElement product : new TastyCoffeeWebPageElement(productSubCategory)
+                        .applySelector(PRODUCT_TABLE)
+                        .applySelector(PRODUCT_ROW)
+                        .getElements()) {
                     productBuilder.setName(getProductTitle(product));
                     try {
                         productBuilder.setSpecialMark(getSpecialMarkTitle(product));
@@ -293,7 +342,7 @@ public class TastyCoffeePage {
                     productBuilder.setProductForm("");
 
                     productBuilder.setGrindable(false);
-                    addProducts(currentTypeProducts, productBuilder, getProductPacks(product));
+                    addProducts(currentTypeProducts, productBuilder, getRegularProductPacks(product));
 
                     productBuilder.setGrindable(true);
                     addProducts(currentTypeProducts, productBuilder, getGrindableProductPacks(product));
@@ -305,41 +354,104 @@ public class TastyCoffeePage {
         return currentTypeProducts;
     }
 
-    private void addProducts(List<Product> categoryProducts, Product.ProductBuilder productBuilder, List<SelenideElement> products) {
-        for (var product : products) {
-            try {
-                productBuilder.setPrice(getProductPrice(product));
-                productBuilder.setPackage(new ProductPackage(getProductPackage(product)));
+    private SelenideElement locateProductCounter(Product product) {
 
-                Product newProduct = productBuilder.build();
-                publisher.publishEvent(new ProductFoundEvent(this, newProduct));
-                categoryProducts.add(newProduct);
-            } catch (RuntimeException e) {
-                logger.warn("Warning parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage() +
-                        " Product will be skipped.");
+        for (SelenideElement productGroup : getProductCategories()) {
+            for (SelenideElement productSubgroup : getProductSubCategoriesFromCategory(productGroup)) {
+                try {
+                    SelenideElement correspondingProduct = productSubgroup.find(byText(product.getName()));
+                    SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
+
+                    return getQuantityControlElement(correspondingProductTableRow,
+                            product.getProductPackage().getDescription(),
+                            product.getProductForm());
+                } catch (ElementNotFound ignored) {}
             }
         }
+        return null;
     }
 
-    private ElementsCollection getProductGroups() {
-        return $$("div.main-accordion");
+    private SelenideElement locateIncrementButton(Product product) {
+        for (SelenideElement productGroup : getProductCategories()) {
+            for (SelenideElement productSubgroup : getProductSubCategoriesFromCategory(productGroup)) {
+                try {
+                    SelenideElement correspondingProduct = productSubgroup.find(byText(product.getName()));
+                    SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
+                    SelenideElement counter = getQuantityControlElement(correspondingProductTableRow,
+                            product.getProductPackage().getDescription(),
+                            product.getProductForm());
+                    return getIncrementButtonFromQuantityCounter(counter);
+                } catch (ElementNotFound ignored) {}
+            }
+        }
+        return null;
     }
 
-    private ElementsCollection getProductSubgroupsFromGroup(SelenideElement productGroup) {
-        return productGroup.$$("div.accordion.accordion_product");
+    private SelenideElement findProductCounter(Product product) {
+
+        SelenideElement correspondingProduct = findProductSubcategory(product)
+                .find(byText(product.getName()))
+                .find(By.xpath("./../../.."));
+
+        return getQuantityControlElement(correspondingProduct,
+                product.getProductPackage().getDescription(),
+                product.getProductForm());
     }
 
-    private ElementsCollection getProductsListFromSubgroup(SelenideElement productSubgroup) {
-        SelenideElement productsTable = productSubgroup.find(By.cssSelector("table.table-lk"));
-        return productsTable.findAll(By.cssSelector("tr.searchTab"));
+    private SelenideElement findProductSubcategory(Product product) {
+        return findProductCategory(product)
+                .findAll(getProductSubgroupsFromGroupLocator())
+                .findBy(Condition.name(product.getProductSubCategory()));
     }
 
-    private List<SelenideElement> getProductPacks(SelenideElement product) {
-        return new ArrayList<>(product.findAll(By.cssSelector("td.price-count-1")));
+    private SelenideElement findProductCategory(Product product) {
+        return $$(getAllProductCategoriesLocator())
+                .findBy(Condition.name(product.getProductCategory()));
+    }
+
+    private ElementsCollection getProductCategories() {
+        return $$(getAllProductCategoriesLocator());
+    }
+
+    private String getAllProductCategoriesLocator() {
+        return "div.main-accordion";
+    }
+
+    private ElementsCollection getProductSubCategoriesFromCategory(SelenideElement productGroup) {
+        return productGroup.$$(getProductSubgroupsFromGroupLocator());
+    }
+
+    private String getProductSubgroupsFromGroupLocator() {
+        return "div.accordion.accordion_product";
+    }
+
+
+    private String getProductsTableLocator() {
+        return "table.table-lk";
+    }
+
+    private String getProductRowLocator() {
+        return "tr.searchTab";
+    }
+
+    private List<SelenideElement> getRegularProductPacks(SelenideElement product) {
+        return new TastyCoffeeWebPageElement(product)
+                .applySelector(PRODUCT_REGULAR_PACKAGE)
+                .getElements();
+    }
+
+    private String getRegularProductPackagesLocator() {
+        return "td.price-count-1";
     }
 
     private List<SelenideElement> getGrindableProductPacks(SelenideElement product) {
-        return new ArrayList<>(product.findAll(By.cssSelector("td.price-count-2")));
+        return new TastyCoffeeWebPageElement(product)
+                .applySelector(PRODUCT_GRINDABLE_PACKAGE)
+                .getElements();
+    }
+
+    private String getGrindableProductPackagesLocator() {
+        return "td.price-count-2";
     }
 
     private SelenideElement getIncrementButtonFromQuantityCounter(SelenideElement counter) {
@@ -347,11 +459,11 @@ public class TastyCoffeePage {
     }
 
     private SelenideElement getProductCountInput(SelenideElement counter) {
-        return counter.find(By.cssSelector("div.input-wrap")).find(By.tagName("input"));
+        return counter.find(By.cssSelector("div.input-wrap")).find(By.name("count"));
     }
 
     private int getCurrentProductCountValue(SelenideElement counter) {
-        String value = getProductCountInput(counter).getAttribute("placeholder");
+        String value = getProductCountInput(counter).getDomProperty("value");
         return Integer.parseInt(Objects.requireNonNull(value));
     }
 
@@ -365,23 +477,31 @@ public class TastyCoffeePage {
         input.sendKeys(newValue);
     }
 
-    private String getGroupTitle(SelenideElement groupElement) {
-        SelenideElement groupTitle = groupElement.find(By.cssSelector("h3.title"));
+    private String getCategoryTitle(SelenideElement groupElement) {
+        SelenideElement groupTitle = new TastyCoffeeWebPageElement(groupElement)
+                .applySelector(PRODUCT_CATEGORY_TITLE)
+                .getElement();
         return groupTitle.getAttribute("innerHTML");
     }
 
     private String getSubGroupTitle(SelenideElement subgroupElement) {
-        SelenideElement subgroupTitle = subgroupElement.find(By.cssSelector("span"));
+        SelenideElement subgroupTitle = new TastyCoffeeWebPageElement(subgroupElement)
+                .applySelector(PRODUCT_SUBCATEGORY_TITLE)
+                .getElement();
         return subgroupTitle.getAttribute("innerHTML");
     }
 
     private String getProductTitle(SelenideElement product) {
-        SelenideElement productNameTableCell = product.find(By.cssSelector("button.font-13.p-0.selectable.btn.pointer"));
+        SelenideElement productNameTableCell = new TastyCoffeeWebPageElement(product)
+                .applySelector(PRODUCT_TITLE)
+                .getElement();
         return productNameTableCell.getAttribute("innerHTML");
     }
 
     private String getSpecialMarkTitle(SelenideElement product) {
-        SelenideElement specialMark = product.find(By.cssSelector("div.prefixdiv.empty-ic"));
+        SelenideElement specialMark = new TastyCoffeeWebPageElement(product)
+                .applySelector(PRODUCT_MARK_TITLE)
+                .getElement();
         return specialMark.getAttribute("data-div");
     }
 

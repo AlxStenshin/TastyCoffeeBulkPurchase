@@ -15,4 +15,19 @@ class StringUtilTest {
     void shouldCorrectlyCapitalizeHighRegistryWord() {
         assertEquals("CAPITAL", StringUtil.capitalize("CAPITAL"));
     }
+
+    @Test
+    void shouldCorrectlyRemoveAllSpecialSymbols() {
+        assertEquals("OnlyAlphabetical", StringUtil.removeNonAlphanumeric("!Only_+Alpha%!<!---->^bet*()i$cal"));
+    }
+
+    @Test
+    void shouldLeftStringUnchangedIfItDoesNotContainsAnySpecialSymbol() {
+        assertEquals("justregularstring", StringUtil.removeNonAlphanumeric("justregularstring"));
+    }
+
+    @Test
+    void shouldReturnCoffe() {
+        assertEquals("Кофе", StringUtil.removeNonAlphanumeric( "Кофе    <!---->"));
+    }
 }
