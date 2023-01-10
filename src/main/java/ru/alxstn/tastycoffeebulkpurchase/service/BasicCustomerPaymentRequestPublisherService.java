@@ -9,17 +9,16 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.SetOrderPaidCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
-import ru.alxstn.tastycoffeebulkpurchase.event.PurchaseSummaryNotificationEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class BasicCustomerPaymentRequestPublisherService implements CustomerPaymentRequestPublisherService {
@@ -27,29 +26,31 @@ public class BasicCustomerPaymentRequestPublisherService implements CustomerPaym
     Logger logger = LogManager.getLogger(BasicCustomerPaymentRequestPublisherService.class);
     private final ApplicationEventPublisher publisher;
     private final DtoSerializer serializer;
+    private final PurchaseManagerService purchaseManagerService;
     private final CustomerSummaryMessageCreatorService customerSummaryMessageCreatorService;
 
     public BasicCustomerPaymentRequestPublisherService(ApplicationEventPublisher publisher,
                                                        DtoSerializer serializer,
+                                                       PurchaseManagerService purchaseManagerService,
                                                        CustomerSummaryMessageCreatorService customerSummaryMessageCreatorService) {
         this.publisher = publisher;
         this.serializer = serializer;
+        this.purchaseManagerService = purchaseManagerService;
+
         this.customerSummaryMessageCreatorService = customerSummaryMessageCreatorService;
     }
 
     @EventListener
     @Override
-    public void createAndPublishSummary(PurchaseSummaryNotificationEvent event) {
-        logger.info("Now building and publishing per-customer session summary");
+    public void createAndPublishPaymentRequest(ActiveSessionClosedNotificationEvent event) {
+        logger.info("Now building and publishing per-customer payment request");
 
-        Session session = event.getCurrentSessionPurchases().get(0).getSession();
-        List<Purchase> currentSessionPurchases = event.getCurrentSessionPurchases();
-        Set<Customer> currentSessionCustomers = currentSessionPurchases.stream()
-                .map(Purchase::getCustomer)
-                .collect(Collectors.toSet());
+        Session session = event.getSession();
+        Set<Customer> currentSessionCustomers = new HashSet<>(purchaseManagerService.getSessionCustomers(session));
 
         for (Customer c : currentSessionCustomers) {
-            String message = customerSummaryMessageCreatorService.buildCustomerSummaryMessage(session, c) + "\n\n" +
+            String message = "Сессия закрыта!\n\n" +
+                    customerSummaryMessageCreatorService.buildCustomerSummaryMessage(session, c) + "\n\n" +
                     "Внесите оплату и нажмите кнопку \"Оплачено\"\n" +
                     "Оплата: " + session.getPaymentInstruction() + "\n";
 

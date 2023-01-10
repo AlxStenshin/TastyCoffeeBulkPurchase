@@ -36,9 +36,6 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
         var currentSessionPurchases = sessionPurchaseReportCreatorService.createPerProductReport(session);
 
         if (currentSessionPurchases.size() > 0) {
-            // ToDo: Turn it back on
-            //publisher.publishEvent(new PurchaseSummaryNotificationEvent(this, currentSessionPurchases));
-
             executorService.execute(() -> {
                 var unfinishedPurchases = tastyCoffeePage.placeOrder(currentSessionPurchases);
                 publisher.publishEvent(new PurchasePlacementErrorEvent(this, unfinishedPurchases));

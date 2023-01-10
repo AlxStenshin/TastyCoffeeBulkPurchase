@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewSessionStartedEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
@@ -63,6 +64,7 @@ public class BasicSessionManagerService implements SessionManagerService {
         sessionRepository.save(session);
         webPageOrderCreator.createOrder(session);
         textFileOrderCreator.createOrder(session);
+        publisher.publishEvent(new ActiveSessionClosedNotificationEvent(this, session));
         return session;
     }
 

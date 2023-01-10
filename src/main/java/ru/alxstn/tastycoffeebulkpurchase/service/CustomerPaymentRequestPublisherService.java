@@ -1,7 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.service;
 
-import ru.alxstn.tastycoffeebulkpurchase.event.PurchaseSummaryNotificationEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
 
 public interface CustomerPaymentRequestPublisherService {
-    void createAndPublishSummary(PurchaseSummaryNotificationEvent event);
+    void createAndPublishPaymentRequest(ActiveSessionClosedNotificationEvent event);
 }
