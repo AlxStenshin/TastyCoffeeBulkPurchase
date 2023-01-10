@@ -8,10 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import ru.alxstn.tastycoffeebulkpurchase.dto.impl.EditPurchaseCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.dto.impl.PlaceOrderCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemovePurchaseCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.dto.impl.UpdatePurchaseCommandDto;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
@@ -131,8 +128,17 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                     .text("Удалить из заказа")
                     .callbackData(serializer.serialize(new RemovePurchaseCommandDto(purchase)))
                     .build());
-            // ToDo: add cancel edit button: Отмена
+
+            RemoveMessageCommandDto removeMessage = new RemoveMessageCommandDto(
+                    update.getCallbackQuery().getMessage().getMessageId(),
+                    update.getCallbackQuery().getMessage().getChatId());
+            deletePurchaseButtons.add(InlineKeyboardButton.builder()
+                    .text("Отмена")
+                    .callbackData(serializer.serialize(removeMessage))
+                    .build());
+
             keyboardRows.add(deletePurchaseButtons);
+
         } else {
             List<InlineKeyboardButton> menuNavigationButtons = new ArrayList<>();
             if (dto.getPrevious() != null)
