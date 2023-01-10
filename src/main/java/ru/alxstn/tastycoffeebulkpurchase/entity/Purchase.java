@@ -47,13 +47,12 @@ public class Purchase {
         this.count = newCount;
     }
 
-    public Purchase(Purchase purchase, String newForm) {
+    public Purchase(Purchase purchase, Product newProduct) {
         this.id = purchase.getId();
         this.customer = purchase.getCustomer();
-        this.product = purchase.getProduct();
         this.session = purchase.getSession();
-        purchase.getProduct().setProductForm(newForm);
         this.count = purchase.count;
+        this.product = newProduct;
     }
 
     @Override

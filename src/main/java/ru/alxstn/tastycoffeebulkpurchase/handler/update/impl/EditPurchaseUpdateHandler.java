@@ -18,19 +18,25 @@ import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchaseCommandDto> {
 
     Logger logger = LogManager.getLogger(EditPurchaseUpdateHandler.class);
     private final ApplicationEventPublisher publisher;
+    private final ProductManagerService productManagerService;
     private final DtoSerializer serializer;
 
-    public EditPurchaseUpdateHandler(ApplicationEventPublisher publisher, DtoSerializer serializer) {
+    public EditPurchaseUpdateHandler(ApplicationEventPublisher publisher,
+                                     ProductManagerService productManagerService,
+                                     DtoSerializer serializer) {
         this.publisher = publisher;
+        this.productManagerService = productManagerService;
         this.serializer = serializer;
     }
 
@@ -48,7 +54,6 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
     protected void handleCallback(Update update, EditPurchaseCommandDto dto) {
         Purchase purchase = dto.getPurchase();
         Product targetProduct = purchase.getProduct();
-        boolean editMode = dto.isEditMode();
 
         logger.info("Edit Purchase Command Received: " + purchase);
 
@@ -61,7 +66,6 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                 .text("-")
                 .callbackData(serializer.serialize(new EditPurchaseCommandDto(
                         new Purchase(purchase,purchase.getCount() > 1 ? purchase.getCount() - 1 : 1),
-                        editMode,
                         dto.getPrevious())))
                 .build());
 
@@ -74,7 +78,6 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                 .text("+")
                 .callbackData(serializer.serialize(new EditPurchaseCommandDto(
                         new Purchase(purchase,  purchase.getCount() < Integer.MAX_VALUE ? purchase.getCount() + 1 : Integer.MAX_VALUE),
-                        editMode,
                         dto.getPrevious())))
                 .build());
 
@@ -89,44 +92,46 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
             String currentForm = purchase.getProduct().getProductForm();
 
             List<InlineKeyboardButton> productFormButtons = new ArrayList<>();
-            productFormButtons.add(InlineKeyboardButton.builder()
+
+            Optional<Product> beansProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Зерно");
+            beansProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Зерно") || currentForm.isEmpty() ? "Зерно ✅" : "Зерно")
                     .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                            new Purchase(purchase, "Зерно"),
-                            editMode)))
-                    .build());
+                            new Purchase(purchase, product))))
+                    .build()));
 
-            productFormButtons.add(InlineKeyboardButton.builder()
+            Optional<Product> coarseProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Крупный");
+            coarseProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Крупный") ? "Крупный ✅" : "Крупный")
                     .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                            new Purchase(purchase, "Крупный"),
-                            editMode)))
-                    .build());
+                            new Purchase(purchase, product))))
+                    .build()));
 
-            productFormButtons.add(InlineKeyboardButton.builder()
+            Optional<Product> mediumProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Средний");
+            mediumProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Средний") ? "Средний ✅" : "Средний")
                     .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                            new Purchase(purchase, "Средний"),
-                            editMode)))
-                    .build());
+                            new Purchase(purchase, product))))
+                    .build()));
 
-            productFormButtons.add(InlineKeyboardButton.builder()
+            Optional<Product> fineProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Мелкий");
+            fineProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
                     .text(currentForm.equals("Мелкий") ? "Мелкий ✅" : "Мелкий")
                     .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                            new Purchase(purchase, "Мелкий"),
-                            editMode)))
-                    .build());
+                            new Purchase(purchase, product))))
+                    .build()));
 
             keyboardRows.add(productFormButtons);
         }
 
-        if (dto.isEditMode()) {
+        // Editing existing purchase
+        if (purchase.getId() != null) {
             List<InlineKeyboardButton> deletePurchaseButtons = new ArrayList<>();
             deletePurchaseButtons.add(InlineKeyboardButton.builder()
                     .text("Удалить из заказа")
                     .callbackData(serializer.serialize(new RemovePurchaseCommandDto(purchase)))
                     .build());
-
+            // ToDo: add cancel edit button: Отмена
             keyboardRows.add(deletePurchaseButtons);
         } else {
             List<InlineKeyboardButton> menuNavigationButtons = new ArrayList<>();

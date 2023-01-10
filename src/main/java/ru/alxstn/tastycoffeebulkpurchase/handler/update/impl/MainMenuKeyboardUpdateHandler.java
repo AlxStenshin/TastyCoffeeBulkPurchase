@@ -119,7 +119,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                             editOrderAnswer.setButtonCreator(p -> InlineKeyboardButton.builder()
                                     .text(buttonTitleCreator.apply(p))
-                                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(p, true)))
+                                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(p)))
                                     .build());
 
                             editOrderAnswer.addAdditionalButtons(List.of(InlineKeyboardButton.builder()

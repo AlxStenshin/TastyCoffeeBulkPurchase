@@ -13,8 +13,6 @@ import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import java.util.Optional;
 public abstract class CallbackUpdateHandler <T extends SerializableInlineObject> implements UpdateHandler {
 
-    Logger logger = LogManager.getLogger(CallbackUpdateHandler.class);
-
     @Autowired
     private DtoDeserializer deserializer;
 
@@ -38,7 +36,6 @@ public abstract class CallbackUpdateHandler <T extends SerializableInlineObject>
             return false;
         }
 
-        logger.info("Found callback {}", getSerializableType());
         handleCallback(update, dto.get());
         return true;
     }

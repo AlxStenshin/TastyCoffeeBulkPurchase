@@ -85,7 +85,7 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         List<List<InlineKeyboardButton>> buttons = new ArrayList<>();
         for (Product p : availablePackages) {
             Purchase purchase = new Purchase(customer, p, session, 1);
-            String callback = serializer.serialize(new EditPurchaseCommandDto(purchase, false, dto));
+            String callback = serializer.serialize(new EditPurchaseCommandDto(purchase, dto));
 
             String packaging = p.getProductPackage().getDescription().isEmpty() ? "" : p.getProductPackage() + ", ";
             String buttonText = packaging + p.getPrice() + "₽";

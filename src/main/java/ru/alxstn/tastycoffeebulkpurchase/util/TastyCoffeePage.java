@@ -145,7 +145,7 @@ public class TastyCoffeePage {
                         .getElement();
                 loginButton.click();
             }
-            Selenide.sleep(10_000);
+            Selenide.sleep(15_000);
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
             throw new WebPageElementException(e);

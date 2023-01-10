@@ -53,14 +53,7 @@ class RedisDtoSerializerTest {
 
     @Test
     void shouldCorrectlySerializeEditPurchaseCommandDto() {
-        EditPurchaseCommandDto o = new EditPurchaseCommandDto(purchase, false);
-        when(repository.save(o)).thenReturn(o);
-        assertNotNull(serializer.serialize(o));
-    }
-
-    @Test
-    void shouldCorrectlySerializeEditPurchaseCommandDtoInEditMode() {
-        EditPurchaseCommandDto o = new EditPurchaseCommandDto(purchase, true);
+        EditPurchaseCommandDto o = new EditPurchaseCommandDto(purchase);
         when(repository.save(o)).thenReturn(o);
         assertNotNull(serializer.serialize(o));
     }

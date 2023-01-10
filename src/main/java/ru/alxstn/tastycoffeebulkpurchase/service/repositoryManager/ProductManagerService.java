@@ -21,6 +21,8 @@ public interface ProductManagerService {
 
     Optional<Product> productExists(String name, String cat, String subCat, ProductPackage pack, String mark, String form, BigDecimal price);
 
+    Optional<Product> findProductWithForm(Product product, String form);
+
     List<Product> getSimilarProducts(String name, String cat, String subCat, String form, ProductPackage pack);
 
     void updateProduct(String name, String cat, String subCat, ProductPackage pack, String mark, String form, BigDecimal price, LocalDateTime updateDateTime);

@@ -46,27 +46,15 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
     @Override
     protected void handleCallback(Update update, UpdatePurchaseCommandDto dto) {
         logger.info("Update Purchase Command Received");
-        Purchase newPurchase = dto.getPurchase();
-        Purchase purchase = purchaseManagerService.getPurchaseIgnoringProductQuantity(
-                        newPurchase.getCustomer(),
-                        newPurchase.getProduct(),
-                        newPurchase.getSession())
-                .orElse(new Purchase(newPurchase.getCustomer(),
-                        newPurchase.getProduct(),
-                        newPurchase.getSession(),
-                        0));
-
-        int previousCount = purchase.getCount();
-        int newCount = newPurchase.getCount();
-        purchase.setCount(previousCount == 0 ? newCount : previousCount + newCount);
+        Purchase purchase = dto.getPurchase();
         try {
             purchaseManagerService.save(purchase);
             Payment payment = paymentManagerService.getCustomerSessionPayment(
-                    purchase.getSession(), purchase.getCustomer())
+                            purchase.getSession(), purchase.getCustomer())
                     .orElse(new Payment(purchase.getCustomer(), purchase.getSession()));
             paymentManagerService.save(payment);
         } catch (Exception e) {
-            logger.error("Saving new purchase : " + purchase + " " + e.getMessage());
+            logger.error("Saving purchase : " + purchase + " " + e.getMessage());
         }
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()

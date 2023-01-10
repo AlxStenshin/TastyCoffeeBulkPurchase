@@ -84,4 +84,15 @@ public class BasicProductManagerService implements ProductManagerService {
     public boolean productPackageExists(Example<ProductPackage> packageExample) {
         return productPackageRepository.exists(packageExample);
     }
+
+    @Override
+    public Optional<Product> findProductWithForm(Product product, String form) {
+        return productRepository.findProductWithForm(product.getName(),
+                product.getProductCategory(),
+                product.getProductSubCategory(),
+                product.getProductPackage(),
+                product.getSpecialMark(),
+                product.getPrice(),
+                form);
+    }
 }

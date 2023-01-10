@@ -33,8 +33,6 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
     @Override
     public void analyzeNewProducts(List<Product> newProducts) {
         for (Product newProduct : newProducts) {
-            logger.info("Analyzing New Product: " + newProduct);
-
             List<Product> similarProducts = productManagerService.getSimilarProducts(
                     newProduct.getName(),
                     newProduct.getProductCategory(),
@@ -51,17 +49,19 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
                 Product latestSimilar = similarProducts.get(0);
 
                 if (!BigDecimalUtil.equals(newProduct.getPrice(), latestSimilar.getPrice())) {
-                    logger.info("Product Price Update Detected.");
+                    logger.info("Analyzing New Product: " + newProduct + ". Price Update Detected: " +
+                            latestSimilar.getPrice() + " -> " + newProduct.getPrice());
                     publisher.publishEvent(new ProductPriceUpdateEvent(this, latestSimilar, newProduct));
                 }
 
                 if (!Objects.equals(newProduct.getSpecialMark(), latestSimilar.getSpecialMark())) {
-                    logger.info("Product Special Mark Update Detected.");
+                    logger.info("Analyzing New Product: " + newProduct + ". Product Special Mark Update Detected: " +
+                            latestSimilar.getSpecialMark()  + " -> " + newProduct.getSpecialMark());
                     publisher.publishEvent(new ProductSpecialMarkUpdateEvent(this, latestSimilar, newProduct));
                 }
             }
             else {
-                logger.info("This is a New Product.");
+                logger.info("Analyzing New Product: " + newProduct + " This is a New Product.");
                 publisher.publishEvent(new NewProductDiscoveredEvent(this, newProduct));
             }
         }
