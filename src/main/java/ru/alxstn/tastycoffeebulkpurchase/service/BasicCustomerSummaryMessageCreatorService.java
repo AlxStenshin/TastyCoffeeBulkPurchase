@@ -14,7 +14,6 @@ import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BasicCustomerSummaryMessageCreatorService implements CustomerSummaryMessageCreatorService {
@@ -30,20 +29,19 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
     }
 
     @Override
-    public String buildCustomerSummaryMessage(Session session, Customer customer ) {
+    public String buildCustomerSummaryMessage(Session session, Customer customer) {
         logger.info("Building Customer Summary for " + customer);
         String message;
         try {
-            List<Purchase> purchases = purchaseManagerService
-                    .findAllPurchasesInSessionByCustomer(session, customer)
-                    .stream()
+            List<Purchase> purchases = purchaseManagerService.findAllPurchasesInSessionByCustomer(session, customer);
+            List<Purchase> availablePurchases = purchases.stream()
                     .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
-                    .collect(Collectors.toList());
+                    .toList();
 
             Payment payment = paymentManagerService.getCustomerSessionPayment(session, customer)
                     .orElseThrow(() -> new CustomerPaymentException("Payment Not Found!"));
 
-            if (purchases.size() > 0) {
+            if (availablePurchases.size() > 0) {
                 int discountValue = session.getDiscountPercentage();
                 BigDecimal totalPrice = payment.getTotalAmountNoDiscount();
                 BigDecimal totalPriceWithDiscount = payment.getTotalAmountWithDiscount();
@@ -55,10 +53,22 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                 messageBuilder.append("Ваш заказ:\n");
                 messageBuilder.append("<code>");
 
-                // ToDo: Show inactive or unavailable products here! ❌⛔🚫
-                for (var purchase : purchases) {
+                for (var purchase : availablePurchases) {
                     messageBuilder.append(purchase.getPurchaseSummary());
                     messageBuilder.append("\n");
+                }
+
+                List<Purchase> unavailablePurchases = purchases.stream()
+                        .filter(purchase -> !purchase.getProduct().isAvailable() || !purchase.getProduct().isActual())
+                        .toList();
+
+                if (!unavailablePurchases.isEmpty()) {
+                    messageBuilder.append("⛔ Недоступные товары:\n");
+                    for (var unavailablePurchase : unavailablePurchases) {
+                        messageBuilder.append("❌").append(unavailablePurchase.getPurchaseSummary());
+                        messageBuilder.append("\n");
+                    }
+                    messageBuilder.append("Пожалуйста удалите или замените недоступные товары из своего заказа.");
                 }
 
                 messageBuilder.append("</code>");

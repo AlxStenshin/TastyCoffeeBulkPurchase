@@ -42,6 +42,27 @@ class BasicCustomerSummaryMessageCreatorServiceTest {
             "",
             false);
 
+    private static final Product unavailableProduct = new Product("Unavailable",
+            new BigDecimal("1"),
+            "нет",
+            new ProductPackage(" "),
+            "Кофе",
+            "Кофе для фильтра",
+            "",
+            false);
+
+    private static final Product notActualProduct = new Product("Not Actual",
+            new BigDecimal("1"),
+            "",
+            new ProductPackage(" "),
+            "Кофе",
+            "Кофе для фильтра",
+            "",
+            false);
+    static {
+        notActualProduct.setActual(false);
+    }
+
     @Test
     void shouldCreate_YourOrderIsEmptyMessage() {
         assertEquals("Ваш заказ пуст", service.buildCustomerSummaryMessage(new Session(), new Customer()));
@@ -90,6 +111,31 @@ class BasicCustomerSummaryMessageCreatorServiceTest {
 
         assertThat(message, containsString("Ваш заказ:"));
         assertThat(message, containsString("Итог без скидки:"));
+    }
+
+    @Test
+    void shouldCreateMessageWithUnavailableProductsWarning() {
+        Customer customer = new Customer();
+        Session session = new Session();
+
+        Purchase purchase = new Purchase(customer, discountableProduct, session, 1);
+        Purchase unavailablePurchase = new Purchase(customer, unavailableProduct, session, 1);
+        Purchase notActualPurchase = new Purchase(customer, notActualProduct, session, 1);
+        when(purchaseManagerService.findAllPurchasesInSessionByCustomer(session, customer)).
+                thenReturn(List.of(purchase, unavailablePurchase, notActualPurchase));
+
+        Payment payment = new Payment(customer, session);
+        payment.setTotalAmountWithDiscount(new BigDecimal(1));
+        payment.setTotalAmountNoDiscount(new BigDecimal(1));
+        payment.setDiscountableAmountWithDiscount(new BigDecimal(1));
+        payment.setDiscountableAmountNoDiscount(new BigDecimal(1));
+        payment.setNonDiscountableAmount(new BigDecimal(1));
+        when(paymentManagerService.getCustomerSessionPayment(session, customer))
+                .thenReturn(Optional.of(payment));
+
+        String message = service.buildCustomerSummaryMessage(session, customer);
+
+        assertThat(message, containsString("Недоступные товары:"));
     }
 
 }
