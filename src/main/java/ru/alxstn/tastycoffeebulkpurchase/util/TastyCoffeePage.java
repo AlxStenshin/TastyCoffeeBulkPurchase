@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -31,6 +30,7 @@ public class TastyCoffeePage {
 
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
+    private final List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
 
     public TastyCoffeePage(TastyCoffeeConfigProperties properties,
                            ApplicationEventPublisher newProductPublisher) {
@@ -44,28 +44,25 @@ public class TastyCoffeePage {
     }
 
     public List<Product> buildPriceList() {
-
         login();
         resetOrder();
-
         List<Product> allProducts = new ArrayList<>();
         try {
-            List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
             ElementsCollection tabs = new TastyCoffeeWebPageElement()
                     .applySelector(PRODUCT_TYPE_BAR)
                     .applySelector(PRODUCT_TYPES)
                     .getElements();
 
             for (var tab : tabs) {
-                SelenideElement link = new TastyCoffeeWebPageElement(tab).applySelector(LINK).getElement();
-                String text = link.innerHtml();
+                SelenideElement productTypeLink = new TastyCoffeeWebPageElement(tab).applySelector(LINK).getElement();
+                String text = productTypeLink.innerHtml();
                 if (acceptedProductTypes.stream().anyMatch(text::contains)) {
                     logger.info("Now Parsing Tab: " + StringUtil.removeNonAlphanumeric(text));
-                    clickWebElement(link.getWrappedElement());
+                    clickWebElementWithJS(productTypeLink.getWrappedElement());
                     expandAllProductSubCategories();
                     allProducts.addAll(parseAllProductsOfType());
                 } else {
-                    logger.info("Ignoring Price List Tab " + text.replace("\n", ""));
+                    logger.info("Ignoring Price List Tab " + StringUtil.removeNonAlphanumeric(text));
                 }
 
             }
@@ -88,28 +85,26 @@ public class TastyCoffeePage {
     }
 
     public List<Product> placeOrder(Map<Product, Integer> currentSessionPurchases) {
+        login();
+        resetOrder();
         try {
-            login();
-            resetOrder();
-
-            SelenideElement tabsBar = $("ul.nav.tab-lk");
-            ElementsCollection tabs = tabsBar.$$("li.nav-item");
-            List<String> acceptedCategories = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
+            ElementsCollection tabs = new TastyCoffeeWebPageElement()
+                    .applySelector(PRODUCT_TYPE_BAR)
+                    .applySelector(PRODUCT_TYPES)
+                    .getElements();
 
             for (var tab : tabs) {
-                SelenideElement link = tab.$("a");
-                String productType = link.innerHtml();
-                if (acceptedCategories.stream().anyMatch(productType::contains)) {
-                    logger.info("Now Filling " + StringUtil.removeNonAlphanumeric(productType) + "-Type Purchases");
-                    clickWebElement(link.getWrappedElement());
-                    Selenide.sleep(500);
+                SelenideElement productTypeLink = new TastyCoffeeWebPageElement(tab).applySelector(LINK).getElement();
+                String productType = productTypeLink.innerHtml();
+                if (acceptedProductTypes.stream().anyMatch(productType::contains)) {
+                    logger.info("Now Filling Tab: " + StringUtil.removeNonAlphanumeric(productType));
+                    clickWebElementWithJS(productTypeLink.getWrappedElement());
                     expandAllProductSubCategories();
                     fillPurchasesAvailableOnPage(currentSessionPurchases);
                 } else {
-                    logger.info("Ignoring Price List Tab " + StringUtil.removeNonAlphanumeric(productType));
+                    logger.info("Ignoring Price List Tab " + productType.replace("\n", ""));
                 }
             }
-
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
             throw new WebPageElementException(e);
@@ -163,13 +158,13 @@ public class TastyCoffeePage {
                     .applySelector(RESET_ORDER_BUTTON_TEXT)
                     .applySelector(ONE_LEVEL_UP)
                     .getElement();
-            clickWebElement(resetOrderButton);
+            clickWebElementWithJS(resetOrderButton);
             try {
                 SelenideElement confirmButton = new TastyCoffeeWebPageElement()
                         .applySelector(CONFIRM_BUTTON_TEXT)
                         .applySelector(ONE_LEVEL_UP)
                         .getElement();
-                clickWebElement(confirmButton);
+                clickWebElementWithJS(confirmButton);
             } catch (ElementNotFound ignored) {
                 logger.info("Confirm Reset Order button not found, is order empty already?");
             }
@@ -195,7 +190,7 @@ public class TastyCoffeePage {
     public void clickElements(ElementsCollection collection) {
         try {
             for (SelenideElement element : collection) {
-                clickWebElement(element);
+                clickWebElementWithJS(element);
             }
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
@@ -203,7 +198,7 @@ public class TastyCoffeePage {
         }
     }
 
-    private void clickWebElement(WebElement element) {
+    private void clickWebElementWithJS(WebElement element) {
         try {
             String jsClickCode = "arguments[0].scrollIntoView(true); arguments[0].click();";
             var driver = getWebDriver();
@@ -231,52 +226,85 @@ public class TastyCoffeePage {
 
     private void fillPurchasesAvailableOnPage(Map<Product, Integer> currentSessionPurchases) {
 
-        for (SelenideElement productCategory : getProductCategories()) {
-            for (SelenideElement productSubgroup : getProductSubCategoriesFromCategory(productCategory)) {
+        List<String> productSubCategoriesAvailableOnPage = new ArrayList<>();
+        for (SelenideElement productCategory : new TastyCoffeeWebPageElement()
+                .applySelector(PRODUCT_CATEGORIES)
+                .getElements()) {
+            for (SelenideElement productSubCategory : new TastyCoffeeWebPageElement(productCategory)
+                    .applySelector(PRODUCT_SUBCATEGORIES)
+                    .getElements()) {
+                productSubCategoriesAvailableOnPage.add(getSubGroupTitle(productSubCategory));
+            }
+        }
 
-                String subgroupTitle = getSubGroupTitle(productSubgroup);
-                Map<Product, Integer> currentSubcategoryPurchases = currentSessionPurchases.entrySet().stream()
-                        .filter(p -> p.getKey().getProductSubCategory().equals(subgroupTitle))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<Product, Integer> currentProductTypePurchases = currentSessionPurchases.entrySet().stream()
+                .filter(p -> productSubCategoriesAvailableOnPage.stream()
+                        .anyMatch(p.getKey().getProductSubCategory()::contentEquals))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-                for (var purchase : currentSubcategoryPurchases.entrySet()) {
-                    Product product = purchase.getKey();
-                    int productCountIncrement = purchase.getValue();
+        for (var purchase : currentProductTypePurchases.entrySet()) {
+            Product product = purchase.getKey();
+            int productCountIncrement = purchase.getValue();
+            try {
+               if (setCountWithIncrementButton(product, productCountIncrement)) {
+                   currentSessionPurchases.remove(product);
+               } else logger.warn("Could Not Increment Count for " + product.getShortName() + "Req Count: " + productCountIncrement);
 
-                    try {
-                        SelenideElement counter = findProductCounter(product);
-                        SelenideElement incrementButton = getIncrementButtonFromQuantityCounter(counter);
-                        int currentProductCount = getCurrentProductCountValue(counter);
-
-                        logger.info(
-                                "Starting product count increase for product: " + product.getShortName() +
-                                ". Current count: " + currentProductCount +
-                                "  increments: " + productCountIncrement);
-                        int retries = 0;
-                        while (productCountIncrement > 0) {
-                            clickWebElement(incrementButton);
-                            if (getCurrentProductCountValue(locateProductCounter(product)) == currentProductCount + 1) {
-                                logger.info(product.getShortName() + " Increment Succeed!");
-                                productCountIncrement--;
-                                currentProductCount++;
-                            } else {
-                                logger.warn(product.getShortName() + " Increment Failed. Retries: " + retries);
-                                retries++;
-                            }
-                            if (retries > 5)
-                                break;
-                        }
-                    } catch (ElementNotFound e) {
-                        logger.warn("Could Not Find Element By Text: " + e.getMessage() + "\nFor product" + product);
-                    }
-
-                    currentSessionPurchases.remove(purchase.getKey());
-                }
+            } catch (ElementNotFound e) {
+                logger.warn("Could Not Find Element: " + e.getMessage() + "\nFor product" + product);
             }
         }
     }
 
-    private SelenideElement getQuantityControlElement(SelenideElement productTableRow, String productPackage, String productForm) {
+    boolean setCountWithIncrementButton(Product product, int productCountIncrement) {
+        SelenideElement counter = findProductCounter(product);
+        int currentProductCount = getCurrentProductCountValue(counter);
+        int targetProductCount = currentProductCount + productCountIncrement;
+        SelenideElement incrementButton = getIncrementButtonFromQuantityCounter(counter);
+
+        logger.info(
+                "Starting product count increase for product: " + product.getShortName() +
+                        ". Current count: " + currentProductCount +
+                        "  increments: " + productCountIncrement);
+
+        int retries = 0;
+        while (productCountIncrement > 0) {
+            clickWebElementWithJS(incrementButton);
+
+            int newProductCountValue = getCurrentProductCountValue(findProductCounter(product));
+            if (newProductCountValue == currentProductCount + 1) {
+                logger.info(product.getShortName() + " Increment Succeed. New Value: " + newProductCountValue);
+                productCountIncrement--;
+                currentProductCount++;
+            } else {
+                logger.warn(product.getShortName() + " Increment Failed. Retries: " + retries);
+                retries++;
+            }
+            if (retries > 5)
+                return false;
+        }
+
+        int finalValidationCount = getCurrentProductCountValue(findProductCounter(product));
+        if (finalValidationCount != targetProductCount) {
+            logger.warn("Product count validation failed, retrying incrementation: ");
+            setCountWithIncrementButton(product, targetProductCount - finalValidationCount);
+        }
+
+        return true;
+    }
+        private SelenideElement findProductCounter(Product product) {
+        String threeLevelsUp = "./../../..";
+        SelenideElement subCatText = $(byText(product.getProductSubCategory()));
+        SelenideElement subCat = subCatText.$(By.xpath(threeLevelsUp));
+        SelenideElement productText = subCat.$(byText(product.getName()));
+        SelenideElement prodRow = productText.find(By.xpath(threeLevelsUp));
+
+        return getQuantityControlElementFromProductRow(prodRow,
+                product.getProductPackage().getDescription(),
+                product.getProductForm());
+    }
+
+    private SelenideElement getQuantityControlElementFromProductRow(SelenideElement productTableRow, String productPackage, String productForm) {
 
         // Product Table Row:
         //
@@ -354,94 +382,10 @@ public class TastyCoffeePage {
         return currentTypeProducts;
     }
 
-    private SelenideElement locateProductCounter(Product product) {
-
-        for (SelenideElement productGroup : getProductCategories()) {
-            for (SelenideElement productSubgroup : getProductSubCategoriesFromCategory(productGroup)) {
-                try {
-                    SelenideElement correspondingProduct = productSubgroup.find(byText(product.getName()));
-                    SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
-
-                    return getQuantityControlElement(correspondingProductTableRow,
-                            product.getProductPackage().getDescription(),
-                            product.getProductForm());
-                } catch (ElementNotFound ignored) {}
-            }
-        }
-        return null;
-    }
-
-    private SelenideElement locateIncrementButton(Product product) {
-        for (SelenideElement productGroup : getProductCategories()) {
-            for (SelenideElement productSubgroup : getProductSubCategoriesFromCategory(productGroup)) {
-                try {
-                    SelenideElement correspondingProduct = productSubgroup.find(byText(product.getName()));
-                    SelenideElement correspondingProductTableRow = correspondingProduct.find(By.xpath("./../../.."));
-                    SelenideElement counter = getQuantityControlElement(correspondingProductTableRow,
-                            product.getProductPackage().getDescription(),
-                            product.getProductForm());
-                    return getIncrementButtonFromQuantityCounter(counter);
-                } catch (ElementNotFound ignored) {}
-            }
-        }
-        return null;
-    }
-
-    private SelenideElement findProductCounter(Product product) {
-
-        SelenideElement correspondingProduct = findProductSubcategory(product)
-                .find(byText(product.getName()))
-                .find(By.xpath("./../../.."));
-
-        return getQuantityControlElement(correspondingProduct,
-                product.getProductPackage().getDescription(),
-                product.getProductForm());
-    }
-
-    private SelenideElement findProductSubcategory(Product product) {
-        return findProductCategory(product)
-                .findAll(getProductSubgroupsFromGroupLocator())
-                .findBy(Condition.name(product.getProductSubCategory()));
-    }
-
-    private SelenideElement findProductCategory(Product product) {
-        return $$(getAllProductCategoriesLocator())
-                .findBy(Condition.name(product.getProductCategory()));
-    }
-
-    private ElementsCollection getProductCategories() {
-        return $$(getAllProductCategoriesLocator());
-    }
-
-    private String getAllProductCategoriesLocator() {
-        return "div.main-accordion";
-    }
-
-    private ElementsCollection getProductSubCategoriesFromCategory(SelenideElement productGroup) {
-        return productGroup.$$(getProductSubgroupsFromGroupLocator());
-    }
-
-    private String getProductSubgroupsFromGroupLocator() {
-        return "div.accordion.accordion_product";
-    }
-
-
-    private String getProductsTableLocator() {
-        return "table.table-lk";
-    }
-
-    private String getProductRowLocator() {
-        return "tr.searchTab";
-    }
-
     private List<SelenideElement> getRegularProductPacks(SelenideElement product) {
         return new TastyCoffeeWebPageElement(product)
                 .applySelector(PRODUCT_REGULAR_PACKAGE)
                 .getElements();
-    }
-
-    private String getRegularProductPackagesLocator() {
-        return "td.price-count-1";
     }
 
     private List<SelenideElement> getGrindableProductPacks(SelenideElement product) {
@@ -450,31 +394,17 @@ public class TastyCoffeePage {
                 .getElements();
     }
 
-    private String getGrindableProductPackagesLocator() {
-        return "td.price-count-2";
+    private SelenideElement getProductCountInput(SelenideElement counter) {
+        return counter.find(By.cssSelector("div.input-wrap")).find(By.name("count"));
     }
 
     private SelenideElement getIncrementButtonFromQuantityCounter(SelenideElement counter) {
         return counter.find(By.cssSelector("div.input-group-append")).find(By.tagName("button"));
     }
 
-    private SelenideElement getProductCountInput(SelenideElement counter) {
-        return counter.find(By.cssSelector("div.input-wrap")).find(By.name("count"));
-    }
-
     private int getCurrentProductCountValue(SelenideElement counter) {
         String value = getProductCountInput(counter).getDomProperty("value");
         return Integer.parseInt(Objects.requireNonNull(value));
-    }
-
-    private void clearInput(SelenideElement input) {
-        input.sendKeys(Keys.CONTROL + "a");
-        input.sendKeys(Keys.BACK_SPACE);
-    }
-
-    private void setInputValue(SelenideElement input, int amount) {
-        String newValue = Integer.toString(amount);
-        input.sendKeys(newValue);
     }
 
     private String getCategoryTitle(SelenideElement groupElement) {

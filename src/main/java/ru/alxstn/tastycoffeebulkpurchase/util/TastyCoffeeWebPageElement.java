@@ -47,6 +47,7 @@ public class TastyCoffeeWebPageElement {
                             new TastyCoffeeWebPageElement($(byXpath(selector.getSelector())));
                 }
             }
+
         } else if (element != null) {
             switch (selector.getSelectorType()) {
                 case "text" -> {
@@ -70,6 +71,7 @@ public class TastyCoffeeWebPageElement {
                             new TastyCoffeeWebPageElement(element.$(byXpath(selector.getSelector())));
                 }
             }
+
         } else {
             // element collections is the source
         }

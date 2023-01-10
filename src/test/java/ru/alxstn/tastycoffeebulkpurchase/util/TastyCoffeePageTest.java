@@ -72,7 +72,7 @@ class TastyCoffeePageTest {
         purchases.put(decaf250Beans, 5);
         Assertions.assertDoesNotThrow(() -> {
             List<Product> leftovers = webPage.placeOrder(purchases);
-            assertEquals(0, leftovers.size());
+            assertTrue(leftovers.isEmpty());
         });
     }
 
@@ -128,13 +128,13 @@ class TastyCoffeePageTest {
 
         Map<Product, Integer> purchases = new HashMap<>();
 
-        purchases.put(berry2000, 1);
-        purchases.put(berry1000, 2);
-        purchases.put(berry250Beans, 3);
+        purchases.put(berry2000, 10);
+        purchases.put(berry1000, 20);
+        purchases.put(berry250Beans, 30);
 
-        purchases.put(berry250Fine, 2);
-        purchases.put(berry250Medium, 1);
-        purchases.put(berry250Coarse, 1);
+        purchases.put(berry250Fine, 20);
+        purchases.put(berry250Medium, 10);
+        purchases.put(berry250Coarse, 10);
 
         Assertions.assertDoesNotThrow(() -> {
             List<Product> leftovers = webPage.placeOrder(purchases);
@@ -147,7 +147,10 @@ class TastyCoffeePageTest {
         // All functionality combined in one test because of parser high time-consuming behavior
         Assertions.assertDoesNotThrow(() -> {
             logger.info("Now Obtaining PriceList");
-            List<Product> obtainedPriceList = webPage.buildPriceList();
+            List<Product> obtainedPriceList = webPage.buildPriceList().stream()
+                    .filter(Product::isAvailable)
+                    .filter(Product::isActual)
+                    .toList();
 
             Map<Product, Integer> purchases = new HashMap<>();
             obtainedPriceList.forEach(p -> purchases.put(p, 5));
