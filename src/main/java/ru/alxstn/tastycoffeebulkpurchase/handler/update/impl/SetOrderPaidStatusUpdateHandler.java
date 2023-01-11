@@ -12,7 +12,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.SetOrderPaidCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoDeserializer;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManagerService;

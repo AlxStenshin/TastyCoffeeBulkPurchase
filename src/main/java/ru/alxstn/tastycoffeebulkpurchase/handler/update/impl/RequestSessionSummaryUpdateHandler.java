@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RequestSessionSummaryCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionSummaryMessageCreatorService;

@@ -14,7 +14,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
 import java.util.List;

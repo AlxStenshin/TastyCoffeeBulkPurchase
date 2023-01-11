@@ -10,10 +10,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TelegramBotConfigProperties;
-import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.AlertMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.RemoveMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 
 import javax.annotation.PostConstruct;

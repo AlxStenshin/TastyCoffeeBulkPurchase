@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemoveMessageCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.event.RemoveMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.RemoveMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 
 @Component

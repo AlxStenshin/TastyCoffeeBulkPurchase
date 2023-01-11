@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.handler;
+package ru.alxstn.tastycoffeebulkpurchase.handler.command;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;

@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemovePurchaseCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.event.AlertMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;

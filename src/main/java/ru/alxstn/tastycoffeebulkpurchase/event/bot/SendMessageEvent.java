@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.event;
+package ru.alxstn.tastycoffeebulkpurchase.event.bot;
 
 import org.springframework.context.ApplicationEvent;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

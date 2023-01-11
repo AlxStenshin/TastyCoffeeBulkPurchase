@@ -13,7 +13,7 @@ import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemoveMessageCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.SetCustomerNotificationSettingsDto;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
-import ru.alxstn.tastycoffeebulkpurchase.event.UpdateMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;

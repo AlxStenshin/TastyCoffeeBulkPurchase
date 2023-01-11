@@ -13,7 +13,7 @@ import ru.alxstn.tastycoffeebulkpurchase.bot.MainMenuKeyboard;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.*;
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
@@ -73,7 +73,6 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
 
                 // ToDo: Separate DTO: PlaceOrder (Purchase)
                 case PLACE_ORDER -> {
-                    SendMessageEvent placeOrderAnswerEvent;
                     try {
                         Session currentSession = sessionManager.getActiveSession();
                         sessionManager.checkSessionCustomerAccessible(currentSession);
@@ -87,7 +86,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                         new PlaceOrderCommandDto("PlaceOrder"))))
                                 .build());
 
-                        placeOrderAnswerEvent = new SendMessageEvent(this, placeOrderAnswer.newMessage());
+                        SendMessageEvent placeOrderAnswerEvent = new SendMessageEvent(this, placeOrderAnswer.newMessage());
                         publisher.publishEvent(placeOrderAnswerEvent);
 
                     } catch (SessionNotFoundException | SessionIsNotOpenException e) {
@@ -176,13 +175,15 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                 .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto(currentSession)))
                                 .build()));
 
+                        // ToDo: Pass correct message id to delete (this)
+                        /*
                         informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                                 .text("Закрыть")
-                                // ToDo: Pass correct message id to delete (this)
                                 .callbackData(serializer.serialize(new RemoveMessageCommandDto(
                                         update.getMessage().getMessageId(),
                                         update.getMessage().getChatId())))
                                 .build()));
+                        */
 
                         publisher.publishEvent(new SendMessageEvent(this,
                                 SendMessage.builder()

@@ -13,8 +13,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.CustomerNotificationSettings;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoDeserializer;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 
 import java.util.Arrays;

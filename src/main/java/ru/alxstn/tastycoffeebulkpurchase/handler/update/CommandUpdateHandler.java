@@ -1,14 +1,14 @@
-package ru.alxstn.tastycoffeebulkpurchase.handler.command;
+package ru.alxstn.tastycoffeebulkpurchase.handler.update;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
+import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandlerFactory;
 import ru.alxstn.tastycoffeebulkpurchase.handler.command.parser.CommandParser;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
-import ru.alxstn.tastycoffeebulkpurchase.handler.CommandHandler;
+import ru.alxstn.tastycoffeebulkpurchase.handler.command.CommandHandler;
 import ru.alxstn.tastycoffeebulkpurchase.dto.ParsedCommandDto;
-import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
 
 import java.util.Optional;
 

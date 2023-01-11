@@ -13,7 +13,7 @@ import ru.alxstn.tastycoffeebulkpurchase.dto.impl.RemoveProductFromCustomerPurch
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.ReplaceProductForCustomerPurchaseCommandDto;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductUpdateEvent;
-import ru.alxstn.tastycoffeebulkpurchase.event.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
