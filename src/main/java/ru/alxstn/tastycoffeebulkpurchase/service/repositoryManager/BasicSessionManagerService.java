@@ -2,6 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import ru.alxstn.tastycoffeebulkpurchase.entity.RequiredProductProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewSessionStartedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
@@ -9,6 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationExcept
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.WebPageOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
@@ -26,6 +28,7 @@ public class BasicSessionManagerService implements SessionManagerService {
     private final DateTimeProvider dateTimeProvider;
     private final WebPageOrderCreatorService webPageOrderCreator;
     private final TextFileOrderCreatorService textFileOrderCreator;
+    private final BasicPurchaseFilterService requiredProductsService;
 
     public BasicSessionManagerService(ApplicationEventPublisher publisher,
                                       SessionRepository sessionRepository,
@@ -37,6 +40,7 @@ public class BasicSessionManagerService implements SessionManagerService {
         this.dateTimeProvider = dateTimeProvider;
         this.webPageOrderCreator = webPageOrderCreator;
         this.textFileOrderCreator = textFileOrderCreator;
+        this.requiredProductsService = new BasicPurchaseFilterService();
     }
 
     @Override
@@ -58,14 +62,22 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public Session closeSession(Session session) {
+    public void closeSession(Session session) {
         session.setDateTimeClosed(dateTimeProvider.getCurrentTimestamp());
         session.setClosed(true);
         sessionRepository.save(session);
-        webPageOrderCreator.createOrder(session);
-        textFileOrderCreator.createOrder(session);
         publisher.publishEvent(new ActiveSessionClosedNotificationEvent(this, session));
-        return session;
+    }
+
+    @Override
+    public void placeSessionPurchases(RequiredProductProperties requiredProducts) {
+        webPageOrderCreator.placeOrderWithProductTypes(requiredProducts);
+        textFileOrderCreator.placeOrderWithProductTypes(requiredProducts);
+    }
+
+    @Override
+    public RequiredProductProperties buildReqProductTypes(Session session) {
+        return requiredProductsService.createAllEnabledProperties(session);
     }
 
     public void checkSessionCustomerAccessible(Session session) {

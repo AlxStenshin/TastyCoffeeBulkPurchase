@@ -32,7 +32,7 @@ public class WebScrapperPriceListUpdaterService implements PriceListUpdaterServi
     }
 
     @Override
-    @Scheduled(fixedRate = 3 * 60 * 60 * 1000, initialDelay = 500)
+    //@Scheduled(fixedRate = 3 * 60 * 60 * 1000, initialDelay = 500)
     public void updatePriceList() {
         List<Product> priceList = tastyCoffeeWebPage.buildPriceList();
         logger.info("Got " + priceList.size() + " items in price list");

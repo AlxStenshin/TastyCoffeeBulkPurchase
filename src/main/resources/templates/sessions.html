@@ -74,12 +74,12 @@
                         <a th:href="@{'/sessions/delete/' + ${s.id}}"
                            th:sessionTitle="${s.title}" id="btnDelete"
                            title="Delete this session" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
-
-                        <a th:href="@{'/sessions/receipt/' + ${s.id}}"
+-->
+                        <a th:href="@{'/sessions/'+ ${s.id} + '/placeOrder/'}"
                            th:sessionTitle="${s.title}" id="btnReceipt"
                            title="Get receipt for this session" class="fa-regular fa-receipt icon-dark"></a>
 
-                        -->
+
                     </td>
                 </tr>
                 </tbody>

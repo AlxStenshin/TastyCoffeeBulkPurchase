@@ -27,7 +27,7 @@ public class Session {
     @Column(name = "closed")
     private boolean closed;
 
-    @Column(name = "closeNotificationSent")
+    @Column(name = "close_notification_sent")
     private boolean closeNotificationSent;
 
     @Column(name = "finished")

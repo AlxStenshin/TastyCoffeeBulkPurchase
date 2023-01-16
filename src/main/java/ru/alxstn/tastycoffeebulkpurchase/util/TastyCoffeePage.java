@@ -45,7 +45,7 @@ public class TastyCoffeePage {
 
     public List<Product> buildPriceList() {
         login();
-        resetOrder();
+        //resetOrder();
         List<Product> allProducts = new ArrayList<>();
         try {
             ElementsCollection tabs = new TastyCoffeeWebPageElement()

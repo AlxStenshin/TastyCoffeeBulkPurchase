@@ -66,7 +66,7 @@ That's it. All orders will be automatically placed after session being closed.
 5) ~~"Product changed" notification message.~~
 6) Do not parse products until there is closed, but non-finished session (this will clear purchases otherwise)
 7) ~~Session summary in human-readable format for order validation.~~
-8) Separate order placement for grindable and non-grindable coffee. (TastyCoffee manager requirements, thanx for that :<)
+8) ~~Separate order placement for grindable and non-grindable coffee.~~
 9) JVM, DB and app-specific metrics monitoring using Prometheus and Grafana.
 10) Docker compose
 11) Heroku? deploy

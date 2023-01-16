@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.alxstn.tastycoffeebulkpurchase.entity.RequiredProductProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
@@ -55,9 +56,30 @@ public class SessionController {
 
     @GetMapping(value = "/sessions/close/{id}", produces = MediaType.TEXT_HTML_VALUE)
     public String closeSession(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("session", sessionManager.closeSession(sessionManager.getSessionById(id)));
+        Session session = sessionManager.getSessionById(id);
+        sessionManager.closeSession(session);
+        model.addAttribute("session", session);
         model.addAttribute("pageTitle", "Close Session");
         return "session_close_form";
+    }
+
+    @GetMapping(value = "/sessions/{id}/placeOrder", produces = MediaType.TEXT_HTML_VALUE)
+    public String placeSessionOrders(@PathVariable("id") Integer id, Model model) {
+        model.addAttribute("properties",
+                sessionManager.buildReqProductTypes(sessionManager.getSessionById(id)));
+        return "session_place_order_form";
+    }
+
+    @PostMapping(value = "/sessions/placeOrder/")
+    public String placeSessionOrders(RequiredProductProperties properties,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            sessionManager.placeSessionPurchases(properties);
+            redirectAttributes.addFlashAttribute("message", "The Orders will be placed now.");
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("message", e.getMessage());
+        }
+        return "redirect:/sessions";
     }
 
     @PostMapping("/sessions/save")
@@ -70,6 +92,7 @@ public class SessionController {
         }
         return "redirect:/sessions";
     }
+
 }
 
 

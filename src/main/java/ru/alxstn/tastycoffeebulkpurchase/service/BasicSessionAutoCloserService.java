@@ -3,7 +3,6 @@ package ru.alxstn.tastycoffeebulkpurchase.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
@@ -15,7 +14,6 @@ import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 import java.time.LocalDateTime;
 
 @Service
-@EnableAsync
 public class BasicSessionAutoCloserService implements SessionAutoCloserService {
 
     Logger logger = LogManager.getLogger(BasicSessionAutoCloserService.class);
@@ -31,7 +29,7 @@ public class BasicSessionAutoCloserService implements SessionAutoCloserService {
     }
 
     @Override
-    @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 500)
+    @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 5000)
     public void closeActiveSession() {
         try {
             Session activeSession = sessionManagerService.getActiveSession();

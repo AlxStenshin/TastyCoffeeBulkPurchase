@@ -34,8 +34,10 @@ class TextFileOrderCreatorServiceTest {
     @InjectMocks
     TextFileOrderCreatorService textFileOrderCreator;
 
-    private final Session session = new Session();
-    { session.setId(1L); }
+    private final Session session = new Session(); {
+        session.setId(1L);
+        session.setTitle("test");
+    }
 
     private final ProductPackage firstPackage = new ProductPackage("Упаковка 250 г");
     private final ProductPackage secondPackage = new ProductPackage("Упаковка 100 г");
@@ -106,9 +108,9 @@ class TextFileOrderCreatorServiceTest {
                         thirdProductCoarse, 1,
                         thirdProductFine, 3));
 
-        assertDoesNotThrow(() -> textFileOrderCreator.createOrder(session));
+        assertDoesNotThrow(() -> textFileOrderCreator.placeFullOrder(session));
 
-        Path filePath = Path.of(session.getId() + ".sessionReport.json");
+        Path filePath = Path.of(session.getId() + ".test.sessionReport.json");
 
         try (Reader reader = Files.newBufferedReader(filePath, Charset.forName("windows-1251"))) {
             String report = IOUtils.toString(reader);
@@ -129,8 +131,8 @@ class TextFileOrderCreatorServiceTest {
                 .thenReturn(Map.of());
 
         assertDoesNotThrow(() -> {
-            textFileOrderCreator.createOrder(session);
-            Path filePath = Path.of(session.getId() + ".sessionReport.json");
+            textFileOrderCreator.placeFullOrder(session);
+            Path filePath = Path.of(session.getId() + ".test.sessionReport.json");
             assertTrue(Files.readString(filePath).isBlank());
         });
     }
