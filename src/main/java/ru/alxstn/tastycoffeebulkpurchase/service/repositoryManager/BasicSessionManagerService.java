@@ -2,7 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import ru.alxstn.tastycoffeebulkpurchase.entity.RequiredProductProperties;
+import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewSessionStartedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
@@ -70,14 +70,14 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public void placeSessionPurchases(RequiredProductProperties requiredProducts) {
+    public void placeSessionPurchases(DiscardedProductProperties requiredProducts) {
         webPageOrderCreator.placeOrderWithProductTypes(requiredProducts);
         textFileOrderCreator.placeOrderWithProductTypes(requiredProducts);
     }
 
     @Override
-    public RequiredProductProperties buildReqProductTypes(Session session) {
-        return requiredProductsService.createAllEnabledProperties(session);
+    public DiscardedProductProperties buildDiscardedProductTypes(Session session) {
+        return requiredProductsService.createAllDiscardedPropertiesTurnedOff(session);
     }
 
     public void checkSessionCustomerAccessible(Session session) {

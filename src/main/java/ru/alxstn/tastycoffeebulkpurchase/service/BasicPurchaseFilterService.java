@@ -1,51 +1,52 @@
 package ru.alxstn.tastycoffeebulkpurchase.service;
 
-import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
-import ru.alxstn.tastycoffeebulkpurchase.entity.RequiredProductProperties;
-import ru.alxstn.tastycoffeebulkpurchase.entity.RequiredProductType;
-import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 public class BasicPurchaseFilterService implements PurchaseFilterService {
 
     final List<String> productFormsCategories = List.of("Зерно", "Мелкий", "Средний", "Крупный");
+    // ToDo: Obtain Product Types via Product Repository Distinct Request.
     final List<String> productTypeCategories = List.of("Чай", "Шоколад", "Сиропы");
 
     @Override
-    public Map<Product, Integer> filterPurchases(RequiredProductProperties requiredTypes, Map<Product, Integer> allPurchases) {
+    public Map<Product, Integer> filterPurchases(DiscardedProductProperties discardedProductProperties, Map<Product, Integer> allPurchases) {
 
-        Map<Product, Integer> requiredPurchases = new HashMap<>();
+        Map<Product, Integer> requiredPurchases = new HashMap<>(allPurchases);
 
-        List<String> acceptedTypes = requiredTypes.getRequiredProductTypes().stream()
-                .filter(RequiredProductType::getValue)
-                .map(RequiredProductType::getDescription)
+        List<String> discardedTypes = discardedProductProperties.getDiscardedProductTypes().stream()
+                .filter(DiscardedProductType::getValue)
+                .map(DiscardedProductType::getDescription)
                 .toList();
 
-        for (var type : acceptedTypes) {
-            requiredPurchases.putAll(allPurchases.entrySet().stream()
-                    .filter(purchase -> allPurchases.keySet().stream().filter(Objects.requireNonNull(buildPredicate(type))).toList().contains(purchase.getKey()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        for (var type : discardedTypes) {
+            List<Product> discardedProducts = requiredPurchases.keySet().stream()
+                    .filter(Objects.requireNonNull(buildPredicate(type)))
+                    .toList();
+
+            for (Product p : discardedProducts) {
+                requiredPurchases.remove(p);
+            }
         }
 
         return requiredPurchases;
     }
 
-    public RequiredProductProperties createAllEnabledProperties(Session session) {
+    public DiscardedProductProperties createAllDiscardedPropertiesTurnedOff(Session session) {
 
-        List<RequiredProductType> productTypes = new ArrayList<>(productFormsCategories.stream()
-                .map(s -> new RequiredProductType(s, true))
+        List<DiscardedProductType> productTypes = new ArrayList<>(productFormsCategories.stream()
+                .map(s -> new DiscardedProductType(s, false))
                 .toList());
 
         productTypes.addAll(productTypeCategories.stream()
-                .map(s -> new RequiredProductType(s, true))
+                .map(s -> new DiscardedProductType(s, false))
                 .toList());
 
-        RequiredProductProperties types = new RequiredProductProperties(productTypes);
+        DiscardedProductProperties types = new DiscardedProductProperties(productTypes);
         types.setSession(session);
 
         return types;

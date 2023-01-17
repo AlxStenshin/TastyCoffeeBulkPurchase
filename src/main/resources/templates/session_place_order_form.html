@@ -35,21 +35,21 @@
 <!--ToDo: change syntax to more supportable :-->
 <!--          https://stackoverflow.com/questions/40717777/thymeleaf-edit-list-of-objects-for-form  -->
 <!--          <input th:field="*{properties[__${status.index}__].value}"/>.-->
-<!--          th:name="*{requiredProductTypes[__${types.index}__].description}"-->
-<!--          th:name="*{requiredProductTypes[__${types.index}__].value}"-->
+<!--          th:name="*{discardedProductTypes[__${types.index}__].description}"-->
+<!--          th:name="*{discardedProductTypes[__${types.index}__].value}"-->
 
-          <th:block th:each="type, types : ${properties.requiredProductTypes}">
+          <th:block th:each="type, types : ${properties.discardedProductTypes}">
             <div class="row form-group">
               <div class="col-sm-8">
                 <label th:text="${type.description}">Label</label>
               </div>
               <div class="col-sm-4">
                   <input type="hidden"
-                       th:name="${'requiredProductTypes[' + types.index + '].description'}"
+                       th:name="${'discardedProductTypes[' + types.index + '].description'}"
                        th:value="${type.description}" />
 
                 <input type="checkbox" data-toggle="toggle"
-                       th:name="${'requiredProductTypes[' + types.index + '].value'}"
+                       th:name="${'discardedProductTypes[' + types.index + '].value'}"
                        th:checked="${type.value}"/>
               </div>
             </div>

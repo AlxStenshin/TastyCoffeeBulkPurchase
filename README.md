@@ -67,6 +67,8 @@ That's it. All orders will be automatically placed after session being closed.
 6) Do not parse products until there is closed, but non-finished session (this will clear purchases otherwise)
 7) ~~Session summary in human-readable format for order validation.~~
 8) ~~Separate order placement for grindable and non-grindable coffee.~~
-9) JVM, DB and app-specific metrics monitoring using Prometheus and Grafana.
-10) Docker compose
-11) Heroku? deploy
+9) ~~Update customer purchase information on discount change, not only on customer purchase change.~~
+10) Separate Service for Text builders with tests
+10) JVM, DB and app-specific metrics monitoring using Prometheus and Grafana.
+11) Docker compose
+12) Heroku? deploy

@@ -1,16 +1,16 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
-public class RequiredProductType {
+public class DiscardedProductType {
 
     private String description;
     private boolean value;
 
     @SuppressWarnings("unused")
-    public RequiredProductType() {
+    public DiscardedProductType() {
         // Required for correct deserialization from thymeleaf html
     }
 
-    public RequiredProductType(String description, boolean value) {
+    public DiscardedProductType(String description, boolean value) {
         this.description = description;
         this.value = value;
     }

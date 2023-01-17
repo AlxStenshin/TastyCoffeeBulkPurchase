@@ -233,10 +233,11 @@ public class Product {
 
     public String getShortName() {
         String displayName = "";
-        displayName += productCategory.isEmpty() ? "" : productCategory + " ";
-        displayName += productSubCategory.isEmpty() ? "" : productSubCategory + " ";
-        displayName += name.isEmpty() ? "" : name;
-        displayName += productForm.isEmpty() ? "" : ", " + productForm;
+        displayName += productCategory.isEmpty() ? "" : productCategory + ", ";
+        displayName += productSubCategory.isEmpty() ? "" : productSubCategory + ", ";
+        displayName += name.isEmpty() ? "" : name + ", ";
+        displayName += productPackage.getDescription().isEmpty() ? "" : productPackage;
+        displayName += productForm.isEmpty() ? "" :  ", " + productForm;
         return displayName;
     }
 

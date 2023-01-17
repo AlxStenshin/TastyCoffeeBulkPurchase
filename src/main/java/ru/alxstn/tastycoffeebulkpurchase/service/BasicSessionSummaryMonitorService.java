@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Purchase;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
@@ -87,7 +88,12 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 
-            List<Customer> currentSessionSubscribedCustomers = purchaseManagerService.getSessionCustomers(currentSession)
+            List<Customer> currentSessionCustomers = purchaseManagerService.getSessionCustomers(currentSession);
+            for (Customer c : currentSessionCustomers) {
+                publisher.publishEvent(new CustomerSummaryCheckRequestEvent(this, c, "Discount Change"));
+            }
+
+            List<Customer> currentSessionSubscribedCustomers = currentSessionCustomers
                     .stream()
                     .filter(c -> c.getNotificationSettings().isReceiveDiscountNotification())
                     .toList();

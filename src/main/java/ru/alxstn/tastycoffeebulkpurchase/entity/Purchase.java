@@ -66,12 +66,12 @@ public class Purchase {
 
     public String getPurchaseSummary() {
         String summary = product.getShortName();
-        summary += ", " + getProductCountAndTotalPrice();
+        summary += getProductCountAndTotalPrice();
         return summary;
     }
 
     public String getProductCountAndTotalPrice() {
-        return getCount() + " шт, " + getTotalPrice() + "₽";
+        return " " + getCount() + " шт, " + getTotalPrice() + "₽";
     }
 
     public BigDecimal getTotalPrice() {

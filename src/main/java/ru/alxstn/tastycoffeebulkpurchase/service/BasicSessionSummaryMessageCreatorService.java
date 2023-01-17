@@ -26,6 +26,7 @@ public class BasicSessionSummaryMessageCreatorService implements SessionSummaryM
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return (session.isClosed() ? "\n<b>! Сессия закрыта. Заказы не принимаются. !</b>\n" : "") +
                 "<code>" +
+                "\nНаименование: " + session.getTitle() +
                 "\nТекущая скидка: " + session.getDiscountPercentage() + "%" +
                 "\nТоваров по скидке в закупке: " + session.getDiscountableWeight() + "кг." +
                 "\nКофе в закупке: " + session.getCoffeeWeight() + "кг." +

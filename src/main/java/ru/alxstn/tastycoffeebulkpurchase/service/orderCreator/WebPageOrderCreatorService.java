@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
-import ru.alxstn.tastycoffeebulkpurchase.entity.RequiredProductProperties;
+import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductProperties;
 import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
@@ -24,7 +24,7 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeePage tastyCoffeePage;
     private final SessionPurchaseReportCreatorService sessionPurchaseReportCreatorService;
-    private final BasicPurchaseFilterService requiredProductsService;
+    private final BasicPurchaseFilterService purchaseFilterService;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public WebPageOrderCreatorService(ApplicationEventPublisher publisher,
@@ -33,7 +33,7 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
         this.publisher = publisher;
         this.tastyCoffeePage = tastyCoffeePage;
         this.sessionPurchaseReportCreatorService = sessionPurchaseReportCreatorService;
-        this.requiredProductsService = new BasicPurchaseFilterService();
+        this.purchaseFilterService = new BasicPurchaseFilterService();
     }
 
     public void placeFullOrder(Session session) {
@@ -51,12 +51,13 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
     }
 
     @Override
-    public void placeOrderWithProductTypes(RequiredProductProperties productTypes) {
-        logger.info("Placing order for: " + productTypes);
-        Session session = productTypes.getSession();
+    public void placeOrderWithProductTypes(DiscardedProductProperties discardedProductProperties) {
+        logger.info("Placing order without products: " + discardedProductProperties);
+        Session session = discardedProductProperties.getSession();
         var currentSessionPurchases = sessionPurchaseReportCreatorService.createPerProductReport(session);
         if (currentSessionPurchases.size() > 0) {
-            Map<Product, Integer> requiredPurchases = requiredProductsService.filterPurchases(productTypes, currentSessionPurchases);
+            Map<Product, Integer> requiredPurchases = purchaseFilterService.
+                    filterPurchases(discardedProductProperties, currentSessionPurchases);
             executorService.execute(() -> {
                 var unfinishedPurchasesProducts = tastyCoffeePage.placeOrder(requiredPurchases);
                 publisher.publishEvent(new PurchasePlacementErrorEvent(this, unfinishedPurchasesProducts));

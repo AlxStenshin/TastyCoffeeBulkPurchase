@@ -1,7 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.service;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -92,8 +92,8 @@ class BasicPurchaseFilterServiceTest {
     );
 
 
-    @BeforeAll
-    static void init() {
+    @BeforeEach
+    void init() {
         service = new BasicPurchaseFilterService();
         for (var p : allProducts) {
             allPurchases.put(p, 1);
@@ -107,13 +107,13 @@ class BasicPurchaseFilterServiceTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"Зерно", "Мелкий", "Средний", "Крупный", "Чай", "Шоколад", "Сиропы"})
-    void shouldFilterAllButOneProduct(String targetProduct) {
-        var properties = service.createAllEnabledProperties(session);
-        properties.getRequiredProductTypes().stream()
-                .filter(p -> !Objects.equals(p.getDescription(), targetProduct))
-                .forEach(p -> p.setValue(false));
+    void shouldFilterOneProduct(String targetType) {
+        var properties = service.createAllDiscardedPropertiesTurnedOff(session);
+        properties.getDiscardedProductTypes().stream()
+                .filter(p -> Objects.equals(p.getDescription(), targetType))
+                .forEach(p -> p.setValue(true));
 
-        Assertions.assertEquals(1, service.filterPurchases(properties, allPurchases).entrySet().size());
+        Assertions.assertEquals(allProducts.size() - 1, service.filterPurchases(properties, allPurchases).entrySet().size());
     }
 
 }

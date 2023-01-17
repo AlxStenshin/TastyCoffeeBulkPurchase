@@ -12,7 +12,7 @@ public class CustomerNotificationSettings {
 
     @Column(name = "payment_confirmation", table = "notification_settings")
     private boolean receivePaymentConfirmationNotification;
-    private static final String receivePaymentConfirmationNotificationDescription = "Уведомления об оплате закзазов";
+    private static final String receivePaymentConfirmationNotificationDescription = "Уведомления об оплате заказов";
 
     @Column(name = "new_session", table = "notification_settings")
     private boolean receiveNewSessionStartedNotification;
