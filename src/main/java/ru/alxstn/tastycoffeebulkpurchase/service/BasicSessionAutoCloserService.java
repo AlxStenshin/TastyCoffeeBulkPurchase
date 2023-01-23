@@ -29,7 +29,7 @@ public class BasicSessionAutoCloserService implements SessionAutoCloserService {
     }
 
     @Override
-    @Scheduled(fixedDelay = 10 * 60 * 1000, initialDelay = 5000)
+    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 5000)
     public void closeActiveSession() {
         try {
             Session activeSession = sessionManagerService.getActiveSession();
@@ -49,7 +49,6 @@ public class BasicSessionAutoCloserService implements SessionAutoCloserService {
                     publisher.publishEvent(new ActiveSessionClosesSoonNotificationEvent(this, activeSession));
                 }
             }
-
         } catch (SessionNotFoundException ignored) {}
     }
 

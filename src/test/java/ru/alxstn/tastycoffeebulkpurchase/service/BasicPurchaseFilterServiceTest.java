@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -91,7 +92,6 @@ class BasicPurchaseFilterServiceTest {
                     false)
     );
 
-
     @BeforeEach
     void init() {
         service = new BasicPurchaseFilterService();
@@ -108,12 +108,18 @@ class BasicPurchaseFilterServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"Зерно", "Мелкий", "Средний", "Крупный", "Чай", "Шоколад", "Сиропы"})
     void shouldFilterOneProduct(String targetType) {
-        var properties = service.createAllDiscardedPropertiesTurnedOff(session);
-        properties.getDiscardedProductTypes().stream()
+        var properties = service.createAllTypesWithState(
+                session, SessionProductFilterType.DISCARD_FILTER, false);
+
+        properties.getProductTypeFilters().stream()
                 .filter(p -> Objects.equals(p.getDescription(), targetType))
                 .forEach(p -> p.setValue(true));
+        var result = service.filterPurchases(properties, allPurchases);
 
-        Assertions.assertEquals(allProducts.size() - 1, service.filterPurchases(properties, allPurchases).entrySet().size());
+        Assertions.assertEquals(allProducts.size() - 1, result.entrySet().size());
+        Assertions.assertTrue(result.entrySet()
+                .stream().noneMatch(e -> e.getKey().getProductCategory().equals(targetType) ||
+                        e.getKey().getProductForm().equals(targetType)));
     }
 
 }

@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.util;
+package ru.alxstn.tastycoffeebulkpurchase.model;
 
 public enum TastyCoffeePageElementSelector {
 

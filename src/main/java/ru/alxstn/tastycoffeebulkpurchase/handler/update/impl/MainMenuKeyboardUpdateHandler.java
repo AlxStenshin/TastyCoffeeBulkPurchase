@@ -55,7 +55,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
     @Override
     public boolean handleUpdate(Update update) {
         Message message = update.getMessage();
-        logger.info("Main Menu Button Click Command Received: " + message);
+        //logger.info("Main Menu Button Click Command Received: " + message);
 
         if (!update.hasMessage()) {
             return false;

@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.util;
+package ru.alxstn.tastycoffeebulkpurchase.model;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;

@@ -2,7 +2,8 @@ package ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductProperties;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewSessionStartedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ActiveSessionClosedNotificationEvent;
@@ -70,14 +71,23 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
-    public void placeSessionPurchases(DiscardedProductProperties requiredProducts) {
-        webPageOrderCreator.placeOrderWithProductTypes(requiredProducts);
-        textFileOrderCreator.placeOrderWithProductTypes(requiredProducts);
+    public void placeSessionPurchases(SessionProductFilters productFilters) {
+        webPageOrderCreator.placeOrderWithProductTypes(productFilters);
+        textFileOrderCreator.placeOrderWithProductTypes(productFilters);
     }
 
     @Override
-    public DiscardedProductProperties buildDiscardedProductTypes(Session session) {
-        return requiredProductsService.createAllDiscardedPropertiesTurnedOff(session);
+    public SessionProductFilters buildDiscardedProductTypes(Session session) {
+        return requiredProductsService.createAllTypesWithState(session,
+                SessionProductFilterType.DISCARD_FILTER,
+                false);
+    }
+
+    @Override
+    public SessionProductFilters buildAcceptedProductTypes(Session session) {
+        return requiredProductsService.createAllTypesWithState(session,
+                SessionProductFilterType.ACCEPT_FILTER,
+                true);
     }
 
     public void checkSessionCustomerAccessible(Session session) {

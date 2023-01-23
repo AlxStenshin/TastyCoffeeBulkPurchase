@@ -28,28 +28,27 @@
   <div class="row">
     <div class="col-md-4 mt-5">
       <form method="post" th:action="@{'/sessions/placeOrder/'}" th:object="${properties}">
+
         <input type="hidden" th:field="${properties.session}"/>
-
-
 
 <!--ToDo: change syntax to more supportable :-->
 <!--          https://stackoverflow.com/questions/40717777/thymeleaf-edit-list-of-objects-for-form  -->
 <!--          <input th:field="*{properties[__${status.index}__].value}"/>.-->
-<!--          th:name="*{discardedProductTypes[__${types.index}__].description}"-->
-<!--          th:name="*{discardedProductTypes[__${types.index}__].value}"-->
+<!--          th:name="*{productTypeFilters[__${types.index}__].description}"-->
+<!--          th:name="*{productTypeFilters[__${types.index}__].value}"-->
 
-          <th:block th:each="type, types : ${properties.discardedProductTypes}">
+          <th:block th:each="type, types : ${properties.productTypeFilters}">
             <div class="row form-group">
               <div class="col-sm-8">
                 <label th:text="${type.description}">Label</label>
               </div>
               <div class="col-sm-4">
                   <input type="hidden"
-                       th:name="${'discardedProductTypes[' + types.index + '].description'}"
+                       th:name="${'productTypeFilters[' + types.index + '].description'}"
                        th:value="${type.description}" />
 
                 <input type="checkbox" data-toggle="toggle"
-                       th:name="${'discardedProductTypes[' + types.index + '].value'}"
+                       th:name="${'productTypeFilters[' + types.index + '].value'}"
                        th:checked="${type.value}"/>
               </div>
             </div>

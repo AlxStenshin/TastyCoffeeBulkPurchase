@@ -3,10 +3,11 @@ package ru.alxstn.tastycoffeebulkpurchase.service.orderCreator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductType;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductTypeFilter;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
-import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductProperties;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
 
@@ -33,11 +34,15 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
     public void placeFullOrder(Session session) {
         logger.info("Now Saving Purchase Summary for session " + session.getId() + ":" + session.getTitle());
         String report = buildReport(sessionPurchaseReportCreatorService.createPerProductReport(session));
-        saveReport(session, report, requiredProductsService.createAllDiscardedPropertiesTurnedOff(session));
+
+        var allAccepted = requiredProductsService.createAllTypesWithState(
+                session, SessionProductFilterType.DISCARD_FILTER, false);
+
+        saveReport(session, report, allAccepted);
     }
 
     @Override
-    public void placeOrderWithProductTypes(DiscardedProductProperties productTypes) {
+    public void placeOrderWithProductTypes(SessionProductFilters productTypes) {
         logger.info("Placing order for types: " + productTypes);
         Session session = productTypes.getSession();
         var currentSessionPurchases = sessionPurchaseReportCreatorService.createPerProductReport(session);
@@ -49,27 +54,36 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
     }
 
     private String buildReport(Map<Product, Integer> purchases) {
-        return purchases.entrySet().stream()
+        String report = purchases.entrySet().stream()
                 .map(e -> e.getKey().getShortName() + " - " + e.getValue() + " шт.")
                 .sorted()
                 .collect(Collectors.joining("\n"));
+
+        int totalCount = purchases.values().stream()
+                        .reduce(Integer::sum).orElse(0);
+
+        logger.info(report);
+        logger.info("totalProductsCount: " + totalCount);
+        // ToDo: Find Reason why it is not working
+        return report;
     }
 
-    private void saveReport(Session session, String report, DiscardedProductProperties productProperties) {
+    private void saveReport(Session session, String report, SessionProductFilters productProperties) {
         StringBuilder fileName = new StringBuilder(session.getId() + "_" + session.getTitle() + "_");
-        List<String> filteredProducts = productProperties.getDiscardedProductTypes().stream()
-                .filter(DiscardedProductType::getValue)
-                .map(DiscardedProductType::getDescription)
+        List<String> filteredProducts = productProperties.getProductTypeFilters().stream()
+                .filter(ProductTypeFilter::getValue)
+                .map(ProductTypeFilter::getDescription)
                 .toList();
 
         if (!filteredProducts.isEmpty()) {
-            fileName.append("SkippedProducts=(");
+            fileName.append(productProperties.getFilterType().getShortDescription());
             for (String product : filteredProducts) {
                 fileName.append(product);
                 fileName.append(" ");
             }
             fileName.append(")");
         }
+
         fileName.append("_SessionReport.json");
 
         try (PrintWriter out = new PrintWriter(fileName.toString())) {

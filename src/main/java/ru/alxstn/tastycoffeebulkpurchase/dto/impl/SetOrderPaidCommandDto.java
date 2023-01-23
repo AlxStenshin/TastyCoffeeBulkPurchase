@@ -12,7 +12,7 @@ public class SetOrderPaidCommandDto extends SerializableInlineObject {
         super(SerializableInlineType.PAYMENT_CONFIRMATION);
     }
 
-    public SetOrderPaidCommandDto( Session session) {
+    public SetOrderPaidCommandDto(Session session) {
         this();
         this.session = session;
     }

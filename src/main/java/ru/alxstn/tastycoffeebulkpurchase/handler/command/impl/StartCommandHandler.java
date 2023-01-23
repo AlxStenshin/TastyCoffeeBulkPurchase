@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MainMenuKeyboard;
-import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
+import ru.alxstn.tastycoffeebulkpurchase.model.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.CustomerNotificationSettings;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoDeserializer;

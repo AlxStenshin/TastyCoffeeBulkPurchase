@@ -39,10 +39,8 @@
                     <th scope="col">Closed</th>
                     <th scope="col">Finished</th>
                     <th scope="col">Discount Value</th>
-                    <th scope="col">Discountable Weight</th>
                     <th scope="col">Coffee Weight</th>
                     <th scope="col">Tea Weight</th>
-                    <th scope="col">Total Weight</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -56,29 +54,28 @@
                         <div th:if="${s.closed == true}" class="fa-regular fa-square-check"></div>
                         <div>
                             <a th:if="${s.closed == false}"  class="fa-regular fa-square icon-dark"
-                                th:href="@{'/sessions/close/' + ${s.id}}" title="Close this session"></a>
+                                th:href="@{'/sessions/' + ${s.id} + '/close/' }" title="Close this session"></a>
                         </div>
                     </td>                    <td>
                         <div th:if="${s.finished == true}" class="fa-regular fa-square-check"></div>
                         <div th:if="${s.finished == false}"  class="fa-regular fa-square icon-dark"></div>
                     </td>
                     <td>[[${s.discountPercentage}]]%</td>
-                    <td>[[${s.discountableWeight}]] kg</td>
                     <td>[[${s.coffeeWeight}]] kg</td>
                     <td>[[${s.teaWeight}]] kg</td>
-                    <td>[[${s.totalWeight}]] kg</td>
                     <td>
                         <a th:href="@{'/sessions/' + ${s.id}}"
                            title="Edit this session"  class="fa-regular fa-pen-to-square icon-dark"></a>
+
                         <!--
                         <a th:href="@{'/sessions/delete/' + ${s.id}}"
                            th:sessionTitle="${s.title}" id="btnDelete"
                            title="Delete this session" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
--->
+
                         <a th:href="@{'/sessions/'+ ${s.id} + '/placeOrder/'}"
                            th:sessionTitle="${s.title}" id="btnReceipt"
                            title="Get receipt for this session" class="fa-regular fa-receipt icon-dark"></a>
-
+                        -->
 
                     </td>
                 </tr>

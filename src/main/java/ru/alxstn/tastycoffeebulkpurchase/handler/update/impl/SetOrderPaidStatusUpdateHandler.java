@@ -67,6 +67,8 @@ public class SetOrderPaidStatusUpdateHandler extends CallbackUpdateHandler<SetOr
         int paidOrders = paymentManagerService.getCompletePaymentsCount(currentSession).orElse(0);
         int totalOrders = paymentManagerService.getSessionCustomersCount(currentSession).orElse(0);
 
+        // ToDo add event emitter notification, remove button from message with totals.
+
         for (Customer c : purchaseManagerService.getSessionCustomers(currentSession)) {
             if (c.getNotificationSettings().isReceivePaymentConfirmationNotification()) {
                 publisher.publishEvent(new SendMessageEvent(this, SendMessage.builder()

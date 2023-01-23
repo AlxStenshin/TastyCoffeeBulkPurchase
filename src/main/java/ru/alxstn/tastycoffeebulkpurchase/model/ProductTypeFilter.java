@@ -1,16 +1,18 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity;
+package ru.alxstn.tastycoffeebulkpurchase.model;
 
-public class DiscardedProductType {
+
+
+public class ProductTypeFilter {
 
     private String description;
     private boolean value;
 
     @SuppressWarnings("unused")
-    public DiscardedProductType() {
-        // Required for correct deserialization from thymeleaf html
+    // Required for correct deserialization from thymeleaf html
+    public ProductTypeFilter() {
     }
 
-    public DiscardedProductType(String description, boolean value) {
+    public ProductTypeFilter(String description, boolean value) {
         this.description = description;
         this.value = value;
     }

@@ -13,9 +13,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
-import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
-import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -26,15 +25,15 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
     Logger logger = LogManager.getLogger(SessionSummaryMonitorService.class);
     private final ApplicationEventPublisher publisher;
     private final PurchaseManagerService purchaseManagerService;
-    private final SessionRepository sessionRepository;
+    private final SessionManagerService sessionManagerService;
     private final TreeMap<Integer, Integer> discounts;
 
     public BasicSessionSummaryMonitorService(ApplicationEventPublisher publisher,
                                              PurchaseManagerService purchaseManagerService,
-                                             SessionRepository sessionRepository) {
+                                             SessionManagerService sessionManagerService) {
         this.publisher = publisher;
         this.purchaseManagerService = purchaseManagerService;
-        this.sessionRepository = sessionRepository;
+        this.sessionManagerService = sessionManagerService;
 
         this.discounts = new TreeMap<>();
         discounts.put(0, 0);
@@ -53,38 +52,29 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
 
     @Override
     public void updateSessionSummary() {
-        Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
+        Session currentSession = sessionManagerService.getActiveSession();
         List<Purchase> currentSessionPurchases = purchaseManagerService
                 .findAllPurchasesInSession(currentSession).stream()
                 .filter(purchase -> purchase.getProduct().isAvailable() && purchase.getProduct().isActual())
                 .toList();
 
-        Double currentSessionDiscountSensitiveWeight = currentSessionPurchases.stream()
-                .filter(purchase -> purchase.getProduct().isDiscountable())
-                .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
-                .reduce(0d, Double::sum);
-        sessionRepository.setSessionDiscountableWeight(currentSession,
-                currentSessionDiscountSensitiveWeight);
-
         Double currentSessionCoffeeProductsWeight = currentSessionPurchases.stream()
                 .filter(purchase -> purchase.getProduct().isWeightableCoffee())
                 .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
                 .reduce(0d, Double::sum);
-        sessionRepository.setSessionCoffeeWeight(currentSession,
-                currentSessionCoffeeProductsWeight);
+        currentSession.setCoffeeWeight(currentSessionCoffeeProductsWeight);
 
         Double currentSessionTeaProductsWeight = currentSessionPurchases.stream()
                 .filter(purchase -> purchase.getProduct().isTea())
                 .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
                 .reduce(0d, Double::sum);
-        sessionRepository.setSessionTeaWeight(currentSession,
-                currentSessionTeaProductsWeight);
+        currentSession.setTeaWeight(currentSessionTeaProductsWeight);
 
-        int newDiscount = discounts.get(discounts.floorKey(currentSessionDiscountSensitiveWeight.intValue()));
-        int previousDiscount = sessionRepository.getActiveSessionDiscountValue();
+        int newDiscount = discounts.get(discounts.floorKey(currentSessionCoffeeProductsWeight.intValue()));
+        int previousDiscount = currentSession.getDiscountPercentage();
 
         if (previousDiscount != newDiscount) {
-            sessionRepository.setSessionDiscountValue(currentSession, newDiscount);
+            currentSession.setDiscountPercentage(newDiscount);
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 
@@ -109,5 +99,7 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
                                 .build()));
             }
         }
+
+        sessionManagerService.saveSession(currentSession);
     }
 }

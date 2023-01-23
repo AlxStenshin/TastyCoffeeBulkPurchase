@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductProperties;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
@@ -48,30 +48,31 @@ public class SessionController {
     }
 
     @GetMapping(value = "/sessions/{id}", produces = MediaType.TEXT_HTML_VALUE)
-    public String editSession(@PathVariable("id") Integer id, Model model) {
+    public String editSession(@PathVariable("id") Integer id,
+                              Model model) {
         model.addAttribute("session", sessionManager.getSessionById(id));
         model.addAttribute("pageTitle", "Edit Session");
         return "session_form";
     }
 
-    @GetMapping(value = "/sessions/close/{id}", produces = MediaType.TEXT_HTML_VALUE)
-    public String closeSession(@PathVariable("id") Integer id, Model model) {
-        Session session = sessionManager.getSessionById(id);
-        sessionManager.closeSession(session);
-        model.addAttribute("session", session);
-        model.addAttribute("pageTitle", "Close Session");
-        return "session_close_form";
-    }
-
-    @GetMapping(value = "/sessions/{id}/placeOrder", produces = MediaType.TEXT_HTML_VALUE)
-    public String placeSessionOrders(@PathVariable("id") Integer id, Model model) {
+    @GetMapping(value = "/sessions/{id}/placeOrder/discardedTypes/", produces = MediaType.TEXT_HTML_VALUE)
+    public String discardSessionProducts(@PathVariable("id") Integer id,
+                                         Model model) {
         model.addAttribute("properties",
                 sessionManager.buildDiscardedProductTypes(sessionManager.getSessionById(id)));
         return "session_place_order_form";
     }
 
+    @GetMapping(value = "/sessions/{id}/placeOrder/acceptedTypes/", produces = MediaType.TEXT_HTML_VALUE)
+    public String acceptSessionProducts(@PathVariable("id") Integer id,
+                                        Model model) {
+        model.addAttribute("properties",
+                sessionManager.buildAcceptedProductTypes(sessionManager.getSessionById(id)));
+        return "session_place_order_form";
+    }
+
     @PostMapping(value = "/sessions/placeOrder/")
-    public String placeSessionOrders(DiscardedProductProperties properties,
+    public String placeSessionOrders(SessionProductFilters properties,
                                      RedirectAttributes redirectAttributes) {
         try {
             sessionManager.placeSessionPurchases(properties);

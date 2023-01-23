@@ -14,6 +14,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.webPage.WebPageElementException;
+import ru.alxstn.tastycoffeebulkpurchase.model.TastyCoffeeWebPageElement;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
-import static ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePageElementSelector.*;
+import static ru.alxstn.tastycoffeebulkpurchase.model.TastyCoffeePageElementSelector.*;
 
 @Component
 public class TastyCoffeePage {

@@ -36,11 +36,9 @@ public class Session {
     @Column(name = "discount")
     private int discountPercentage;
 
+    // ToDo: remove
     @Column(name = "total_weight")
     private double totalWeight;
-
-    @Column(name = "discountable_weight")
-    private double discountableWeight;
 
     @Column(name = "coffee_weight")
     private double coffeeWeight;
@@ -56,7 +54,6 @@ public class Session {
         this.title = "";
         this.paymentInstruction = "";
         this.discountPercentage = 0;
-        this.discountableWeight = 0;
         this.totalWeight = 0;
     }
 
@@ -122,14 +119,6 @@ public class Session {
 
     public void setDiscountPercentage(int discountPercentage) {
         this.discountPercentage = discountPercentage;
-    }
-
-    public double getDiscountableWeight() {
-        return discountableWeight;
-    }
-
-    public void setDiscountableWeight(double discountableWeight) {
-        this.discountableWeight = discountableWeight;
     }
 
     public double getTotalWeight() {

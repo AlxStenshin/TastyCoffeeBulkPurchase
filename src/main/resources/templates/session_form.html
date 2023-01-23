@@ -27,9 +27,13 @@
 
     <div class="my-3">
         <form th:action="@{/sessions/save}" method="post" enctype="multipart/form-data" th:object="${session}"
-              style="max-width: 550px; margin: 0 auto">
+              style="max-width: 1024px; margin: 0 auto">
 
-            <input type="hidden" th:field="*{id}" />
+<!--            <input type="hidden" th:field="*{id}" />-->
+            <input type="hidden" th:field="*{discountPercentage}" />
+            <input type="hidden" th:field="*{totalWeight}" />
+            <input type="hidden" th:field="*{coffeeWeight}" />
+            <input type="hidden" th:field="*{teaWeight}" />
 
             <div class="p-3">
                 <div class="form-group row">
@@ -42,7 +46,8 @@
                 <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="paymentInstructions">Payment Instructions:</label>
                     <div class="col-sm-9">
-                        <input type="text" th:field="*{paymentInstruction}" required minlength="2" maxlength="256" class="form-control" id="paymentInstructions" />
+                        <input type="text" th:field="*{paymentInstruction}" required minlength="2" maxlength="256"
+                               class="form-control" id="paymentInstructions" />
                     </div>
                 </div>
 
@@ -50,7 +55,7 @@
                     <label class="col-sm-3 col-form-label" for="openDate">Open Date:</label>
                     <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
                         <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
-                               th:field="*{dateTimeOpened}" id="openDate" placeholder="Session Open DateTime (UTC)"/>
+                               th:field="*{dateTimeOpened}" id="openDate" placeholder="Session Open DateTim"/>
                         <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
                             <div class="input-group-text"><i class="fa-regular fa-calendar-days"></i></div>
                         </div>
@@ -61,18 +66,49 @@
                     <label class="col-sm-3 col-form-label" for="closeDate">Close Date:</label>
                     <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
                         <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2"
-                               th:field="*{dateTimeClosed}" id="closeDate" placeholder="Session Close DateTime (UTC)"/>
+                               th:field="*{dateTimeClosed}" id="closeDate" placeholder="Session Close DateTime"/>
                         <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
                             <div class="input-group-text"><i class="fa-regular fa-calendar-days"></i></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-center">
-                    <input type="submit" value="Save" class="btn btn-primary btn-sm mr-2" />
-                    <input type="button" value="Cancel" id="btnCancel" class="btn btn-secondary btn-sm" />
+                <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="closed">Session Closed:</label>
+                    <input type="checkbox" th:field="*{closed}" id="closed" />
                 </div>
-            </div>
+
+                <div class="form-group row">
+                <label class="col-sm-3 col-form-label" for="finished">Session Finished:</label>
+                    <input type="checkbox" th:field="*{finished}" id="finished" />
+                </div>
+
+                <div class="form-group row">
+                    <span>
+                        <input type="submit" value="Save"
+                               class="btn btn-primary btn-sm mr-2" />
+
+                        <input type="button" value="Cancel" id="btnCancel"
+                               class="btn btn-secondary btn-sm" />
+                    </span>
+                </div>
+
+                <div class="form-group row">
+                    <span>
+                        <a th:href="@{'/sessions/__${id}__/close/'}"
+                           title="Close with Customer Notifications"
+                           class="btn btn-primary btn-sm mr-2">Close with Customer Notifications</a>
+
+                        <a th:href="@{'/sessions/__${id}__/placeOrder/discardedTypes/'}"
+                           title="Place Session With Discarded Product Filter"
+                           class="btn btn-primary btn-sm mr-2">Place Purchases With Discarded Product Filter</a>
+
+                        <a th:href="@{'/sessions/__${id}__/placeOrder/acceptedTypes/'}"
+                           title="Place Session With Accepted Product Filter"
+                           class="btn btn-primary btn-sm mr-2">Place Purchases With Accepted Product Filter</a>
+                    </span>
+                </div>
+        </div>
         </form>
     </div>
 </div>

@@ -30,8 +30,7 @@ public class BasicSessionSummaryMessageCreatorService implements SessionSummaryM
         return (session.isClosed() ? "\n<b>! Сессия закрыта. Заказы не принимаются. !</b>\n" : "") +
                 "<code>" +
                 "\nНаименование: " + session.getTitle() +
-                "\nТекущая скидка: " + session.getDiscountPercentage() + "%" +
-                "\nТоваров по скидке в закупке: " + decimalFormat.format(session.getDiscountableWeight()) + "кг." +
+                "\nТекущая скидка: " + session.getDiscountPercentage() + "%\n" +
                 "\nКофе в закупке: " + decimalFormat.format(session.getCoffeeWeight()) + "кг." +
                 "\nЧая в закупке: " + decimalFormat.format(session.getTeaWeight()) + "кг." + "\n" +
                 "\nДата открытия: " + session.getDateTimeOpened().format(dateFormatter) +
@@ -42,7 +41,7 @@ public class BasicSessionSummaryMessageCreatorService implements SessionSummaryM
                 "\nКоличество участников: " + paymentManagerService.getSessionCustomersCount(session).orElse(0) +
                 "\nОплачено заказов: " + paymentManagerService.getCompletePaymentsCount(session).orElse(0) +
                 "\nНа сумму: " +  paymentManagerService.getSessionTotalPaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
-                "\nОстлась оплатить: " +paymentManagerService.getSessionTotalUnpaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
+                "\nОсталось оплатить: " + paymentManagerService.getSessionTotalUnpaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
                 "</code>";
     }
 }

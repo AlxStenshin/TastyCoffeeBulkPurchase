@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.entity;
+package ru.alxstn.tastycoffeebulkpurchase.model;
 
 import org.apache.commons.lang3.StringUtils;
 

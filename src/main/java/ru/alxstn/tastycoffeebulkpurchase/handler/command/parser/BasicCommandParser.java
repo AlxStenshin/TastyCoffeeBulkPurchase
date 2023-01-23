@@ -2,7 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.handler.command.parser;
 
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TelegramBotConfigProperties;
-import ru.alxstn.tastycoffeebulkpurchase.entity.BotCommand;
+import ru.alxstn.tastycoffeebulkpurchase.model.BotCommand;
 import ru.alxstn.tastycoffeebulkpurchase.dto.ParsedCommandDto;
 
 import java.util.Optional;

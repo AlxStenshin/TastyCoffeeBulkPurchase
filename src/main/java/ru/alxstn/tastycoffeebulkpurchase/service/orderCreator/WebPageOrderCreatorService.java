@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
-import ru.alxstn.tastycoffeebulkpurchase.entity.DiscardedProductProperties;
+import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
@@ -51,7 +51,7 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
     }
 
     @Override
-    public void placeOrderWithProductTypes(DiscardedProductProperties discardedProductProperties) {
+    public void placeOrderWithProductTypes(SessionProductFilters discardedProductProperties) {
         logger.info("Placing order without products: " + discardedProductProperties);
         Session session = discardedProductProperties.getSession();
         var currentSessionPurchases = sessionPurchaseReportCreatorService.createPerProductReport(session);
