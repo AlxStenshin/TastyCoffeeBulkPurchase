@@ -11,7 +11,6 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationExcept
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
-import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.WebPageOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
@@ -29,19 +28,20 @@ public class BasicSessionManagerService implements SessionManagerService {
     private final DateTimeProvider dateTimeProvider;
     private final WebPageOrderCreatorService webPageOrderCreator;
     private final TextFileOrderCreatorService textFileOrderCreator;
-    private final BasicPurchaseFilterService requiredProductsService;
+    private final PurchaseFilterService purchaseFilterService;
 
     public BasicSessionManagerService(ApplicationEventPublisher publisher,
                                       SessionRepository sessionRepository,
                                       DateTimeProvider dateTimeProvider,
                                       WebPageOrderCreatorService webPageOrderCreator,
-                                      TextFileOrderCreatorService textFileOrderCreator) {
+                                      TextFileOrderCreatorService textFileOrderCreator,
+                                      PurchaseFilterService purchaseFilterService) {
         this.publisher = publisher;
         this.sessionRepository = sessionRepository;
         this.dateTimeProvider = dateTimeProvider;
         this.webPageOrderCreator = webPageOrderCreator;
         this.textFileOrderCreator = textFileOrderCreator;
-        this.requiredProductsService = new BasicPurchaseFilterService();
+        this.purchaseFilterService = purchaseFilterService;
     }
 
     @Override
@@ -78,14 +78,14 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     @Override
     public SessionProductFilters buildDiscardedProductTypes(Session session) {
-        return requiredProductsService.createAllTypesWithState(session,
+        return purchaseFilterService.createFilter(session,
                 SessionProductFilterType.DISCARD_FILTER,
                 false);
     }
 
     @Override
     public SessionProductFilters buildAcceptedProductTypes(Session session) {
-        return requiredProductsService.createAllTypesWithState(session,
+        return purchaseFilterService.createFilter(session,
                 SessionProductFilterType.ACCEPT_FILTER,
                 true);
     }

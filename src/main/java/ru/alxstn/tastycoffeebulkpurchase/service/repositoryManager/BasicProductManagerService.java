@@ -36,6 +36,11 @@ public class BasicProductManagerService implements ProductManagerService {
     }
 
     @Override
+    public List<String> findAllActiveProductForms() {
+        return productRepository.findAllActiveProductForms();
+    }
+
+    @Override
     public List<Product> findDistinctActiveProductsBySubCategory(String subCategory) {
         return productRepository.findDistinctActiveProductsBySubCategory(subCategory);
     }

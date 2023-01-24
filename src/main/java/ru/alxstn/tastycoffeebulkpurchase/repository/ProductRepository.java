@@ -23,6 +23,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT DISTINCT productSubCategory FROM Product WHERE productCategory = ?1 AND actual = true")
     List<String> findAllActiveSubCategories(String category);
 
+    @Query("SELECT DISTINCT productForm FROM Product WHERE actual = true")
+    List<String> findAllActiveProductForms();
+
     @Query("SELECT p FROM Product p WHERE p.productSubCategory = ?1 AND p.actual = true")
     List<Product> findDistinctActiveProductsBySubCategory(String subCategory);
 
@@ -105,5 +108,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query("UPDATE Product p SET p.actual = false")
     void markAllNotActual();
+
 
 }

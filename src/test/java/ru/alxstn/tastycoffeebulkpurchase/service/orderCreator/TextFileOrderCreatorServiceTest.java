@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.service.BasicSessionPurchaseReportCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -27,6 +29,12 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 class TextFileOrderCreatorServiceTest {
+
+    @Mock
+    ProductManagerService productManagerService;
+
+    @Mock
+    PurchaseFilterService purchaseFilterService;
 
     @Mock
     BasicSessionPurchaseReportCreatorService sessionPurchaseReportCreatorService;
@@ -92,7 +100,7 @@ class TextFileOrderCreatorServiceTest {
     @AfterEach
     void cleanup() {
         try {
-            Files.deleteIfExists(Path.of(session.getId() + ".sessionReport.json"));
+            Files.deleteIfExists(Path.of(session.getId() + "_" +  session.getTitle() + "_SessionReport.json"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -110,16 +118,16 @@ class TextFileOrderCreatorServiceTest {
 
         assertDoesNotThrow(() -> textFileOrderCreator.placeFullOrder(session));
 
-        Path filePath = Path.of(session.getId() + ".test.sessionReport.json");
+        Path filePath = Path.of(session.getId() + "_" +  session.getTitle() + "_SessionReport.json");
 
         try (Reader reader = Files.newBufferedReader(filePath, Charset.forName("windows-1251"))) {
             String report = IOUtils.toString(reader);
             assertFalse(report.contains("Unavailable Product"));
-            assertTrue(report.contains("Group Subgroup Product One - 3 шт."));
-            assertTrue(report.contains("Group Subgroup Product One, Coarse - 1 шт."));
-            assertTrue(report.contains("Group Subgroup Product Two - 4 шт."));
-            assertTrue(report.contains("Group Subgroup2 Product Three, Coarse - 1 шт."));
-            assertTrue(report.contains("Group Subgroup2 Product Three, Fine - 3 шт."));
+            assertTrue(report.contains("Group, Subgroup, Product One, Упаковка 250 г - 3 шт."));
+            assertTrue(report.contains("Group, Subgroup, Product One, Упаковка 250 г, Coarse - 1 шт."));
+            assertTrue(report.contains("Group, Subgroup, Product Two, Упаковка 100 г - 4 шт."));
+            assertTrue(report.contains("Group, Subgroup2, Product Three, Упаковка 1 кг, Coarse - 1 шт."));
+            assertTrue(report.contains("Group, Subgroup2, Product Three, Упаковка 1 кг, Fine - 3 шт."));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -132,7 +140,7 @@ class TextFileOrderCreatorServiceTest {
 
         assertDoesNotThrow(() -> {
             textFileOrderCreator.placeFullOrder(session);
-            Path filePath = Path.of(session.getId() + ".test.sessionReport.json");
+            Path filePath = Path.of(session.getId() + "_" +  session.getTitle() + "_SessionReport.json");
             assertTrue(Files.readString(filePath).isBlank());
         });
     }

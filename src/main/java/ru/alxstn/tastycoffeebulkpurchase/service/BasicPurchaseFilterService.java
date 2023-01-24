@@ -1,20 +1,25 @@
 package ru.alxstn.tastycoffeebulkpurchase.service;
 
+import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.model.ProductTypeFilter;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-
+@Service
 public class BasicPurchaseFilterService implements PurchaseFilterService {
 
-    final List<String> productFormsCategories = List.of("Зерно", "Мелкий", "Средний", "Крупный");
-    // ToDo: Obtain Product Types via Product Repository Distinct Request.
-    final List<String> productTypeCategories = List.of("Чай", "Шоколад", "Сиропы");
+
+    private final ProductManagerService productManagerService;
+
+    public BasicPurchaseFilterService(ProductManagerService productManagerService) {
+        this.productManagerService = productManagerService;
+    }
 
     @Override
     public Map<Product, Integer> filterPurchases(SessionProductFilters discardedProductProperties, Map<Product, Integer> allPurchases) {
@@ -39,15 +44,17 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
         return requiredPurchases;
     }
 
-    public SessionProductFilters createAllTypesWithState(Session session,
-                                                         SessionProductFilterType filterType,
-                                                         boolean state) {
-        List<ProductTypeFilter> productTypes = new ArrayList<>(productFormsCategories.stream()
-                .map(s -> new ProductTypeFilter(s, state))
+    public SessionProductFilters createFilter(Session session,
+                                              SessionProductFilterType filterType,
+                                              boolean targetState) {
+        List<ProductTypeFilter> productTypes = new ArrayList<>(productManagerService.findAllActiveCategories()
+                .stream()
+                .map(s -> new ProductTypeFilter(s, targetState))
                 .toList());
 
-        productTypes.addAll(productTypeCategories.stream()
-                .map(s -> new ProductTypeFilter(s, state))
+        productTypes.addAll(productManagerService.findAllActiveProductForms()
+                .stream()
+                .map(s -> new ProductTypeFilter(s, targetState))
                 .toList());
 
         SessionProductFilters types = new SessionProductFilters(productTypes, filterType);
@@ -57,10 +64,12 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
     }
 
     private Predicate<Product> buildPredicate(String type) {
-        if (productFormsCategories.contains(type))
+        if (productManagerService.findAllActiveProductForms().contains(type))
             return product -> product.getProductForm().equals(type);
-        else if (productTypeCategories.contains(type))
+
+        else if (productManagerService.findAllActiveCategories().contains(type))
             return product -> product.getProductCategory().equals(type);
+
         else return null;
     }
 

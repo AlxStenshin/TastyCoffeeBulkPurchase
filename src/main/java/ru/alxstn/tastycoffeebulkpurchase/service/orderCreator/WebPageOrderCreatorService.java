@@ -8,8 +8,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
-import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
 
 import java.util.Map;
@@ -24,16 +24,17 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
     private final ApplicationEventPublisher publisher;
     private final TastyCoffeePage tastyCoffeePage;
     private final SessionPurchaseReportCreatorService sessionPurchaseReportCreatorService;
-    private final BasicPurchaseFilterService purchaseFilterService;
+    private final PurchaseFilterService purchaseFilterService;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public WebPageOrderCreatorService(ApplicationEventPublisher publisher,
                                       TastyCoffeePage tastyCoffeePage,
+                                      PurchaseFilterService purchaseFilterService,
                                       SessionPurchaseReportCreatorService sessionPurchaseReportCreatorService) {
         this.publisher = publisher;
         this.tastyCoffeePage = tastyCoffeePage;
+        this.purchaseFilterService = purchaseFilterService;
         this.sessionPurchaseReportCreatorService = sessionPurchaseReportCreatorService;
-        this.purchaseFilterService = new BasicPurchaseFilterService();
     }
 
     public void placeFullOrder(Session session) {

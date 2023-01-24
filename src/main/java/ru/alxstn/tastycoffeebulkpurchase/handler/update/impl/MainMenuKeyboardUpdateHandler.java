@@ -69,6 +69,9 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
         Optional<MainMenuKeyboard> keyboardButton = MainMenuKeyboard.parse(messageText);
         if (keyboardButton.isPresent()) {
             String chatId = message.getChatId().toString();
+
+            // ToDo: Replace Conditional Switch with polymorphism
+            //  https://refactoring.guru/ru/replace-conditional-with-polymorphism
             switch (keyboardButton.get()) {
 
                 // ToDo: Separate DTO: PlaceOrder (Purchase)

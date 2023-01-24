@@ -8,13 +8,14 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
-import ru.alxstn.tastycoffeebulkpurchase.service.BasicPurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
+import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,11 +24,12 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
     Logger logger = LogManager.getLogger(TextFileOrderCreatorService.class);
 
     private final SessionPurchaseReportCreatorService sessionPurchaseReportCreatorService;
-    private final BasicPurchaseFilterService requiredProductsService;
+    private final PurchaseFilterService purchaseFilterService;
 
-    public TextFileOrderCreatorService(SessionPurchaseReportCreatorService sessionPurchaseReportCreatorService) {
+    public TextFileOrderCreatorService(SessionPurchaseReportCreatorService sessionPurchaseReportCreatorService,
+                                       PurchaseFilterService purchaseFilterService) {
         this.sessionPurchaseReportCreatorService = sessionPurchaseReportCreatorService;
-        this.requiredProductsService = new BasicPurchaseFilterService();
+        this.purchaseFilterService = purchaseFilterService;
     }
 
     @Override
@@ -35,10 +37,10 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
         logger.info("Now Saving Purchase Summary for session " + session.getId() + ":" + session.getTitle());
         String report = buildReport(sessionPurchaseReportCreatorService.createPerProductReport(session));
 
-        var allAccepted = requiredProductsService.createAllTypesWithState(
+        var allAccepted = purchaseFilterService.createFilter(
                 session, SessionProductFilterType.DISCARD_FILTER, false);
 
-        saveReport(session, report, allAccepted);
+        saveReport(session, report, Optional.ofNullable(allAccepted));
     }
 
     @Override
@@ -47,9 +49,9 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
         Session session = productTypes.getSession();
         var currentSessionPurchases = sessionPurchaseReportCreatorService.createPerProductReport(session);
         if (currentSessionPurchases.size() > 0) {
-            Map<Product, Integer> requiredPurchases = requiredProductsService.filterPurchases(productTypes, currentSessionPurchases);
+            Map<Product, Integer> requiredPurchases = purchaseFilterService.filterPurchases(productTypes, currentSessionPurchases);
             String report = buildReport(requiredPurchases);
-            saveReport(session, report, productTypes);
+            saveReport(session, report, Optional.of(productTypes));
         }
     }
 
@@ -68,23 +70,26 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
         return report;
     }
 
-    private void saveReport(Session session, String report, SessionProductFilters productProperties) {
+    private void saveReport(Session session, String report, Optional<SessionProductFilters> productProperties) {
         StringBuilder fileName = new StringBuilder(session.getId() + "_" + session.getTitle() + "_");
-        List<String> filteredProducts = productProperties.getProductTypeFilters().stream()
-                .filter(ProductTypeFilter::getValue)
-                .map(ProductTypeFilter::getDescription)
-                .toList();
+        if (productProperties.isPresent()) {
 
-        if (!filteredProducts.isEmpty()) {
-            fileName.append(productProperties.getFilterType().getShortDescription());
-            for (String product : filteredProducts) {
-                fileName.append(product);
-                fileName.append(" ");
+            List<String> filteredProducts = productProperties.get().getProductTypeFilters().stream()
+                    .filter(ProductTypeFilter::getValue)
+                    .map(ProductTypeFilter::getDescription)
+                    .toList();
+
+            if (!filteredProducts.isEmpty()) {
+                fileName.append(productProperties.get().getFilterType().getShortDescription());
+                for (String product : filteredProducts) {
+                    fileName.append(product);
+                    fileName.append(" ");
+                }
+                fileName.append(")_");
             }
-            fileName.append(")");
         }
 
-        fileName.append("_SessionReport.json");
+        fileName.append("SessionReport.json");
 
         try (PrintWriter out = new PrintWriter(fileName.toString())) {
             out.println(report);

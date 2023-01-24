@@ -15,6 +15,8 @@ public interface ProductManagerService {
 
     List<String> findAllActiveSubCategories(String category);
 
+    List<String> findAllActiveProductForms();
+
     List<Product> findDistinctActiveProductsBySubCategory(String subCategory);
 
     List<Product> findAllActiveProductsByProductNameAndSubcategory(String productName, String productSubCat);

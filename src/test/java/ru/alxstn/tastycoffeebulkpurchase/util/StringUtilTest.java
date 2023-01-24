@@ -27,7 +27,7 @@ class StringUtilTest {
     }
 
     @Test
-    void shouldReturnCoffe() {
+    void shouldReturnCoffee() {
         assertEquals("Кофе", StringUtil.removeNonAlphanumeric( "Кофе    <!---->"));
     }
 }

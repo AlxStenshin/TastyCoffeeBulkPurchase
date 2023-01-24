@@ -52,6 +52,7 @@ public class BasicUnfinishedPurchasesCustomerNotifierService implements Unfinish
                 notificationMessage.append("\nПожалуйста обратитесь к администратору сессии.");
 
                 for (var notificationReceiver : notificationReceivers) {
+                    logger.info("Message for: " + notificationReceiver + ": " + notificationMessage);
 
                     publisher.publishEvent(new SendMessageEvent(this,
                             SendMessage.builder()
