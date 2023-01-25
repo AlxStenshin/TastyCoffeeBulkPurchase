@@ -192,7 +192,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return getDisplayName();
+        return getDisplayNameWithPackage();
     }
 
     public boolean isDiscountable() {
@@ -216,7 +216,14 @@ public class Product {
         return !getSpecialMark().equals("нет");
     }
 
-    public String getDisplayName() {
+    public String getDisplayNameWithoutPackage() {
+        String displayName = name;
+        displayName += specialMark.isEmpty() ? "" : ", '" + StringUtil.capitalize(specialMark)+ "'";
+        displayName +=  ", " + price + "₽";
+        return displayName;
+    }
+
+    public String getDisplayNameWithPackage() {
         String displayName = name;
         displayName += productPackage.getDescription().isEmpty() ? "" : ", " + productPackage.getDescription();
         displayName += specialMark.isEmpty() ? "" : ", '" + StringUtil.capitalize(specialMark)+ "'";
@@ -224,8 +231,15 @@ public class Product {
         return displayName;
     }
 
-    public String getFullDisplayName() {
-        String displayName = getDisplayName();
+    public String getFullDisplayNameWithPackage() {
+        String displayName = getDisplayNameWithPackage();
+        displayName += productCategory.isEmpty() ? "" : "\nИз категории " + productCategory;
+        displayName += productSubCategory.isEmpty() ? "" : "\nПодкатегории " + productSubCategory;
+        return displayName;
+    }
+
+    public String getFullDisplayNameWithoutPackage() {
+        String displayName = getDisplayNameWithoutPackage();
         displayName += productCategory.isEmpty() ? "" : "\nИз категории " + productCategory;
         displayName += productSubCategory.isEmpty() ? "" : "\nПодкатегории " + productSubCategory;
         return displayName;

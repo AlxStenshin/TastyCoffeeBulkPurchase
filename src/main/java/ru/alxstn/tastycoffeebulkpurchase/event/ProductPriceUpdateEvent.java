@@ -7,7 +7,7 @@ public class ProductPriceUpdateEvent extends ProductUpdateEvent {
         super(source, oldProduct, newProduct);
 
         super.setUpdateMessage("Изменилась цена на продукт из вашего заказа:<code> \n" +
-                oldProduct.getDisplayName() + "</code>\n" +
+                oldProduct.getDisplayNameWithPackage() + "</code>\n" +
                 "Новая цена: " + newProduct.getPrice() +
                 "\nСохранить с новой ценой или удалить продукт из заказа?");
     }

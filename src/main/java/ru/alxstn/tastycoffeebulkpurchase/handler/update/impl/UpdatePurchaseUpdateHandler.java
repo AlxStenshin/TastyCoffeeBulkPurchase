@@ -59,7 +59,7 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(0)
-                .text("Сохранено!\n" + purchase.getProduct().getDisplayName())
+                .text("Сохранено!\n" + purchase.getProduct().getDisplayNameWithPackage())
                 .showAlert(false)
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));

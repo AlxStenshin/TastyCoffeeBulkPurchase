@@ -54,7 +54,7 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
 
         logger.info("Edit Purchase Command Received: " + purchase);
 
-        String title = "Измените заказ: \n" + targetProduct.getFullDisplayName();
+        String title = "Измените заказ: \n" + targetProduct.getFullDisplayNameWithPackage();
 
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         List<InlineKeyboardButton> countButtonsRow = new ArrayList<>();

@@ -71,14 +71,16 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         String productName = dto.getName();
         logger.info("Set Product Name Command Received: " + productName);
 
-        List<Product> availablePackages = productManagerService.findAllActiveProductsByProductNameAndSubcategory(
-                dto.getName(), dto.getSubCategory())
+
+        // ToDo: for grindable products set default form to beans
+        List<Product> availablePackages = productManagerService
+                .findAllActiveProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory())
                 .stream()
                 .filter(distinctByKey(Product::getProductPackage))
                 .toList();
 
         Product targetProduct = availablePackages.get(0);
-        String title = "Выберите параметры для \n" + targetProduct.getFullDisplayName();
+        String title = "Выберите параметры для \n" + targetProduct.getDisplayNameWithoutPackage();
         Session session = sessionManagerService.getActiveSession();
         Customer customer = customerRepository.getByChatId(update.getCallbackQuery().getMessage().getChatId());
 

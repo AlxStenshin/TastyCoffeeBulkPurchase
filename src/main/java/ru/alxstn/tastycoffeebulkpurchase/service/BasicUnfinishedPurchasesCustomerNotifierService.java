@@ -47,7 +47,7 @@ public class BasicUnfinishedPurchasesCustomerNotifierService implements Unfinish
                         unfinishedSession, product);
 
                 StringBuilder notificationMessage = new StringBuilder("Не удалось обработать позицию из вашего заказа:\n\n");
-                notificationMessage.append(product.getFullDisplayName());
+                notificationMessage.append(product.getFullDisplayNameWithPackage());
                 notificationMessage.append("\n");
                 notificationMessage.append("\nПожалуйста обратитесь к администратору сессии.");
 
