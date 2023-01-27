@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.priceListSaver.PriceListFileSaverService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
@@ -51,7 +52,7 @@ class PriceListSaverServiceTest {
 
     @Test
     void shouldCorrectlySaveToFile() {
-        Product p0 = new Product.ProductBuilder()
+        Product p0 = new ProductBuilder()
                 .setCategory("Group0")
                 .setSubCategory("SubGroup0")
                 .setName("Name0")
@@ -59,7 +60,7 @@ class PriceListSaverServiceTest {
                 .setPrice(new BigDecimal(0))
                 .build();
 
-        Product p1 = new Product.ProductBuilder()
+        Product p1 = new ProductBuilder()
                 .setCategory("Group1")
                 .setSubCategory("SubGroup1")
                 .setName("Name1")

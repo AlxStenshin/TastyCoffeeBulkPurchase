@@ -5,6 +5,7 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.util.StringUtil;
 
 import javax.persistence.*;
@@ -192,7 +193,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return getDisplayNameWithPackage();
+        return new ProductCaptionBuilder(this).createIconNameMarkPackagePriceCatSubcatView();
     }
 
     public boolean isDiscountable() {
@@ -213,102 +214,24 @@ public class Product {
     }
 
     public boolean isAvailable() {
-        return !getSpecialMark().equals("нет");
+        return !getSpecialMark().equals("нет") || StringUtil.containsDate(getSpecialMark());
     }
 
-    public String getDisplayNameWithoutPackage() {
-        String displayName = name;
-        displayName += specialMark.isEmpty() ? "" : ", '" + StringUtil.capitalize(specialMark)+ "'";
-        displayName +=  ", " + price + "₽";
-        return displayName;
+    public boolean isSpecialOffer() {
+        return getSpecialMark().equals("Сорт недели") || getSpecialMark().equals("Сорт месяца");
     }
 
-    public String getDisplayNameWithPackage() {
-        String displayName = name;
-        displayName += productPackage.getDescription().isEmpty() ? "" : ", " + productPackage.getDescription();
-        displayName += specialMark.isEmpty() ? "" : ", '" + StringUtil.capitalize(specialMark)+ "'";
-        displayName +=  ", " + price + "₽";
-        return displayName;
+    public String getIcon() {
+        if (isSpecialOffer())
+            return "⚡";
+
+        if (!isAvailable())
+            return "\uD83D\uDEAB";
+
+        return "";
     }
 
-    public String getFullDisplayNameWithPackage() {
-        String displayName = getDisplayNameWithPackage();
-        displayName += productCategory.isEmpty() ? "" : "\nИз категории " + productCategory;
-        displayName += productSubCategory.isEmpty() ? "" : "\nПодкатегории " + productSubCategory;
-        return displayName;
-    }
 
-    public String getFullDisplayNameWithoutPackage() {
-        String displayName = getDisplayNameWithoutPackage();
-        displayName += productCategory.isEmpty() ? "" : "\nИз категории " + productCategory;
-        displayName += productSubCategory.isEmpty() ? "" : "\nПодкатегории " + productSubCategory;
-        return displayName;
-    }
 
-    public String getShortName() {
-        String displayName = "";
-        displayName += productCategory.isEmpty() ? "" : productCategory + ", ";
-        displayName += productSubCategory.isEmpty() ? "" : productSubCategory + ", ";
-        displayName += name.isEmpty() ? "" : name + ", ";
-        displayName += productPackage.getDescription().isEmpty() ? "" : productPackage;
-        displayName += productForm.isEmpty() ? "" :  ", " + productForm;
-        return displayName;
-    }
 
-    public static class ProductBuilder {
-        private String group;
-        private String subgroup;
-        private ProductPackage pack;
-        private String specialMark;
-        private String name;
-        private BigDecimal price;
-        private String productForm;
-        private boolean grindable;
-
-        public ProductBuilder() {}
-
-        public ProductBuilder setCategory(String cat) {
-            this.group = cat;
-            return this;
-        }
-
-        public ProductBuilder setSubCategory(String subCat) {
-            this.subgroup = subCat;
-            return this;
-        }
-
-        public ProductBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public ProductBuilder setSpecialMark(String specialMark) {
-            this.specialMark = specialMark;
-            return this;
-        }
-
-        public ProductBuilder setPackage(ProductPackage pack) {
-            this.pack = pack;
-            return this;
-        }
-
-        public ProductBuilder setPrice(BigDecimal  price) {
-            this.price = price;
-            return this;
-        }
-
-        public ProductBuilder setProductForm(String productForm) {
-            this.productForm = productForm;
-            return this;
-        }
-
-        public ProductBuilder setGrindable(boolean grindable) {
-            this.grindable = grindable;
-            return this;
-        }
-
-        public Product build() {
-            return new Product(name, price, specialMark, pack, group, subgroup, productForm, grindable);
-        }
-    }
 }

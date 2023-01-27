@@ -1,6 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.event;
 
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 
 public class ProductSpecialMarkUpdateEvent extends ProductUpdateEvent {
 
@@ -8,7 +9,8 @@ public class ProductSpecialMarkUpdateEvent extends ProductUpdateEvent {
         super(source, oldProduct, newProduct);
 
         super.setUpdateMessage("Изменилась метка продукта из вашего заказа: \n<code>" +
-                oldProduct.getFullDisplayNameWithPackage() + "\n</code>" +
+                new ProductCaptionBuilder(oldProduct)
+                        .createIconNameMarkPackagePriceCatSubcatView() + "</code>\n" +
                 "Новая метка: " + newProduct.getSpecialMark() +
                 "\n\nЧто это значит?" +
                 "\nМетка 'нет' означает что продукт временно не доступен для заказа." +

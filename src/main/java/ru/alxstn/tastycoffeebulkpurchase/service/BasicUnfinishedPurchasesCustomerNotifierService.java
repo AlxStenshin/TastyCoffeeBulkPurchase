@@ -11,6 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
 
@@ -47,7 +48,8 @@ public class BasicUnfinishedPurchasesCustomerNotifierService implements Unfinish
                         unfinishedSession, product);
 
                 StringBuilder notificationMessage = new StringBuilder("Не удалось обработать позицию из вашего заказа:\n\n");
-                notificationMessage.append(product.getFullDisplayNameWithPackage());
+                notificationMessage.append(new ProductCaptionBuilder(product)
+                        .createIconNameMarkPackagePriceCatSubcatView());
                 notificationMessage.append("\n");
                 notificationMessage.append("\nПожалуйста обратитесь к администратору сессии.");
 

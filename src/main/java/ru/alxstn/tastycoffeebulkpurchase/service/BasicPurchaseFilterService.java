@@ -6,10 +6,12 @@ import ru.alxstn.tastycoffeebulkpurchase.model.ProductTypeFilter;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
-import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
 
 import java.util.*;
 import java.util.function.Predicate;
+
+import static ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType.ACCEPT_FILTER;
+import static ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType.DISCARD_FILTER;
 
 @Service
 public class BasicPurchaseFilterService implements PurchaseFilterService {
@@ -22,23 +24,30 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
     }
 
     @Override
-    public Map<Product, Integer> filterPurchases(SessionProductFilters discardedProductProperties, Map<Product, Integer> allPurchases) {
+    public Map<Product, Integer> filterPurchases(SessionProductFilters filter,
+                                                 Map<Product, Integer> allPurchases) {
 
         Map<Product, Integer> requiredPurchases = new HashMap<>(allPurchases);
 
-        List<String> discardedTypes = discardedProductProperties.getProductTypeFilters().stream()
-                .filter(ProductTypeFilter::getValue)
-                .map(ProductTypeFilter::getDescription)
-                .toList();
-
-        for (var type : discardedTypes) {
-            List<Product> discardedProducts = requiredPurchases.keySet().stream()
-                    .filter(Objects.requireNonNull(buildPredicate(type)))
+        if (filter.getFilterType() == DISCARD_FILTER) {
+            List<String> discardedTypes = filter.getProductTypeFilters().stream()
+                    .filter(ProductTypeFilter::getValue)
+                    .map(ProductTypeFilter::getDescription)
                     .toList();
 
-            for (Product p : discardedProducts) {
-                requiredPurchases.remove(p);
+            for (var type : discardedTypes) {
+                List<Product> discardedProducts = requiredPurchases.keySet().stream()
+                        .filter(Objects.requireNonNull(buildPredicate(type)))
+                        .toList();
+
+                for (Product p : discardedProducts) {
+                    requiredPurchases.remove(p);
+                }
             }
+        }
+
+        if (filter.getFilterType() == ACCEPT_FILTER) {
+            // ToDo: Accept Filter logic
         }
 
         return requiredPurchases;

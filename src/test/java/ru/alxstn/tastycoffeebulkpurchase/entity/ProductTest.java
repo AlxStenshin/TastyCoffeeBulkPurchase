@@ -2,6 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.entity;
 
 
 import org.junit.jupiter.api.Test;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductBuilder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,7 +10,7 @@ class ProductTest {
 
     @Test
     void shouldBeDiscountableWithFirstCoffeeCategory() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("КОФЕ ДЛЯ ФИЛЬТРА")
                 .setSpecialMark("Товар месяца")
                 .build();
@@ -19,7 +20,7 @@ class ProductTest {
 
     @Test
     void shouldBeDiscountableWithSecondCoffeeCategory() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("КОФЕ ДЛЯ ЭСПРЕССО")
                 .setSpecialMark("Товар месяца")
                 .build();
@@ -29,7 +30,7 @@ class ProductTest {
 
     @Test
     void shouldBeDiscountableWithThirdCoffeeCategory() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")
                 .setSpecialMark("Товар месяца")
                 .build();
@@ -39,7 +40,7 @@ class ProductTest {
 
     @Test
     void shouldThrowExceptionWithNullProductMark() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")
                 .build();
 
@@ -48,7 +49,7 @@ class ProductTest {
 
     @Test
     void shouldNotBeDiscountableWithNonCoffeeCategoryAndNotGoodOfTheWeekMark() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("Чай")
                 .setSpecialMark("Новый")
                 .build();
@@ -58,7 +59,7 @@ class ProductTest {
 
     @Test
     void shouldNotBeDiscountableWithCoffeeCategoryAndGoodOfTheWeekMark() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("КОФЕ ДЛЯ ЭСПРЕССО")
                 .setSpecialMark("Сорт недели")
                 .build();
@@ -68,7 +69,7 @@ class ProductTest {
 
     @Test
     void shouldBeAvailable() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setCategory("КОФЕ ДЛЯ ЭСПРЕССО")
                 .setSpecialMark("Сорт недели")
                 .build();
@@ -78,7 +79,7 @@ class ProductTest {
 
     @Test
     void shouldNotBeAvailable() {
-        Product discountableProduct = new Product.ProductBuilder()
+        Product discountableProduct = new ProductBuilder()
                 .setSpecialMark("нет")
                 .build();
 

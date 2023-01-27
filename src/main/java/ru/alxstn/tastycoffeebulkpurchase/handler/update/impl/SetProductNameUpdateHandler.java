@@ -20,6 +20,7 @@ import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.SessionManagerService;
@@ -80,7 +81,8 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
                 .toList();
 
         Product targetProduct = availablePackages.get(0);
-        String title = "Выберите параметры для \n" + targetProduct.getDisplayNameWithoutPackage();
+        String title = "Выберите фасовку для \n" +
+                new ProductCaptionBuilder(targetProduct).createCatSubcatNameMarkView();
         Session session = sessionManagerService.getActiveSession();
         Customer customer = customerRepository.getByChatId(update.getCallbackQuery().getMessage().getChatId());
 

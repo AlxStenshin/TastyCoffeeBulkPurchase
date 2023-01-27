@@ -1,5 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
 import javax.persistence.*;
@@ -38,7 +39,6 @@ public class Purchase {
         this.count = count;
     }
 
-
     public Purchase(Purchase purchase, int newCount) {
         this.id = purchase.getId();
         this.customer = purchase.getCustomer();
@@ -65,7 +65,8 @@ public class Purchase {
     }
 
     public String getPurchaseSummary() {
-        String summary = product.getShortName();
+        String summary = new ProductCaptionBuilder(product)
+                .createIconCatSubcatNameMarkPackageFormView();
         summary += getProductCountAndTotalPrice();
         return summary;
     }

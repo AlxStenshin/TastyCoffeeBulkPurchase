@@ -16,6 +16,7 @@ public class SessionController {
 
     private final SessionManagerService sessionManager;
 
+    // ToDo: add "action" parameter for save, delete, close, placeOrder with type commands
     public SessionController(SessionManagerService sessionManager) {
         this.sessionManager = sessionManager;
     }
@@ -35,6 +36,7 @@ public class SessionController {
         return "sessions";
     }
 
+    // ToDo: find the reason why new session creation called after session save
     @GetMapping(value = "/sessions/new", produces = MediaType.TEXT_HTML_VALUE)
     public String addNewSession(Model model, RedirectAttributes redirectAttributes) {
         try {

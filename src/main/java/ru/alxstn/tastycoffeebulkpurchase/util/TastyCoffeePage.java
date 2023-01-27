@@ -14,6 +14,8 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
 import ru.alxstn.tastycoffeebulkpurchase.exception.webPage.WebPageElementException;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductBuilder;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.model.TastyCoffeeWebPageElement;
 
 import java.math.BigDecimal;
@@ -209,7 +211,7 @@ public class TastyCoffeePage {
         }
     }
 
-    private void addProducts(List<Product> categoryProducts, Product.ProductBuilder productBuilder, List<SelenideElement> products) {
+    private void addProducts(List<Product> categoryProducts, ProductBuilder productBuilder, List<SelenideElement> products) {
         for (var product : products) {
             try {
                 productBuilder.setPrice(getProductPrice(product));
@@ -249,7 +251,9 @@ public class TastyCoffeePage {
             try {
                if (setCountWithIncrementButton(product, productCountIncrement)) {
                    currentSessionPurchases.remove(product);
-               } else logger.warn("Could Not Increment Count for " + product.getShortName() + "Req Count: " + productCountIncrement);
+               } else logger.warn("Could Not Increment Count for " +
+                       new ProductCaptionBuilder(product).createCatSubcatNameMarkPackageView() +
+                       "Req Count: " + productCountIncrement);
 
             } catch (ElementNotFound e) {
                 logger.warn("Could Not Find Element: " + e.getMessage() + "\nFor product" + product);
@@ -264,7 +268,7 @@ public class TastyCoffeePage {
         SelenideElement incrementButton = getIncrementButtonFromQuantityCounter(counter);
 
         logger.info(
-                "Starting product count increase for product: " + product.getShortName() +
+                "Starting product count increase for product: " +
                         ". Current count: " + currentProductCount +
                         "  increments: " + productCountIncrement);
 
@@ -274,11 +278,13 @@ public class TastyCoffeePage {
 
             int newProductCountValue = getCurrentProductCountValue(findProductCounter(product));
             if (newProductCountValue == currentProductCount + 1) {
-                logger.info(product.getShortName() + " Increment Succeed. New Value: " + newProductCountValue);
+                logger.info(new ProductCaptionBuilder(product).createCatSubcatNameMarkPackageView() +
+                        " Increment Succeed. New Value: " + newProductCountValue);
                 productCountIncrement--;
                 currentProductCount++;
             } else {
-                logger.warn(product.getShortName() + " Increment Failed. Retries: " + retries);
+                logger.warn(new ProductCaptionBuilder(product).createCatSubcatNameMarkPackageView() +
+                        " Increment Failed. Retries: " + retries);
                 retries++;
             }
             if (retries > 5)
@@ -346,7 +352,7 @@ public class TastyCoffeePage {
 
     private List<Product> parseAllProductsOfType() {
         List<Product> currentTypeProducts = new ArrayList<>();
-        Product.ProductBuilder productBuilder = new Product.ProductBuilder();
+        ProductBuilder productBuilder = new ProductBuilder();
         for (SelenideElement productCategory : new TastyCoffeeWebPageElement()
                 .applySelector(PRODUCT_CATEGORIES)
                 .getElements()) {

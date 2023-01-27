@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.alxstn.tastycoffeebulkpurchase.entity.*;
 import ru.alxstn.tastycoffeebulkpurchase.service.BasicSessionPurchaseReportCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
-import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
+import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
 
 import java.io.IOException;
 import java.io.Reader;

@@ -14,6 +14,7 @@ import ru.alxstn.tastycoffeebulkpurchase.event.bot.AlertMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.CustomerSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.SessionSummaryCheckRequestEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
 
@@ -59,7 +60,8 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
 
         publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
                 .cacheTime(0)
-                .text("Сохранено!\n" + purchase.getProduct().getDisplayNameWithPackage())
+                .text("Сохранено!\n" +
+                        new ProductCaptionBuilder(purchase.getProduct()).createIconNameMarkPackagePriceCatSubcatView())
                 .showAlert(false)
                 .callbackQueryId(update.getCallbackQuery().getId())
                 .build()));
@@ -68,5 +70,6 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
         publisher.publishEvent(new SessionSummaryCheckRequestEvent(this, "Save"));
 
         // ToDo: Show Edit Purchase List After That
+
     }
 }

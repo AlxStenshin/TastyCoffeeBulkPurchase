@@ -1,4 +1,4 @@
-package ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager;
+package ru.alxstn.tastycoffeebulkpurchase.service;
 
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;

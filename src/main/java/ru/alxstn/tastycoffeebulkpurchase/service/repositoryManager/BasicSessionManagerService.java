@@ -11,6 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionCreationExcept
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenException;
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
+import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.WebPageOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
@@ -72,8 +73,8 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     @Override
     public void placeSessionPurchases(SessionProductFilters productFilters) {
-        webPageOrderCreator.placeOrderWithProductTypes(productFilters);
-        textFileOrderCreator.placeOrderWithProductTypes(productFilters);
+        webPageOrderCreator.placeOrderWithProductFilter(productFilters);
+        textFileOrderCreator.placeOrderWithProductFilter(productFilters);
     }
 
     @Override

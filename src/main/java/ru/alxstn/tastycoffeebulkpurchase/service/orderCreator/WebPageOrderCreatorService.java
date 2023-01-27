@@ -9,7 +9,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.event.PurchasePlacementErrorEvent;
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
-import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseFilterService;
+import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
 
 import java.util.Map;
@@ -52,7 +52,7 @@ public class WebPageOrderCreatorService implements OrderCreatorService {
     }
 
     @Override
-    public void placeOrderWithProductTypes(SessionProductFilters discardedProductProperties) {
+    public void placeOrderWithProductFilter(SessionProductFilters discardedProductProperties) {
         logger.info("Placing order without products: " + discardedProductProperties);
         Session session = discardedProductProperties.getSession();
         var currentSessionPurchases = sessionPurchaseReportCreatorService.createPerProductReport(session);

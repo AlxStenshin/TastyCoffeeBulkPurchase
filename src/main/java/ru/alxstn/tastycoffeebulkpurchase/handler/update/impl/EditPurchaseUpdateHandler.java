@@ -15,6 +15,7 @@ import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 import java.util.ArrayList;
@@ -52,9 +53,15 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
         Purchase purchase = dto.getPurchase();
         Product targetProduct = purchase.getProduct();
 
-        logger.info("Edit Purchase Command Received: " + purchase);
+        boolean editMode = (purchase.getId() != null);
 
-        String title = "Измените заказ: \n" + targetProduct.getFullDisplayNameWithPackage();
+        logger.info(editMode ?
+                "Edit Purchase Command Received: " + purchase :
+                "Create Purchase Command Received: " + purchase);
+
+        String title = editMode ?
+                "Измените заказ: \n" + new ProductCaptionBuilder(targetProduct).createIconNameMarkPackagePriceCatSubcatView() :
+                "Измените параметры: \n" + new ProductCaptionBuilder(targetProduct).createIconNameMarkPackagePriceCatSubcatView();
 
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         List<InlineKeyboardButton> countButtonsRow = new ArrayList<>();
@@ -62,7 +69,7 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("-")
                 .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                        new Purchase(purchase,purchase.getCount() > 1 ? purchase.getCount() - 1 : 1),
+                        new Purchase(purchase, purchase.getCount() > 1 ? purchase.getCount() - 1 : 1),
                         dto.getPrevious())))
                 .build());
 
@@ -74,7 +81,7 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
         countButtonsRow.add(InlineKeyboardButton.builder()
                 .text("+")
                 .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                        new Purchase(purchase,  purchase.getCount() < Integer.MAX_VALUE ? purchase.getCount() + 1 : Integer.MAX_VALUE),
+                        new Purchase(purchase, purchase.getCount() < Integer.MAX_VALUE ? purchase.getCount() + 1 : Integer.MAX_VALUE),
                         dto.getPrevious())))
                 .build());
 

@@ -29,9 +29,8 @@
         <form th:action="@{/sessions/save}" method="post" enctype="multipart/form-data" th:object="${session}"
               style="max-width: 1024px; margin: 0 auto">
 
-<!--            <input type="hidden" th:field="*{id}" />-->
+            <input type="hidden" th:field="*{id}" />
             <input type="hidden" th:field="*{discountPercentage}" />
-            <input type="hidden" th:field="*{totalWeight}" />
             <input type="hidden" th:field="*{coffeeWeight}" />
             <input type="hidden" th:field="*{teaWeight}" />
 
