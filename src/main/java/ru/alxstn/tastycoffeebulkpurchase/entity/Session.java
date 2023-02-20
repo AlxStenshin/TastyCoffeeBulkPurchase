@@ -28,7 +28,7 @@ public class Session {
     private boolean closed;
 
     @Column(name = "close_notification_sent")
-    private boolean closeNotificationSent;
+    private boolean closeSoonNotificationSent;
 
     @Column(name = "finished")
     private boolean finished;
@@ -92,12 +92,12 @@ public class Session {
         this.closed = closed;
     }
 
-    public boolean isCloseNotificationSent() {
-        return closeNotificationSent;
+    public boolean isCloseSoonNotificationSent() {
+        return closeSoonNotificationSent;
     }
 
-    public void setCloseNotificationSent(boolean closeNotificationSent) {
-        this.closeNotificationSent = closeNotificationSent;
+    public void setCloseSoonNotificationSent(boolean closeNotificationSent) {
+        this.closeSoonNotificationSent = closeNotificationSent;
     }
 
     public boolean isFinished() {

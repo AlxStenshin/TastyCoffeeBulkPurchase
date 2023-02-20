@@ -42,7 +42,7 @@ public class ProductCaptionBuilder {
                 .name().separator(SPACE)
                 .mark().separator(COMMA_SPACE)
                 .pack().separator(COMMA_SPACE)
-                .price().rouble().separator(SPACE)
+                .price().rouble()
                 .titledCat().separator(SPACE)
                 .titledSubcat().separator(SPACE)
                 .build();
@@ -58,12 +58,22 @@ public class ProductCaptionBuilder {
                 .form()
                 .build();
     }
+
     public String createCatSubcatNameMarkPackageView() {
         return cat().separator(COMMA_SPACE)
                 .subcat().separator(COMMA_SPACE)
                 .name().separator(COMMA_SPACE)
                 .mark().separator(COMMA_SPACE)
                 .pack().separator(COMMA_SPACE)
+                .build();
+    }
+
+    public String createCatSubcatNamePackageFormView() {
+        return cat().separator(COMMA_SPACE)
+                .subcat().separator(COMMA_SPACE)
+                .name().separator(COMMA_SPACE)
+                .pack().separator(COMMA_SPACE)
+                .form().separator(COMMA_SPACE)
                 .build();
     }
 
@@ -80,61 +90,72 @@ public class ProductCaptionBuilder {
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder name() {
         captionBuilder.append(product.getName());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder mark() {
         captionBuilder.append(product.getSpecialMark().isEmpty() ? "" : "'" + product.getSpecialMark() + "'");
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder price() {
         captionBuilder.append(product.getPrice());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder pack() {
         String pack = product.getProductPackage().getDescription();
         captionBuilder.append(pack.isEmpty() ? "" : pack);
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder titledCat() {
         captionBuilder.append(product.getProductCategory().isEmpty() ? "" :
                 "\nИз категории " + product.getProductCategory());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder titledSubcat() {
         captionBuilder.append(product.getProductSubCategory().isEmpty() ? "" :
                 "\nПодкатегории " + product.getProductSubCategory());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder cat() {
         captionBuilder.append(product.getProductCategory().isEmpty() ? "" :
                 product.getProductCategory());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder subcat() {
         captionBuilder.append(product.getProductSubCategory().isEmpty() ? "" :
                 product.getProductSubCategory());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder form() {
         captionBuilder.append(product.getProductForm().isEmpty() ? "" : product.getProductForm());
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder rouble() {
         captionBuilder.append("₽");
         separatorApplied = false;
         return this;
     }
+
     private ProductCaptionBuilder separator(CaptionBuilderSeparator separator) {
         if (!separatorApplied) {
             captionBuilder.append(separator.getValue());

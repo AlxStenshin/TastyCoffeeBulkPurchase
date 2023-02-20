@@ -26,20 +26,17 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     private final ApplicationEventPublisher publisher;
     private final SessionRepository sessionRepository;
-    private final DateTimeProvider dateTimeProvider;
     private final WebPageOrderCreatorService webPageOrderCreator;
     private final TextFileOrderCreatorService textFileOrderCreator;
     private final PurchaseFilterService purchaseFilterService;
 
     public BasicSessionManagerService(ApplicationEventPublisher publisher,
                                       SessionRepository sessionRepository,
-                                      DateTimeProvider dateTimeProvider,
                                       WebPageOrderCreatorService webPageOrderCreator,
                                       TextFileOrderCreatorService textFileOrderCreator,
                                       PurchaseFilterService purchaseFilterService) {
         this.publisher = publisher;
         this.sessionRepository = sessionRepository;
-        this.dateTimeProvider = dateTimeProvider;
         this.webPageOrderCreator = webPageOrderCreator;
         this.textFileOrderCreator = textFileOrderCreator;
         this.purchaseFilterService = purchaseFilterService;
@@ -65,8 +62,9 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     @Override
     public void closeSession(Session session) {
-        session.setDateTimeClosed(dateTimeProvider.getCurrentTimestamp());
+        //session.setDateTimeClosed(dateTimeProvider.getCurrentTimestamp());
         session.setClosed(true);
+        session.setCloseSoonNotificationSent(true);
         sessionRepository.save(session);
         publisher.publishEvent(new ActiveSessionClosedNotificationEvent(this, session));
     }

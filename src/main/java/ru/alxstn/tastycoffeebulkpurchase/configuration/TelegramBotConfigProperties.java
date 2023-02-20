@@ -3,6 +3,7 @@ package ru.alxstn.tastycoffeebulkpurchase.configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("telegram-bot")
+// ToDo: add validation
 public class TelegramBotConfigProperties {
 
     String name;

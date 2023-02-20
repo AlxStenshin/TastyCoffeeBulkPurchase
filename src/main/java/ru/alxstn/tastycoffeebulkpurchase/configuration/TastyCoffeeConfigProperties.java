@@ -3,6 +3,7 @@ package ru.alxstn.tastycoffeebulkpurchase.configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("tasty-coffee")
+// ToDo: add validation
 public class TastyCoffeeConfigProperties {
 
     String url;

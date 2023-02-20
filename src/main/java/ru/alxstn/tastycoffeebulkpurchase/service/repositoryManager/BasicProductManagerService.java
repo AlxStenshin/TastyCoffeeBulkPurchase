@@ -42,7 +42,7 @@ public class BasicProductManagerService implements ProductManagerService {
 
     @Override
     public List<Product> findDistinctActiveProductsBySubCategory(String subCategory) {
-        return productRepository.findDistinctActiveProductsBySubCategory(subCategory);
+        return productRepository.findDistinctActualProductsBySubCategory(subCategory);
     }
 
     @Override

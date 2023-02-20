@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.alxstn.tastycoffeebulkpurchase.dto.impl.ShowProductNotAvailableAlertDto;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineType;
 import ru.alxstn.tastycoffeebulkpurchase.dto.impl.SetProductNameCommandDto;
@@ -16,10 +17,12 @@ import ru.alxstn.tastycoffeebulkpurchase.dto.serialize.DtoSerializer;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.CallbackUpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+import static ru.alxstn.tastycoffeebulkpurchase.util.Predicates.distinctByKey;
+
 
 @Component
 public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProductSubCategoryCommandDto> {
@@ -56,18 +59,19 @@ public class SetSubCategoryUpdateHandler extends CallbackUpdateHandler<SetProduc
         String targetCategory = dto.getMessage();
         logger.info("Command Received: Set Product SubCategory " + targetCategory);
 
-        MenuNavigationBotMessage<String> answer = new MenuNavigationBotMessage<>(update);
+        MenuNavigationBotMessage<Product> answer = new MenuNavigationBotMessage<>(update);
         answer.setTitle("Выберите продукт: ");
-        answer.setDataSource(new ArrayList<>(productManagerService.findDistinctActiveProductsBySubCategory(targetCategory)
-                .stream()
-                .filter(Product::isAvailable)
-                    .map(Product::getName)
-                .collect(Collectors.toSet())));
+        answer.setDataSource(new ArrayList<>(
+                productManagerService.findDistinctActiveProductsBySubCategory(targetCategory)).stream()
+                .filter(distinctByKey(Product::getName))
+                .toList());
 
         answer.setBackButtonCallback(serializer.serialize(dto.getPrevious()));
-        answer.setButtonCreator(s -> InlineKeyboardButton.builder()
-                .text(s)
-                .callbackData(serializer.serialize(new SetProductNameCommandDto(s, targetCategory, dto)))
+        answer.setButtonCreator(p -> InlineKeyboardButton.builder()
+                .text(new ProductCaptionBuilder(p).createIconNameView())
+                .callbackData(p.isAvailable() ?
+                        serializer.serialize(new SetProductNameCommandDto(p.getName(), targetCategory, dto)) :
+                        serializer.serialize(new ShowProductNotAvailableAlertDto(p.getName())))
                 .build());
 
         publisher.publishEvent(new UpdateMessageEvent( this, answer.updatePrevious()));

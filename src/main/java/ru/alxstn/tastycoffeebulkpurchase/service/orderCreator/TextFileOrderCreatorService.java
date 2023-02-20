@@ -58,7 +58,7 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
 
     private String buildReport(Map<Product, Integer> purchases) {
         String report = purchases.entrySet().stream()
-                .map(e -> new ProductCaptionBuilder(e.getKey()).createCatSubcatNameMarkPackageView() +
+                .map(e -> new ProductCaptionBuilder(e.getKey()).createCatSubcatNamePackageFormView() +
                         " - " + e.getValue() + " шт.")
                 .sorted()
                 .collect(Collectors.joining("\n"));

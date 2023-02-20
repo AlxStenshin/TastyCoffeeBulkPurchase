@@ -23,6 +23,8 @@ public enum SerializableInlineType {
 
     REMOVE_PRODUCT_FOR_CUSTOMER(16),
     REPLACE_PRODUCT_FOR_CUSTOMER(17),
+
+    SHOW_PRODUCT_UNAVAILABLE_ALERT(18),
     ;
 
     private final int index;

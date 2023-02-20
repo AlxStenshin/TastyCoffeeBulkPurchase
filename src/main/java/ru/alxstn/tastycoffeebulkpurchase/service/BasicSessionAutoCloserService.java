@@ -33,6 +33,7 @@ public class BasicSessionAutoCloserService implements SessionAutoCloserService {
     public void closeActiveSession() {
         try {
             Session activeSession = sessionManagerService.getActiveSession();
+
             LocalDateTime now = dateTimeProvider.getCurrentTimestamp();
             LocalDateTime closeTime = activeSession.getDateTimeClosed();
 
@@ -42,9 +43,9 @@ public class BasicSessionAutoCloserService implements SessionAutoCloserService {
             }
 
             if (now.plusHours(1).isAfter(closeTime)) {
-                if (!activeSession.isCloseNotificationSent()) {
+                if (!activeSession.isCloseSoonNotificationSent()) {
                     logger.info("Session will be auto closed in one hour: " + activeSession);
-                    activeSession.setCloseNotificationSent(true);
+                    activeSession.setCloseSoonNotificationSent(true);
                     sessionManagerService.saveSession(activeSession);
                     publisher.publishEvent(new ActiveSessionClosesSoonNotificationEvent(this, activeSession));
                 }

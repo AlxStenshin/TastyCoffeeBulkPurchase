@@ -27,7 +27,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<String> findAllActiveProductForms();
 
     @Query("SELECT p FROM Product p WHERE p.productSubCategory = ?1 AND p.actual = true")
-    List<Product> findDistinctActiveProductsBySubCategory(String subCategory);
+    List<Product> findDistinctActualProductsBySubCategory(String subCategory);
 
     @Query("SELECT p FROM Product p WHERE p.name = :name AND" +
             " p.productSubCategory = :cat AND " +

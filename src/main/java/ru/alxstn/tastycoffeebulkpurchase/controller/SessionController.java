@@ -16,7 +16,7 @@ public class SessionController {
 
     private final SessionManagerService sessionManager;
 
-    // ToDo: add "action" parameter for save, delete, close, placeOrder with type commands
+    // ToDo: add "action" parameter for save, delete, close, placeOrder with filter endpoints
     public SessionController(SessionManagerService sessionManager) {
         this.sessionManager = sessionManager;
     }
@@ -57,6 +57,25 @@ public class SessionController {
         return "session_form";
     }
 
+    @PostMapping("/sessions/save")
+    public String saveSession(Session session, RedirectAttributes redirectAttributes) {
+        try {
+            sessionManager.saveSession(session);
+            redirectAttributes.addFlashAttribute("message", "The Session has been saved successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("message", e.getMessage());
+        }
+        return "redirect:/sessions";
+    }
+
+    @GetMapping(value = "/sessions/{id}/close", produces = MediaType.TEXT_HTML_VALUE)
+    public String closeSession(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        Session session = sessionManager.getSessionById(id);
+        sessionManager.closeSession(session);
+        redirectAttributes.addFlashAttribute("message", "Session Closed With Customer Notifications!");
+        return "redirect:/sessions";
+    }
+
     @GetMapping(value = "/sessions/{id}/placeOrder/discardedTypes/", produces = MediaType.TEXT_HTML_VALUE)
     public String discardSessionProducts(@PathVariable("id") Integer id,
                                          Model model) {
@@ -79,17 +98,6 @@ public class SessionController {
         try {
             sessionManager.placeSessionPurchases(properties);
             redirectAttributes.addFlashAttribute("message", "The Orders will be placed now.");
-        } catch (Exception e) {
-            redirectAttributes.addAttribute("message", e.getMessage());
-        }
-        return "redirect:/sessions";
-    }
-
-    @PostMapping("/sessions/save")
-    public String saveSession(Session session, RedirectAttributes redirectAttributes) {
-        try {
-            sessionManager.saveSession(session);
-            redirectAttributes.addFlashAttribute("message", "The Session has been saved successfully!");
         } catch (Exception e) {
             redirectAttributes.addAttribute("message", e.getMessage());
         }

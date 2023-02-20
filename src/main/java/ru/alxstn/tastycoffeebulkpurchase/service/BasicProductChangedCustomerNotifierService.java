@@ -76,6 +76,8 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
                         new RemoveProductFromCustomerPurchaseCommandDto(oldProduct)))
                 .build()));
 
+
+        // ToDo: Update Customer Purchase Totals after that
         actionButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                 .text("Обновить")
                 .callbackData(serializer.serialize(

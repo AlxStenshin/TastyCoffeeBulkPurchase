@@ -68,6 +68,7 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
 
         SessionProductFilters types = new SessionProductFilters(productTypes, filterType);
         types.setSession(session);
+        types.setFilterType(filterType);
 
         return types;
     }
