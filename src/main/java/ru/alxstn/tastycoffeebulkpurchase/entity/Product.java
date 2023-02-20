@@ -214,7 +214,7 @@ public class Product {
     }
 
     public boolean isAvailable() {
-        return !getSpecialMark().equals("нет") || StringUtil.containsDate(getSpecialMark());
+        return !getSpecialMark().equals("нет") && !StringUtil.containsDate(this.getSpecialMark());
     }
 
     public boolean isSpecialOffer() {
@@ -222,16 +222,30 @@ public class Product {
     }
 
     public String getIcon() {
-        if (isSpecialOffer())
-            return "⚡";
 
-        if (!isAvailable())
+        if (isSpecialOffer())
+            return "⭐️";
+
+        // 🚫
+        if (!isAvailable() || !isActual())
             return "\uD83D\uDEAB";
+
+        // 🆕
+        if (specialMark.equals("Новый"))
+            return "\uD83C\uDD95";
+
+        // Low Battery
+        if (specialMark.equals("Заканчивается"))
+            return "\uD83E\uDEAB";
+
+        // 👍
+        if (specialMark.equals("Рекомендуем"))
+            return"\uD83D\uDC4D";
+
+        // 🔥
+        if (specialMark.equals("Популярный"))
+            return "\uD83D\uDD25️";
 
         return "";
     }
-
-
-
-
 }

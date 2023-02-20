@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeePage;
 
 import java.util.List;
@@ -28,7 +29,8 @@ public class WebScrapperPriceListUpdaterService implements PriceListUpdaterServi
     @Override
     @EventListener
     public void handleNewProduct(final ProductFoundEvent event) {
-        logger.info("New product obtained: " + event.getProduct().toString());
+        logger.info("New product obtained: " + new ProductCaptionBuilder(event.getProduct())
+                .createIconNameMarkPackagePriceView());
     }
 
     @Override

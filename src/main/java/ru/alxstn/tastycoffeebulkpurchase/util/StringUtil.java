@@ -1,8 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class StringUtil {
     public static String capitalize(final String line) {
@@ -18,12 +17,12 @@ public class StringUtil {
     }
 
     public static boolean containsDate(String text) {
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         try {
             format.parse(text);
-            return true;
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             return false;
         }
+        return true;
     }
 }

@@ -41,6 +41,9 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
             Payment payment = paymentManagerService.getCustomerSessionPayment(session, customer)
                     .orElseThrow(() -> new CustomerPaymentException("Payment Not Found!"));
 
+            StringBuilder messageBuilder = new StringBuilder();
+            messageBuilder.append("Ваш заказ:\n");
+
             if (availablePurchases.size() > 0) {
                 int discountValue = session.getDiscountPercentage();
                 BigDecimal totalPrice = payment.getTotalAmountNoDiscount();
@@ -49,29 +52,13 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                 BigDecimal discountableTotalWithDiscount = payment.getDiscountableAmountWithDiscount();
                 BigDecimal nonDiscountableTotal = payment.getNonDiscountableAmount();
 
-                StringBuilder messageBuilder = new StringBuilder();
-                messageBuilder.append("Ваш заказ:\n");
                 messageBuilder.append("<code>");
-
                 for (var purchase : availablePurchases) {
                     messageBuilder.append(purchase.getPurchaseSummary());
                     messageBuilder.append("\n");
                 }
-
-                List<Purchase> unavailablePurchases = purchases.stream()
-                        .filter(purchase -> !purchase.getProduct().isAvailable() || !purchase.getProduct().isActual())
-                        .toList();
-
-                if (!unavailablePurchases.isEmpty()) {
-                    messageBuilder.append("⛔ Недоступные товары:\n");
-                    for (var unavailablePurchase : unavailablePurchases) {
-                        messageBuilder.append("❌").append(unavailablePurchase.getPurchaseSummary());
-                        messageBuilder.append("\n");
-                    }
-                    messageBuilder.append("Пожалуйста удалите или замените недоступные товары из своего заказа.");
-                }
-
                 messageBuilder.append("</code>");
+
                 if (discountValue > 0) {
                     messageBuilder.append("\nИтог без скидки: ").append(totalPrice).append("₽");
                     messageBuilder.append(BigDecimalUtil.greaterThanZero(discountableTotal) ?
@@ -87,10 +74,24 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                             .append(totalPrice.subtract(totalPriceWithDiscount)).append(" ₽");
                 }
                 messageBuilder.append("\n\n<b>Всего к оплате: ").append(totalPriceWithDiscount).append(" ₽</b>");
-                message = messageBuilder.toString();
-            } else {
-                message = "Ваш заказ пуст";
             }
+
+            List<Purchase> unavailablePurchases = purchases.stream()
+                    .filter(purchase -> !purchase.getProduct().isAvailable() || !purchase.getProduct().isActual())
+                    .toList();
+
+            if (!unavailablePurchases.isEmpty()) {
+                messageBuilder.append("<code>");
+                messageBuilder.append("\n\n⛔ Недоступные товары:\n");
+                for (var unavailablePurchase : unavailablePurchases) {
+                    messageBuilder.append(unavailablePurchase.getPurchaseSummary());
+                    messageBuilder.append("\n");
+                }
+                messageBuilder.append("</code>");
+                messageBuilder.append("Пожалуйста удалите или замените недоступные товары из своего заказа.");
+            }
+            message = messageBuilder.toString();
+
         } catch (CustomerPaymentException e) {
             message = "Ваш заказ пуст";
         }

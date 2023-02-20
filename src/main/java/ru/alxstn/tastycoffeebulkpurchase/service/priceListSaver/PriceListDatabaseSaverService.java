@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.ProductPackage;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.NewProductAnalyzerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
@@ -64,7 +65,7 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
                     product.getProductForm(),
                     product.getPrice()
                     ).isPresent()) {
-                logger.info("Product already exist, updating timestamp: " + product);
+                logger.info("Product already exist, updating timestamp: " + new ProductCaptionBuilder(product).createIconNameMarkPackageFormPriceView());
                 productManagerService.updateProduct(
                         product.getName(),
                         product.getProductCategory(),
@@ -77,7 +78,7 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
             } else {
                 newProducts.add(product);
                 productManagerService.save(product);
-                logger.info("Saving new Product: " + product);
+                logger.info("Saving new Product: " + new ProductCaptionBuilder(product).createIconNameMarkPackageFormPriceView());
             }
         }
         newProductAnalyzerService.analyzeNewProducts(newProducts);

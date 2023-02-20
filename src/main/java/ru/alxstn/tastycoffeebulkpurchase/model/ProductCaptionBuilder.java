@@ -22,7 +22,7 @@ public class ProductCaptionBuilder {
 
     public String createIconNameMarkPriceView() {
         return icon().separator(SPACE)
-                .name().separator(SPACE)
+                .name().separator(COMMA_SPACE)
                 .mark().separator(COMMA_SPACE)
                 .price().rouble()
                 .build();
@@ -33,6 +33,16 @@ public class ProductCaptionBuilder {
                 .name().separator(SPACE)
                 .mark().separator(COMMA_SPACE)
                 .pack().separator(COMMA_SPACE)
+                .price().rouble()
+                .build();
+    }
+
+    public String createIconNameMarkPackageFormPriceView() {
+        return icon().separator(SPACE)
+                .name().separator(SPACE)
+                .mark().separator(COMMA_SPACE)
+                .pack().separator(COMMA_SPACE)
+                .form().separator(COMMA_SPACE)
                 .price().rouble()
                 .build();
     }
@@ -98,8 +108,11 @@ public class ProductCaptionBuilder {
     }
 
     private ProductCaptionBuilder mark() {
-        captionBuilder.append(product.getSpecialMark().isEmpty() ? "" : "'" + product.getSpecialMark() + "'");
-        separatorApplied = false;
+        if (!product.getSpecialMark().isEmpty()) {
+            captionBuilder.append("'").append(product.getSpecialMark()).append("'");
+            if (separatorApplied)
+                separatorApplied = false;
+        }
         return this;
     }
 
@@ -110,6 +123,7 @@ public class ProductCaptionBuilder {
     }
 
     private ProductCaptionBuilder pack() {
+        // ToDo: skip sepator if pack is empty
         String pack = product.getProductPackage().getDescription();
         captionBuilder.append(pack.isEmpty() ? "" : pack);
         separatorApplied = false;

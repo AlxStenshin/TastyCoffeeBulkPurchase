@@ -85,4 +85,13 @@ class ProductTest {
 
         assertFalse(discountableProduct.isAvailable());
     }
+
+    @Test
+    void shouldNotBeAvailableWithDateInMark() {
+        Product discountableProduct = new ProductBuilder()
+                .setSpecialMark("07.03.2023")
+                .build();
+
+        assertFalse(discountableProduct.isAvailable());
+    }
 }

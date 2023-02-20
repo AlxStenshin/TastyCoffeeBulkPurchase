@@ -19,6 +19,7 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundExcept
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 import ru.alxstn.tastycoffeebulkpurchase.bot.MenuNavigationBotMessage;
 import ru.alxstn.tastycoffeebulkpurchase.handler.update.UpdateHandlerStage;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.repository.CustomerRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService;
@@ -110,9 +111,10 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                             editOrderAnswer.setTitle("Выберите продукт из заказа: ");
                             editOrderAnswer.setDataSource(purchases);
 
+                            // ToDo: Purchase Caption Builder
                             Function<Purchase, String> buttonTitleCreator = purchase -> {
                                 Product product = purchase.getProduct();
-                                String buttonTitle = product.getName();
+                                String buttonTitle = new ProductCaptionBuilder(product).createIconNameView();
                                 buttonTitle += product.getProductPackage().getDescription().isEmpty() ? "" : ", " + product.getProductPackage();
                                 buttonTitle += purchase.getProduct().getProductForm().isEmpty() ? "" : ", " + purchase.getProduct().getProductForm();
                                 buttonTitle += " x " + purchase.getCount() + " шт.";
@@ -177,6 +179,13 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                 .text("Информация о заказе")
                                 .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto(currentSession)))
                                 .build()));
+
+                        // ToDo: Emoji Legend
+//                        informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+//                                .text("Условные обозначения")
+//                                .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto(currentSession)))
+//                                .build()));
+
 
                         // ToDo: Pass correct message id to delete (this)
                         /*

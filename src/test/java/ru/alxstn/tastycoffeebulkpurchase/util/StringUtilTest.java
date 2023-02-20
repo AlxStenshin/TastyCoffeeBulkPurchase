@@ -32,8 +32,14 @@ class StringUtilTest {
     }
 
     @Test
-    void shouldContainDate() {
-        String input = "01.01.01";
+    void shouldNotContainDate() {
+        String input = "a1.01.01ss";
+        assertFalse(StringUtil.containsDate(input));
+    }
+
+    @Test
+    void shouldContainDateWithFullYear() {
+        String input = "07.03.2023";
         assertTrue(StringUtil.containsDate(input));
     }
 

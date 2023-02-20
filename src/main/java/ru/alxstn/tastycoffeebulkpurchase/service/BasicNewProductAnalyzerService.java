@@ -8,6 +8,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.NewProductDiscoveredEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductPriceUpdateEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductSpecialMarkUpdateEvent;
+import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManagerService;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
@@ -49,19 +50,25 @@ public class BasicNewProductAnalyzerService implements NewProductAnalyzerService
                 Product latestSimilar = similarProducts.get(0);
 
                 if (!BigDecimalUtil.equals(newProduct.getPrice(), latestSimilar.getPrice())) {
-                    logger.info("Analyzing New Product: " + newProduct + ". Price Update Detected: " +
+                    logger.info("Analyzing New Product: " +
+                            new ProductCaptionBuilder(newProduct).createIconNameMarkPriceView() +
+                            ". Price Update Detected: " +
                             latestSimilar.getPrice() + " -> " + newProduct.getPrice());
                     publisher.publishEvent(new ProductPriceUpdateEvent(this, latestSimilar, newProduct));
                 }
 
                 if (!Objects.equals(newProduct.getSpecialMark(), latestSimilar.getSpecialMark())) {
-                    logger.info("Analyzing New Product: " + newProduct + ". Product Special Mark Update Detected: " +
+                    logger.info("Analyzing New Product: " +
+                            new ProductCaptionBuilder(newProduct).createIconNameMarkPriceView() +
+                            ". Product Special Mark Update Detected: " +
                             latestSimilar.getSpecialMark()  + " -> " + newProduct.getSpecialMark());
                     publisher.publishEvent(new ProductSpecialMarkUpdateEvent(this, latestSimilar, newProduct));
                 }
             }
             else {
-                logger.info("Analyzing New Product: " + newProduct + " This is a New Product.");
+                logger.info("Analyzing New Product: " +
+                        new ProductCaptionBuilder(newProduct).createIconNameMarkPriceView() +
+                        " This is a New Product.");
                 publisher.publishEvent(new NewProductDiscoveredEvent(this, newProduct));
             }
         }

@@ -19,6 +19,15 @@ class ProductCaptionBuilderTest {
                     "Мелкий",
                     true);
 
+    private static final Product regularPackagedProductWithFormAndNoMark = new Product("fineGrind",
+                    new BigDecimal(1),
+                    "",
+                    pack,
+                    "Group",
+                    "Subgroup",
+                    "Мелкий",
+                    true);
+
     private static final Product regularPackagedProductNoFormNoMark = new Product("Product",
                     new BigDecimal(1),
                     "",
@@ -75,7 +84,7 @@ class ProductCaptionBuilderTest {
     @Test
     void shouldReturnIconNameMarkPriceView() {
         Assertions.assertEquals(unavailablePackagedProductWithForm.getIcon() + " " +
-                unavailablePackagedProductWithForm.getName() + " " +
+                unavailablePackagedProductWithForm.getName() + ", " +
                 "'" + unavailablePackagedProductWithForm.getSpecialMark() + "', " +
                 unavailablePackagedProductWithForm.getPrice() + "₽",
                 new ProductCaptionBuilder(unavailablePackagedProductWithForm).createIconNameMarkPriceView());
@@ -93,10 +102,17 @@ class ProductCaptionBuilderTest {
 
     @Test
     void shouldSkipIconWithIconNameMarkPriceViewAndNoIconProduct() {
-        Assertions.assertEquals(regularPackagedProductWithForm.getName() + " " +
+        Assertions.assertEquals(regularPackagedProductWithForm.getName() + ", " +
                 "'" + regularPackagedProductWithForm.getSpecialMark() + "', " +
                         regularPackagedProductWithForm.getPrice() + "₽",
                 new ProductCaptionBuilder(regularPackagedProductWithForm).createIconNameMarkPriceView());
+    }
+
+    @Test
+    void shouldSkipSpecialMarkWithIconNameMarkPriceViewAndNoMarkProduct() {
+        Assertions.assertEquals(regularPackagedProductWithFormAndNoMark.getName() + ", " +
+                        regularPackagedProductWithFormAndNoMark.getPrice() + "₽",
+                new ProductCaptionBuilder(regularPackagedProductWithFormAndNoMark).createIconNameMarkPriceView());
     }
 
     @Test
