@@ -72,7 +72,6 @@ public class SetProductNameUpdateHandler extends CallbackUpdateHandler<SetProduc
         String productName = dto.getName();
         logger.info("Set Product Name Command Received: " + productName);
 
-
         // ToDo: for grindable products set default form to beans
         List<Product> availablePackages = productManagerService
                 .findAllActiveProductsByProductNameAndSubcategory(dto.getName(), dto.getSubCategory())

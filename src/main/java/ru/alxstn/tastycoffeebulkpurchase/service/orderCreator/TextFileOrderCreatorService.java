@@ -68,7 +68,6 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
 
         logger.info(report);
         logger.info("totalProductsCount: " + totalCount);
-        // ToDo: Find Reason why it is not working
         return report;
     }
 

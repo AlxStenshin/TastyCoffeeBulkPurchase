@@ -62,15 +62,15 @@ That's it. All orders will be automatically placed after session being closed.
 1) ~~Auto-close session by reaching session close date.~~
 2) ~~"Session will be closed in 1 hour" customer notification.~~
 3) ~~"New session started" customer notification.~~
-4) "Session completely paid" (closed, finished) customer notification.
+4) ~~"Session completely paid" (closed, finished) customer notification.~~
 5) ~~"Product changed" notification message.~~
 6) Do not parse products until there is closed, but non-finished session (this will clear purchases otherwise)
 7) ~~Session summary in human-readable format for order validation.~~
 8) ~~Separate order placement for grindable and non-grindable coffee.~~
 9) ~~Update customer purchase information on discount change, not only on customer purchase change.~~
-10) Show unavailable product with special mark in purchase list. buttons should be inactive. (show pop-up message)
+10) ~~Show unavailable product with special mark in purchase list. buttons should be inactive. (show pop-up message)~~
 11) Make Log messages more readable
-12) Separate Service for Text builders with tests
+12) ~~Separate Service for Text builders with tests~~
 13) JVM, DB and app-specific metrics monitoring using Prometheus and Grafana.
 14) Docker compose
 15) Heroku? deploy
