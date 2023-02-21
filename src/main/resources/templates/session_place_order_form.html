@@ -30,6 +30,7 @@
       <form method="post" th:action="@{'/sessions/placeOrder/'}" th:object="${properties}">
 
         <input type="hidden" th:field="${properties.session}"/>
+        <input type="hidden" th:field="${properties.filterType}"/>
 
 <!--ToDo: change syntax to more supportable :-->
 <!--          https://stackoverflow.com/questions/40717777/thymeleaf-edit-list-of-objects-for-form  -->

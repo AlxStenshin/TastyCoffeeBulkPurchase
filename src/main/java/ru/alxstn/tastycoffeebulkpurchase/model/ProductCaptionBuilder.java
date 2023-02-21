@@ -123,10 +123,12 @@ public class ProductCaptionBuilder {
     }
 
     private ProductCaptionBuilder pack() {
-        // ToDo: skip sepator if pack is empty
         String pack = product.getProductPackage().getDescription();
-        captionBuilder.append(pack.isEmpty() ? "" : pack);
-        separatorApplied = false;
+        if (!pack.isEmpty()) {
+            captionBuilder.append(pack);
+            if (separatorApplied)
+                separatorApplied = false;
+        }
         return this;
     }
 
@@ -159,8 +161,12 @@ public class ProductCaptionBuilder {
     }
 
     private ProductCaptionBuilder form() {
-        captionBuilder.append(product.getProductForm().isEmpty() ? "" : product.getProductForm());
-        separatorApplied = false;
+        String form = product.getProductForm();
+        if (!form.isEmpty()) {
+            captionBuilder.append(form);
+            if (separatorApplied)
+                separatorApplied = false;
+        }
         return this;
     }
 

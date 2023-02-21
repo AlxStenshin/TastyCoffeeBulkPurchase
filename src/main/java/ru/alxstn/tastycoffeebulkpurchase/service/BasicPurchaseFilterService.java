@@ -9,6 +9,7 @@ import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.ProductManage
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType.ACCEPT_FILTER;
 import static ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilterType.DISCARD_FILTER;
@@ -26,30 +27,34 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
     @Override
     public Map<Product, Integer> filterPurchases(SessionProductFilters filter,
                                                  Map<Product, Integer> allPurchases) {
-
         Map<Product, Integer> requiredPurchases = new HashMap<>(allPurchases);
 
-        if (filter.getFilterType() == DISCARD_FILTER) {
-            List<String> discardedTypes = filter.getProductTypeFilters().stream()
-                    .filter(ProductTypeFilter::getValue)
-                    .map(ProductTypeFilter::getDescription)
+        List<String> discardedTypes = filter.getProductTypeFilters().stream()
+                .filter(ProductTypeFilter::getValue)
+                .map(ProductTypeFilter::getDescription)
+                .toList();
+
+        List<Product> filteredProducts = new ArrayList<>();
+        for (var type : discardedTypes) {
+            filteredProducts = requiredPurchases.keySet().stream()
+                    .filter(Objects.requireNonNull(buildPredicate(type)))
                     .toList();
+        }
 
-            for (var type : discardedTypes) {
-                List<Product> discardedProducts = requiredPurchases.keySet().stream()
-                        .filter(Objects.requireNonNull(buildPredicate(type)))
-                        .toList();
-
-                for (Product p : discardedProducts) {
-                    requiredPurchases.remove(p);
-                }
+        // Removing listed product
+        if (filter.getFilterType() == DISCARD_FILTER) {
+            for (Product p : filteredProducts) {
+                requiredPurchases.remove(p);
             }
         }
 
-        if (filter.getFilterType() == ACCEPT_FILTER) {
-            // ToDo: Accept Filter logic
+        // Bypassing only listed products
+        else if (filter.getFilterType() == ACCEPT_FILTER) {
+            List<Product> finalFilteredProducts = filteredProducts;
+            requiredPurchases = requiredPurchases.entrySet().stream()
+                    .filter(e -> finalFilteredProducts.contains(e.getKey()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
-
         return requiredPurchases;
     }
 
@@ -58,6 +63,7 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
                                               boolean targetState) {
         List<ProductTypeFilter> productTypes = new ArrayList<>(productManagerService.findAllActiveCategories()
                 .stream()
+                .filter(Predicate.not(String::isBlank))
                 .map(s -> new ProductTypeFilter(s, targetState))
                 .toList());
 

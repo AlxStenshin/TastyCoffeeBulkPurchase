@@ -46,23 +46,27 @@ public class BasicProductChangedCustomerNotifierService implements ProductChange
         Product oldProduct = event.getOldProduct();
         Product newProduct = event.getNewProduct();
 
-        Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
-        List<Purchase> currentSessionProductPurchases = purchaseManagerService.
-                findProductPurchasesInSession(currentSession, oldProduct);
+        try {
+            Session currentSession = sessionRepository.getActiveSession().orElseThrow(SessionNotFoundException::new);
+            List<Purchase> currentSessionProductPurchases = purchaseManagerService.
+                    findProductPurchasesInSession(currentSession, oldProduct);
 
-        for (Purchase purchase : currentSessionProductPurchases) {
-            Customer customer = purchase.getCustomer();
+            for (Purchase purchase : currentSessionProductPurchases) {
+                Customer customer = purchase.getCustomer();
 
-            logger.info("Sending Product Changed Notification to " + purchase.getCustomer());
-            publisher.publishEvent(new SendMessageEvent(this,
-                    SendMessage.builder()
-                            .chatId(customer.getChatId())
-                            .parseMode("html")
-                            .text("Обновился прайс-лист. \n" + event.getUpdateMessage())
-                            .replyMarkup(InlineKeyboardMarkup.builder()
-                                    .keyboard(buildActionButtons(oldProduct, newProduct))
-                                    .build())
-                            .build()));
+                logger.info("Sending Product Changed Notification to " + purchase.getCustomer());
+                publisher.publishEvent(new SendMessageEvent(this,
+                        SendMessage.builder()
+                                .chatId(customer.getChatId())
+                                .parseMode("html")
+                                .text("Обновился прайс-лист. \n" + event.getUpdateMessage())
+                                .replyMarkup(InlineKeyboardMarkup.builder()
+                                        .keyboard(buildActionButtons(oldProduct, newProduct))
+                                        .build())
+                                .build()));
+            }
+        } catch (SessionNotFoundException e) {
+            logger.info("No Active Session Found. Notifications skipped.");
         }
     }
 

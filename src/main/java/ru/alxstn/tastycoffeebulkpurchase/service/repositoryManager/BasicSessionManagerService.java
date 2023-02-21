@@ -14,7 +14,6 @@ import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.WebPageOrderCreatorService;
-import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
 import java.util.List;
 
@@ -71,8 +70,8 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     @Override
     public void placeSessionPurchases(SessionProductFilters productFilters) {
-        webPageOrderCreator.placeOrderWithProductFilter(productFilters);
         textFileOrderCreator.placeOrderWithProductFilter(productFilters);
+        webPageOrderCreator.placeOrderWithProductFilter(productFilters);
     }
 
     @Override

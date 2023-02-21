@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Customer;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
@@ -56,10 +55,10 @@ public class BasicUnfinishedPurchasesCustomerNotifierService implements Unfinish
                 for (var notificationReceiver : notificationReceivers) {
                     logger.info("Message for: " + notificationReceiver + ": " + notificationMessage);
 
-                    publisher.publishEvent(new SendMessageEvent(this,
-                            SendMessage.builder()
-                                    .chatId(notificationReceiver.getChatId())
-                                    .text(notificationMessage.toString()).build()));
+//                    publisher.publishEvent(new SendMessageEvent(this,
+//                            SendMessage.builder()
+//                                    .chatId(notificationReceiver.getChatId())
+//                                    .text(notificationMessage.toString()).build()));
                 }
             }
         }

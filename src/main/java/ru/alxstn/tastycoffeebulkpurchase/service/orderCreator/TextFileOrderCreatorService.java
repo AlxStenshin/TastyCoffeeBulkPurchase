@@ -74,8 +74,8 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
 
     private void saveReport(Session session, String report, Optional<SessionProductFilters> productProperties) {
         StringBuilder fileName = new StringBuilder(session.getId() + "_" + session.getTitle() + "_");
-        if (productProperties.isPresent()) {
 
+        if (productProperties.isPresent()) {
             List<String> filteredProducts = productProperties.get().getProductTypeFilters().stream()
                     .filter(ProductTypeFilter::getValue)
                     .map(ProductTypeFilter::getDescription)
@@ -83,15 +83,18 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
 
             if (!filteredProducts.isEmpty()) {
                 fileName.append(productProperties.get().getFilterType().getShortDescription());
-                for (String product : filteredProducts) {
-                    fileName.append(product);
-                    fileName.append(" ");
+                fileName.append("=");
+                for (int i = 0; i < filteredProducts.size(); i++) {
+                    fileName.append(filteredProducts.get(i));
+                    if (i != filteredProducts.size() - 1)
+                        fileName.append(", ");
                 }
-                fileName.append(")_");
+                fileName.append("_");
             }
         }
 
         fileName.append("SessionReport.json");
+        logger.info("Report File Name: " + fileName);
 
         try (PrintWriter out = new PrintWriter(fileName.toString())) {
             out.println(report);

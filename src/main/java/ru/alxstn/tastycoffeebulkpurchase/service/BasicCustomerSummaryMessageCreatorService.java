@@ -88,7 +88,9 @@ public class BasicCustomerSummaryMessageCreatorService implements CustomerSummar
                     messageBuilder.append("\n");
                 }
                 messageBuilder.append("</code>");
-                messageBuilder.append("Пожалуйста удалите или замените недоступные товары из своего заказа.");
+                if (session.isClosed())
+                    messageBuilder.append("Данные товары будут проигнорированы при размещении заказа и рассчете стоимости заказа.");
+                else messageBuilder.append("Пожалуйста удалите или замените недоступные товары из своего заказа.");
             }
             message = messageBuilder.toString();
 

@@ -221,7 +221,10 @@ public class TastyCoffeePage {
                 publisher.publishEvent(new ProductFoundEvent(this, newProduct));
                 categoryProducts.add(newProduct);
             } catch (RuntimeException e) {
-                logger.warn("Warning parsing product " + productBuilder.build().toString() + " Message: " + e.getMessage() +
+                logger.warn("Warning parsing product " +
+                        new ProductCaptionBuilder(productBuilder.build()).createIconNameMarkPackagePriceView() +
+                        " Message: " +
+                        e.getMessage() +
                         " Product will be skipped.");
             }
         }

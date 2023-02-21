@@ -37,8 +37,12 @@ public class PriceListDatabaseSaverService implements PriceListSaverService {
     @EventListener
     @Override
     public void handlePriceList(final PriceListReceivedEvent event) {
-        productManagerService.markAllNotActual();
         List<Product> productsToSave = event.getPriceList();
+        if (productsToSave.isEmpty()) {
+            return;
+        }
+
+        productManagerService.markAllNotActual();
 
         // Product Package Persistence
         for (var pack : productsToSave.stream().map(Product::getProductPackage).collect(Collectors.toSet())) {
