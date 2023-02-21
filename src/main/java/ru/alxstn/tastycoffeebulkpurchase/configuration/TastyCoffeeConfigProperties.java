@@ -1,13 +1,23 @@
 package ru.alxstn.tastycoffeebulkpurchase.configuration;
 
+import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
+@Validated
 @ConfigurationProperties("tasty-coffee")
-// ToDo: add validation
 public class TastyCoffeeConfigProperties {
 
+    @URL
     String url;
+
+    @Email
     String userName;
+
+    @NotBlank
     String password;
 
     public String getUrl() {
