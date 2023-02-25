@@ -25,6 +25,7 @@ public enum SerializableInlineType {
     REPLACE_PRODUCT_FOR_CUSTOMER(17),
 
     SHOW_PRODUCT_UNAVAILABLE_ALERT(18),
+    SHOW_EMOJI_LEGEND(19),
     ;
 
     private final int index;

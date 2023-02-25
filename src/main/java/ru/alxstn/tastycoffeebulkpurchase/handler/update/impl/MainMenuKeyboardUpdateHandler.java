@@ -161,14 +161,21 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                 }
                 case INFORMATION -> {
                     List<List<InlineKeyboardButton>> informationButtons = new ArrayList<>();
+
+                    // ToDo: Add "How To Use" Information Message "Как это работает"
+
+                    informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Скачать PriceList")
+                            .url("https://storage.yandexcloud.net/coffee-opt-static/media/TastyCoffee_pricelist.pdf")
+                            .build()));
+
+                    informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
+                            .text("Условные обозначения")
+                            .callbackData(serializer.serialize(new RequestEmojiLegendCommandDto()))
+                            .build()));
+
                     try {
                         Session currentSession = sessionManager.getUnfinishedSession();
-                        informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
-                                .text("Скачать PriceList")
-                                .url("https://storage.yandexcloud.net/coffee-opt-static/media/TastyCoffee_pricelist.pdf")
-                                .build()));
-
-                        // ToDo: Add "How To Use" Information Message "Как это работает"
 
                         informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                                 .text("Информация о текущей сессии")
@@ -180,14 +187,10 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                 .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto(currentSession)))
                                 .build()));
 
-                        // ToDo: Emoji Legend
-//                        informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
-//                                .text("Условные обозначения")
-//                                .callbackData(serializer.serialize(new RequestCustomerPurchaseSummaryCommandDto(currentSession)))
-//                                .build()));
+                    } catch (SessionNotFoundException | SessionIsNotOpenException ignored) {
+                    }
 
-
-                        // ToDo: Pass correct message id to delete (this)
+                    // ToDo: Pass correct message id to delete (this)
                         /*
                         informationButtons.add(Collections.singletonList(InlineKeyboardButton.builder()
                                 .text("Закрыть")
@@ -197,16 +200,13 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                 .build()));
                         */
 
-                        publisher.publishEvent(new SendMessageEvent(this,
-                                SendMessage.builder()
-                                        .text("Выбрерите категорию")
-                                        .chatId(message.getChatId().toString())
-                                        .replyMarkup(InlineKeyboardMarkup.builder().keyboard(informationButtons).build())
-                                        .build()));
+                    publisher.publishEvent(new SendMessageEvent(this,
+                            SendMessage.builder()
+                                    .text("Выбрерите категорию")
+                                    .chatId(message.getChatId().toString())
+                                    .replyMarkup(InlineKeyboardMarkup.builder().keyboard(informationButtons).build())
+                                    .build()));
 
-                    } catch (SessionNotFoundException | SessionIsNotOpenException e) {
-                        sendSessionErrorMessage(update, e.getMessage());
-                    }
                 }
             }
             return true;
