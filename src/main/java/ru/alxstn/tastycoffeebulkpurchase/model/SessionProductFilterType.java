@@ -1,7 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.model;
 
 public enum SessionProductFilterType {
-    // ToDo: Add this to html view
     ACCEPT_FILTER("Включить только товары выбранных типов", "Accepted"),
     DISCARD_FILTER("Исключить товары выбранных типов", "Discarded"),
     ;

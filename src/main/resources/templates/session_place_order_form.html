@@ -29,6 +29,7 @@
     <div class="col-md-4 mt-5">
       <form method="post" th:action="@{'/sessions/placeOrder/'}" th:object="${properties}">
 
+        <h2 class="text-center">[[${properties.filterType.description}]]</h2>
         <input type="hidden" th:field="${properties.session}"/>
         <input type="hidden" th:field="${properties.filterType}"/>
 
