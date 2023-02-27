@@ -36,7 +36,6 @@ public class SessionController {
         return "sessions";
     }
 
-    // ToDo: find the reason why new session creation called after session save
     @GetMapping(value = "/sessions/new", produces = MediaType.TEXT_HTML_VALUE)
     public String addNewSession(Model model, RedirectAttributes redirectAttributes) {
         try {

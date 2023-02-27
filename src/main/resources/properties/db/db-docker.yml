@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    database: postgresql
+  sql:
+    init:
+      platform: postgres
+  datasource:
+    url: jdbc:postgresql://db:5432/tastycoffee

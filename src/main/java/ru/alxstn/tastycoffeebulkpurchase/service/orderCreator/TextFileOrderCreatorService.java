@@ -12,6 +12,7 @@ import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters;
 import ru.alxstn.tastycoffeebulkpurchase.service.SessionPurchaseReportCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -52,8 +53,9 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
         if (currentSessionPurchases.size() > 0) {
             Map<Product, Integer> requiredPurchases = purchaseFilterService.filterPurchases(filter, currentSessionPurchases);
             String report = buildReport(requiredPurchases);
+            logger.info("Report Created successfully: \n\n" + report);
             saveReport(session, report, Optional.of(filter));
-        }
+        } else logger.info("No purchases found, report building skipped.");
     }
 
     private String buildReport(Map<Product, Integer> purchases) {
@@ -64,7 +66,7 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
                 .collect(Collectors.joining("\n"));
 
         int totalCount = purchases.values().stream()
-                        .reduce(Integer::sum).orElse(0);
+                .reduce(Integer::sum).orElse(0);
 
         logger.info(report);
         logger.info("totalProductsCount: " + totalCount);
@@ -72,7 +74,12 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
     }
 
     private void saveReport(Session session, String report, Optional<SessionProductFilters> productProperties) {
-        StringBuilder fileName = new StringBuilder(session.getId() + "_" + session.getTitle() + "_");
+        File dir = new File("report");
+        if (!dir.exists())
+            if (!dir.mkdirs())
+                logger.error("Could not create text files report directory");
+
+        StringBuilder fileName = new StringBuilder(dir.getAbsolutePath() + File.separator + session.getId() + "_" + session.getTitle() + "_");
 
         if (productProperties.isPresent()) {
             List<String> filteredProducts = productProperties.get().getProductTypeFilters().stream()

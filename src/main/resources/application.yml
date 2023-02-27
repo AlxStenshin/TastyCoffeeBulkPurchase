@@ -1,0 +1,25 @@
+tasty-coffee:
+  url: https://tastycoffee.ru
+
+spring:
+  config:
+    # docker public
+    import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets.yml
+
+   # docker dev
+#    import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets-dev.yml
+
+    # docker prod
+#    import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets-prod.yml
+
+    # local prod
+#    import: properties/db/db-local-prod.yml, properties/cache/cache-local.yml, properties/secrets-prod.yml
+
+    # local dev
+#    import: properties/db/db-local-dev.yml, properties/cache/cache-local.yml, properties/secrets-dev.yml
+
+  jpa:
+    generate-ddl: true
+#    show-sql: true
+    hibernate:
+      ddl-auto: update

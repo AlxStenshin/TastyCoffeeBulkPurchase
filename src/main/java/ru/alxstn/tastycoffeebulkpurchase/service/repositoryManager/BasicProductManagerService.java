@@ -32,12 +32,12 @@ public class BasicProductManagerService implements ProductManagerService {
 
     @Override
     public List<String> findAllActiveSubCategories(String category) {
-        return productRepository.findAllActiveSubCategories(category);
+        return productRepository.findAllActualSubCategories(category);
     }
 
     @Override
     public List<String> findAllActiveProductForms() {
-        return productRepository.findAllActiveProductForms();
+        return productRepository.findAllActualProductForms();
     }
 
     @Override

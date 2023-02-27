@@ -10,6 +10,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.util.DateTimeProvider;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PriceListFileSaverService implements PriceListSaverService {
 
     private final DateTimeProvider dateTimeProvider;
+
     public PriceListFileSaverService(DateTimeProvider dateTimeProvider) {
         this.dateTimeProvider = dateTimeProvider;
     }
@@ -38,10 +40,15 @@ public class PriceListFileSaverService implements PriceListSaverService {
         JsonElement tree = gson.toJsonTree(priceList);
         String json = gson.toJson(tree);
 
-        try (PrintWriter out = new PrintWriter(targetFileName)) {
+        File dir = new File("report");
+        if (!dir.exists())
+            dir.mkdirs();
+
+        try (PrintWriter out = new PrintWriter(dir.getAbsolutePath() + File.separator + targetFileName)) {
             out.println(json);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
+
 }

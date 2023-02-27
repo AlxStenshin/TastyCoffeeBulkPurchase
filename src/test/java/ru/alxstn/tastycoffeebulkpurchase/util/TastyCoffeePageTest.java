@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(TastyCoffeeConfigProperties.class)
 @TestPropertySource("classpath:application.properties")
-@TestPropertySource("classpath:secrets.properties")
+@TestPropertySource("classpath:properties/secrets.yml")
 class TastyCoffeePageTest {
 
     Logger logger = LogManager.getLogger(TastyCoffeePageTest.class);
@@ -57,6 +57,7 @@ class TastyCoffeePageTest {
     }
 
     @Test
+    //@Disabled
     void shouldCorrectlyAddDecaffToPurchaseList() {
         Product decaf250Beans = new Product("Колумбия Декаф",
                 new BigDecimal(1),
@@ -77,6 +78,7 @@ class TastyCoffeePageTest {
     }
 
     @Test
+    //@Disabled
     void shouldCorrectlyAddBerryToPurchaseList() {
         Product berry250Beans = new Product("Бэрри", new BigDecimal(1),
                 "",
@@ -143,6 +145,7 @@ class TastyCoffeePageTest {
     }
 
     @Test
+    //@Disabled
     void shouldCorrectlyObtainPriceListAndPlaceOrder() {
         // All functionality combined in one test because of parser high time-consuming behavior
         Assertions.assertDoesNotThrow(() -> {

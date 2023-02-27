@@ -37,6 +37,5 @@ out/
 .vscode/
 
 ### Secrets ###
-secrets-debug.properties
-secrets-prod.properties
-secrets-test.properties
+/src/main/resources/properties/secrets-prod.yml
+/src/main/resources/properties/secrets-dev.yml

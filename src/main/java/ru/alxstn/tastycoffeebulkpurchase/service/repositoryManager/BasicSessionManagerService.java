@@ -20,9 +20,6 @@ import java.util.List;
 @Service
 public class BasicSessionManagerService implements SessionManagerService {
 
-    // ToDo: Session closed developer notification with session stats.
-    // ToDo: Refresh session summary button for usage in controller -> html form
-
     private final ApplicationEventPublisher publisher;
     private final SessionRepository sessionRepository;
     private final WebPageOrderCreatorService webPageOrderCreator;
