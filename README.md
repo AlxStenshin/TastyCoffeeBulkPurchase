@@ -68,8 +68,8 @@ You will be redirected to the index page after successful session creation.
 ![session-created.png](assets%2Fsession-created.png)
 
 Next, share your bot with your company employees or any other bulk purchase participants.<br />
-Basic telegram bot user workflow:
-[telegram-customer-workflow.mp4](assets%2Ftelegram-customer-workflow.mp4)<br />
+Basic telegram bot user workflow: <br/>
+[![Watch the video](https://img.youtube.com/vi/SH17j_o1-ug/hqdefault.jpg)](https://youtu.be/SH17j_o1-ug)<br />
 
 That's it. All orders will be automatically placed after session being closed on reaching session close date.
 
