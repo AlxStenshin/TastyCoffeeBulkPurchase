@@ -88,8 +88,8 @@ Each of "Place purchases" buttons launches two actions with corresponding produc
 1) Webpage order placement.
 2) Text file report creation for manual order validation.
 
-Product are filters useful for partial order placement.<br />
-Some of tasty-coffee managers can ask you to put fine grind coffee as separate order, for example.
+Product filters are useful for partial order placement.<br />
+Some of tasty-coffee managers may ask you to put fine grind coffee as separate order, for example.
 
 |                        Exclude filter                        |                        Include filter                        |
 |:------------------------------------------------------------:|:------------------------------------------------------------:|
