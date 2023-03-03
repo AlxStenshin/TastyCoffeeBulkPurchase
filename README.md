@@ -15,6 +15,9 @@ This application being developed for simplifying bulk coffee purchase process fr
 
 # How to start using?
 
+Preparation: Configure your tastycoffee account:<br />
+![show-discount-prices.png](assets%2Fshow-discount-prices.png)
+
 First: get the code:
 ```sh
    git clone https://github.com/AlxStenshin/TastyCoffeeBulkPurchase.git
