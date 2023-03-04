@@ -13,7 +13,7 @@ This application being developed for simplifying bulk coffee purchase process fr
 - Application provides per-customer order payment tracking and notifications.
 - Session manager manually validates placed order, puts any required corrections and places order.
 
-# How to start using?
+# How to run?
 
 Preparation: Configure your tastycoffee account:<br />
 ![show-discount-prices.png](assets%2Fshow-discount-prices.png)
@@ -50,12 +50,15 @@ spring:
 Finally, build and run this app using docker compose:
 
    ```sh
-   ./gradlew clean build
-   ./gradlew bootJar
+   ./gradlew clean build -x test
+   ./gradlew bootJar -x test
    docker compose up
    ```
 
 Anyway, you can run app locally using your favorite IDE, but don't forget to install and configure Postgres and Redis first.<br />
+
+# Usage
+
 Session manager web interface available at <a href="localhost:8080">localhost:8080</a><br />
 Please note, only one active session allowed. Please close and finish any open session before opening the new one.<br />
 You can open new session by clicking corresponding link in the top left corner of the window:
