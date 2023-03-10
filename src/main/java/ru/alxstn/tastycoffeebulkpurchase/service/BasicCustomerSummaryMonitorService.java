@@ -38,8 +38,9 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
     @EventListener
     public void handleCustomerSummaryCheckRequest(CustomerSummaryCheckRequestEvent event) {
         // ToDo: Remove payment info after order clear or last item removed from purchase list
-        logger.info("Checking Customer Purchase Summary because of purchase " + event.getReason());
-        updateCustomerSummary(event.getCustomer());
+        Customer customer = event.getCustomer();
+        logger.info("Checking "  + customer + " Purchase Summary because of purchase " + event.getReason());
+        updateCustomerSummary(customer);
     }
 
     @Override

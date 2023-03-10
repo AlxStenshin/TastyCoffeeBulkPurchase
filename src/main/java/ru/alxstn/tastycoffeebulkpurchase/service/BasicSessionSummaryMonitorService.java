@@ -78,8 +78,10 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
             logger.info("Current Session Discount Changed. Previous value: " +
                     previousDiscount + " New Value: " + newDiscount);
 
+            sessionManagerService.saveSession(currentSession);
+
             List<Customer> currentSessionCustomers = purchaseManagerService.getSessionCustomers(currentSession);
-            for (Customer c : currentSessionCustomers) {
+            for (final Customer c : currentSessionCustomers) {
                 publisher.publishEvent(new CustomerSummaryCheckRequestEvent(this, c, "Discount Change"));
             }
 
@@ -99,7 +101,5 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
                                 .build()));
             }
         }
-
-        sessionManagerService.saveSession(currentSession);
     }
 }
