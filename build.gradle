@@ -27,8 +27,10 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator'
 
 
+    implementation 'org.flywaydb:flyway-core'
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation ('org.springframework.boot:spring-boot-starter-data-redis') {
@@ -40,10 +42,13 @@ dependencies {
     implementation 'org.telegram:telegrambots:6.1.0'
     implementation 'com.google.code.gson:gson:2.10'
 
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.amqp:spring-rabbit-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     testAnnotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 

@@ -2,6 +2,10 @@ package ru.alxstn.tastycoffeebulkpurchase.bot;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -21,17 +25,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RabbitListener(queues = "botUpdateQueue")
 @Component
 public class CoffeeOrderBot extends TelegramLongPollingBot {
     Logger logger = LogManager.getLogger(CoffeeOrderBot.class);
 
     private final TelegramBotConfigProperties botConfigProperties;
+    private final RabbitTemplate mqTemplate;
+    private final Queue updateQueue;
     private List<UpdateHandler> updateHandlers;
 
     public CoffeeOrderBot(TelegramBotConfigProperties botConfigProperties,
-                          List<UpdateHandler> updateHandlers) {
+                          RabbitTemplate mqTemplate, Queue updateQueue, List<UpdateHandler> updateHandlers) {
 
         this.botConfigProperties = botConfigProperties;
+        this.mqTemplate = mqTemplate;
+        this.updateQueue = updateQueue;
         this.updateHandlers = updateHandlers;
     }
 
@@ -50,7 +59,11 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        // ToDo: Message Query
+        mqTemplate.convertAndSend(updateQueue.getName(), update);
+    }
+
+    @RabbitHandler
+    public void processBotUpdate(Update update) {
         for (UpdateHandler updateHandler : updateHandlers) {
             try {
                 if (updateHandler.handleUpdate(update)) {

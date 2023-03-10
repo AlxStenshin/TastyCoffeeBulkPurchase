@@ -69,6 +69,7 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
                 .map(purchase -> purchase.getCount() * purchase.getProduct().getProductPackage().getWeight())
                 .reduce(0d, Double::sum);
         currentSession.setTeaWeight(currentSessionTeaProductsWeight);
+        sessionManagerService.saveSession(currentSession);
 
         int newDiscount = discounts.get(discounts.floorKey(
                 currentSessionCoffeeProductsWeight.intValue() + currentSessionTeaProductsWeight.intValue()));
