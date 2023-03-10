@@ -35,6 +35,8 @@ public class TastyCoffeePage {
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
     private final List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
 
+    // ToDo: logout after each operation
+
     public TastyCoffeePage(TastyCoffeeConfigProperties properties,
                            ApplicationEventPublisher newProductPublisher) {
         this.publisher = newProductPublisher;

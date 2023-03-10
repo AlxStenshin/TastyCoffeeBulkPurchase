@@ -50,6 +50,7 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        // ToDo: Message Query
         for (UpdateHandler updateHandler : updateHandlers) {
             try {
                 if (updateHandler.handleUpdate(update)) {

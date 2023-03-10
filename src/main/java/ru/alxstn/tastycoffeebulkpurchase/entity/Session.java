@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Entity(name = "session")
 public class Session {
 
+    // ToDo: add fixed or percentage service commission field
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
