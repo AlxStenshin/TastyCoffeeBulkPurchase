@@ -70,7 +70,8 @@ public class BasicSessionSummaryMonitorService implements SessionSummaryMonitorS
                 .reduce(0d, Double::sum);
         currentSession.setTeaWeight(currentSessionTeaProductsWeight);
 
-        int newDiscount = discounts.get(discounts.floorKey(currentSessionCoffeeProductsWeight.intValue()));
+        int newDiscount = discounts.get(discounts.floorKey(
+                currentSessionCoffeeProductsWeight.intValue() + currentSessionTeaProductsWeight.intValue()));
         int previousDiscount = currentSession.getDiscountPercentage();
 
         if (previousDiscount != newDiscount) {
