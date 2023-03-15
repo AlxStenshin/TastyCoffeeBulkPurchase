@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(TastyCoffeeConfigProperties.class)
 @TestPropertySource("classpath:application.properties")
-@TestPropertySource("classpath:properties/secrets.yml")
+@TestPropertySource("classpath:secrets-test.properties")
 class TastyCoffeePageTest {
 
     Logger logger = LogManager.getLogger(TastyCoffeePageTest.class);
@@ -52,8 +52,9 @@ class TastyCoffeePageTest {
 
 
     @Test
-    void shouldCorrectlyLogin() {
+    void shouldCorrectlyLoginAndLogout() {
         Assertions.assertDoesNotThrow(() -> webPage.login());
+        Assertions.assertDoesNotThrow(() -> webPage.logout());
     }
 
     @Test

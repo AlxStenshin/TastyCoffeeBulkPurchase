@@ -20,6 +20,7 @@ import ru.alxstn.tastycoffeebulkpurchase.model.TastyCoffeeWebPageElement;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.Selectors.*;
@@ -86,6 +87,7 @@ public class TastyCoffeePage {
             }
         }
 
+        logout();
         return allProducts;
     }
 
@@ -114,6 +116,7 @@ public class TastyCoffeePage {
             logger.error("WebPageElementError: " + e.getMessage());
             throw new WebPageElementException(e);
         }
+        logout();
         return new ArrayList<>(currentSessionPurchases.keySet());
     }
 
@@ -151,6 +154,18 @@ public class TastyCoffeePage {
                 loginButton.click();
             }
             Selenide.sleep(15_000);
+        } catch (RuntimeException e) {
+            logger.error("WebPageElementError: " + e.getMessage());
+            throw new WebPageElementException(e);
+        }
+    }
+
+    public void logout() {
+        try {
+            SelenideElement logoutButton = new TastyCoffeeWebPageElement()
+                    .applySelector(ACCOUNT_LOGOUT_BUTTON)
+                    .getElement();
+            logoutButton.click();
         } catch (RuntimeException e) {
             logger.error("WebPageElementError: " + e.getMessage());
             throw new WebPageElementException(e);
@@ -372,7 +387,10 @@ public class TastyCoffeePage {
                         .applySelector(PRODUCT_TABLE)
                         .applySelector(PRODUCT_ROW)
                         .getElements()) {
-                    productBuilder.setName(getProductTitle(product));
+                    List<String> titles = getMultilineProductTitle(product);
+                    productBuilder.setName(titles.get(0));
+                    if (titles.size() > 1)
+                        logger.info("Product Processing Type: " + titles.get(1));
                     try {
                         productBuilder.setSpecialMark(getSpecialMarkTitle(product));
                     } catch (ElementNotFound ignored) {
@@ -433,11 +451,17 @@ public class TastyCoffeePage {
         return subgroupTitle.getAttribute("innerHTML");
     }
 
-    private String getProductTitle(SelenideElement product) {
+    // First string contains product name, second one is optional and contains product processing type.
+    private List<String> getMultilineProductTitle(SelenideElement product) {
         SelenideElement productNameTableCell = new TastyCoffeeWebPageElement(product)
                 .applySelector(PRODUCT_TITLE)
                 .getElement();
-        return productNameTableCell.getAttribute("innerHTML");
+
+        return Arrays.stream(Objects.requireNonNull(productNameTableCell.getAttribute("textContent"))
+                .split("\n"))
+                .map(String::trim)
+                .filter(Predicate.not(String::isBlank))
+                .toList();
     }
 
     private String getSpecialMarkTitle(SelenideElement product) {

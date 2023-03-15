@@ -43,6 +43,8 @@ public class Product {
     @Column(name = "mark")
     private String specialMark;
 
+    // ToDo: Add ProcessingType field
+
     @ManyToOne(fetch = FetchType.EAGER)
     @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "product_package_id")
