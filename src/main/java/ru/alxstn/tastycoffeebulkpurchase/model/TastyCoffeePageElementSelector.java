@@ -24,6 +24,7 @@ public enum TastyCoffeePageElementSelector {
     BULK_PURCHASE_SECTION("text", "Вход для оптовых клиентов"),
     PERSONAL_ACCOUNT_SECTION("text", "Личный кабинет"),
     ACCOUNT_LOGIN_BUTTON("text", "Войти"),
+    ACCOUNT_LOGOUT_BUTTON("text", "Выйти"),
     USERNAME_INPUT("name", "login"),
     PASSWORD_INPUT("name", "password"),
 
