@@ -36,13 +36,11 @@ public class TastyCoffeePage {
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
     private final List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
 
-    // ToDo: logout after each operation
-
     public TastyCoffeePage(TastyCoffeeConfigProperties properties,
                            ApplicationEventPublisher newProductPublisher) {
         this.publisher = newProductPublisher;
         this.tastyCoffeeConfig = properties;
-
+        System.setProperty("chromeoptions.args", "--remote-allow-origins=*");
         Configuration.timeout = 10;
         Configuration.browserSize = "1920x1080";
         Configuration.browserPosition = "2x2";
