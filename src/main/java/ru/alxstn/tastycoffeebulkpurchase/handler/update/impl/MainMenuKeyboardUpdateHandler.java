@@ -142,6 +142,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                         sendSessionErrorMessage(update, e.getMessage());
                     }
                 }
+
                 case SETTING -> {
                     List<List<InlineKeyboardButton>> settingsButtons = new ArrayList<>();
                     CustomerNotificationSettings customerSettings = customerRepository
@@ -159,6 +160,7 @@ public class MainMenuKeyboardUpdateHandler implements UpdateHandler {
                                     .replyMarkup(InlineKeyboardMarkup.builder().keyboard(settingsButtons).build())
                                     .build()));
                 }
+
                 case INFORMATION -> {
                     List<List<InlineKeyboardButton>> informationButtons = new ArrayList<>();
 

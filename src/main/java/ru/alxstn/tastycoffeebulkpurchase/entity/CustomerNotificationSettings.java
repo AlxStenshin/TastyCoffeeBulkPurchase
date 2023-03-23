@@ -1,7 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.*;
 
 @Embeddable
 public class CustomerNotificationSettings {

@@ -3,26 +3,26 @@ tasty-coffee:
 
 spring:
   config:
-    # docker public
-#    import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets.yml, properties/mq/rabbitmq-docker.yml
+#    docker public
+     import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets.yml, properties/mq/rabbitmq-docker.yml
 
-   # docker dev
-    import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets-dev.yml, properties/mq/rabbitmq-docker.yml
+#    docker dev
+#     import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets-dev.yml, properties/mq/rabbitmq-docker.yml
 
-    # docker prod
+#    docker prod
 #    import: properties/db/db-docker.yml, properties/cache/cache-docker.yml, properties/secrets-prod.yml, properties/mq/rabbitmq-docker.yml
 
-    # local prod
+#    local prod
 #    import: properties/db/db-local-prod.yml, properties/cache/cache-local.yml, properties/secrets-prod.yml properties/mq/rabbitmq-local.yml
 
-#     local dev
+#    local dev
 #    import: properties/db/db-local-dev.yml, properties/cache/cache-local.yml, properties/secrets-dev.yml, properties/mq/rabbitmq-local.yml
 
   jpa:
     generate-ddl: true
 #    show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
 
   flyway:
     enabled: true

@@ -36,11 +36,13 @@ public class TastyCoffeePage {
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
     private final List<String> acceptedProductTypes = List.of("Кофе", "Чай", "Шоколад", "Сиропы");
 
-    public TastyCoffeePage(TastyCoffeeConfigProperties properties,
+    public TastyCoffeePage(TastyCoffeeConfigProperties tastyCoffeeConfigProperties,
                            ApplicationEventPublisher newProductPublisher) {
         this.publisher = newProductPublisher;
-        this.tastyCoffeeConfig = properties;
+        this.tastyCoffeeConfig = tastyCoffeeConfigProperties;
+
         System.setProperty("chromeoptions.args", "--remote-allow-origins=*");
+
         Configuration.timeout = 10;
         Configuration.browserSize = "1920x1080";
         Configuration.browserPosition = "2x2";

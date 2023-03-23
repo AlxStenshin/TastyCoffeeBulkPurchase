@@ -31,7 +31,6 @@ public class BasicSessionPurchaseReportCreatorService implements SessionPurchase
                 .filter(purchase -> purchase.getProduct().isActual() && purchase.getProduct().isAvailable())
                 .toList();
 
-
         // ToDo: add pricing with discount here
         //  For manual order validation
         Map<Product, Integer> totalProductCount = new HashMap<>();

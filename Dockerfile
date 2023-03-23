@@ -23,16 +23,25 @@ RUN apt-get update; apt-get install -y java-17-amazon-corretto-jdk
 RUN java -version
 
 # Google Chrome
-RUN apt-get update && \
-    apt-get install -y gnupg wget curl unzip --no-install-recommends && \
-    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list && \
-    apt-get update -y && \
-    apt-get install -y google-chrome-stable && \
-    CHROMEVER=$(google-chrome --product-version | grep -o "[^\.]*\.[^\.]*\.[^\.]*") && \
-    DRIVERVER=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROMEVER") && \
-    wget -q --continue -P /chromedriver "http://chromedriver.storage.googleapis.com/$DRIVERVER/chromedriver_linux64.zip" && \
-    unzip /chromedriver/chromedriver* -d /chromedriver
+ARG CHROME_VERSION=111.0.5563.110-1
+RUN apt-get update -qqy \
+	&& apt-get -qqy install gpg unzip \
+	&& wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+	&& echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+	&& apt-get update -qqy \
+	&& apt-get -qqy install google-chrome-stable=$CHROME_VERSION \
+	&& rm /etc/apt/sources.list.d/google-chrome.list \
+	&& rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
+	&& sed -i 's/"$HERE\/chrome"/"$HERE\/chrome" --no-sandbox/g' /opt/google/chrome/google-chrome
+
+# ChromeDriver
+ARG CHROME_DRIVER_VERSION=111.0.5563.64
+RUN wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
+	&& unzip /tmp/chromedriver.zip -d /opt \
+	&& rm /tmp/chromedriver.zip \
+	&& mv /opt/chromedriver /opt/chromedriver-$CHROME_DRIVER_VERSION \
+	&& chmod 755 /opt/chromedriver-$CHROME_DRIVER_VERSION \
+	&& ln -s /opt/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
 
 COPY build/libs/TastyCoffeeBulkPurchase-0.0.1-SNAPSHOT.jar app.jar
 

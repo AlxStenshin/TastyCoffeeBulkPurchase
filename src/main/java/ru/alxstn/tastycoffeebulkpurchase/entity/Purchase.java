@@ -3,7 +3,7 @@ package ru.alxstn.tastycoffeebulkpurchase.entity;
 import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.util.BigDecimalUtil;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 public class Purchase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 

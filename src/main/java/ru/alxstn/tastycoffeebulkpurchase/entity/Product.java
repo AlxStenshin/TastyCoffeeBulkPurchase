@@ -8,7 +8,7 @@ import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
 import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder;
 import ru.alxstn.tastycoffeebulkpurchase.util.StringUtil;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

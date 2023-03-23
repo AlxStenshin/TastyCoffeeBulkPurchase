@@ -1,5 +1,6 @@
 package ru.alxstn.tastycoffeebulkpurchase.bot;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.Queue;
@@ -20,7 +21,7 @@ import ru.alxstn.tastycoffeebulkpurchase.event.bot.SendMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.bot.UpdateMessageEvent;
 import ru.alxstn.tastycoffeebulkpurchase.handler.UpdateHandler;
 
-import javax.annotation.PostConstruct;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +76,7 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
         }
     }
 
+    // ToDo: Refactor with BotApiMethod
     @EventListener
     public void sendMessage(SendMessageEvent event) {
         try {

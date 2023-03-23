@@ -2,6 +2,7 @@ version: '3'
 
 services:
   tastycoffee:
+    platform: linux/amd64
     container_name: tastycoffee
     ports:
       - "8080:8080"

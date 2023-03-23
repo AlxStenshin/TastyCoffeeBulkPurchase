@@ -1,6 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.dto.serialize;
 
 import com.google.gson.*;
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -8,7 +9,7 @@ import ru.alxstn.tastycoffeebulkpurchase.annotation.AnnotationExclusionStrategy;
 import ru.alxstn.tastycoffeebulkpurchase.dto.SerializableInlineObject;
 import ru.alxstn.tastycoffeebulkpurchase.repository.TelegramCallbackRepository;
 
-import javax.xml.bind.DatatypeConverter;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;

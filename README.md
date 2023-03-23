@@ -104,3 +104,4 @@ Some of tasty-coffee managers may ask you to put fine grind coffee as separate o
 2) Per-customer text file order for each closed session.
 3) Make Log messages more readable
 4) JVM, DB and app-specific metrics monitoring using VictoriaMetrics and Grafana.
+5) Handle unregistered user situation (clear db), send /start message hint, or add user silently

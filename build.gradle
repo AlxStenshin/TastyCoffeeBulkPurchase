@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.3'
+    id 'org.springframework.boot' version '3.0.4'
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'java'
 }
@@ -13,43 +13,43 @@ repositories {
 
 dependencies {
 
-    testImplementation 'junit:junit:4.13.1'
-    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'junit:junit:4.13.2'
+    runtimeOnly 'org.postgresql:postgresql:42.5.4'
 
-    implementation 'org.webjars:jquery:3.6.1'
+    implementation 'org.webjars:jquery:3.6.4'
     implementation 'org.webjars:AdminLTE:3.2.0'
-    implementation 'org.webjars:bootstrap:5.2.2'
+    implementation 'org.webjars:bootstrap:5.2.3'
     implementation 'org.webjars.npm:moment:2.29.4'
-    implementation 'org.webjars:font-awesome:6.2.0'
+    implementation 'org.webjars:font-awesome:6.3.0'
     implementation 'org.webjars.npm:popper.js:1.16.1'
     implementation 'org.webjars:webjars-locator-core:0.52'
 
-    implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
 
 
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation ('org.springframework.boot:spring-boot-starter-data-redis') {
+    implementation 'org.flywaydb:flyway-core:9.16.0'
+    implementation 'org.springframework.boot:spring-boot-starter:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.0.4'
+    implementation ('org.springframework.boot:spring-boot-starter-data-redis:3.0.4') {
         exclude group: 'io.lettuce.lettuce-core'
     }
     implementation 'com.github.houbb:redis-client-jedis:0.0.3'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.5.0'
-    implementation 'com.codeborne:selenide:6.8.1'
-    implementation 'org.telegram:telegrambots:6.1.0'
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.8.1'
+    implementation 'com.codeborne:selenide:6.12.3'
+    implementation 'org.telegram:telegrambots:6.5.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    testImplementation 'com.h2database:h2:2.1.214'
+    testImplementation 'org.springframework.amqp:spring-rabbit-test:3.0.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.4'
 
 
-    testImplementation 'com.h2database:h2'
-    testImplementation 'org.springframework.amqp:spring-rabbit-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testAnnotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.0.4'
+    testAnnotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.0.4'
 }
 
 tasks.named('test') {

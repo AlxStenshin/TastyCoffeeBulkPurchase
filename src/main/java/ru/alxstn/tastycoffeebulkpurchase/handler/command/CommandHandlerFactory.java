@@ -1,9 +1,10 @@
 package ru.alxstn.tastycoffeebulkpurchase.handler.command;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import ru.alxstn.tastycoffeebulkpurchase.model.BotCommand;
 
-import javax.annotation.PostConstruct;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

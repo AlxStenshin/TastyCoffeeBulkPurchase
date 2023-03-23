@@ -1,6 +1,7 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
-import javax.persistence.*;
+
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity(name = "payment")

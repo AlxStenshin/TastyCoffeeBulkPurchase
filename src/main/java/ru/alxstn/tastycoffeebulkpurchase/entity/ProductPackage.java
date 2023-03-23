@@ -2,7 +2,7 @@ package ru.alxstn.tastycoffeebulkpurchase.entity;
 
 import ru.alxstn.tastycoffeebulkpurchase.annotation.JsonExclude;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity

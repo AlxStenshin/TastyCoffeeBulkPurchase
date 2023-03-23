@@ -1,8 +1,8 @@
 package ru.alxstn.tastycoffeebulkpurchase.entity;
 
+import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity(name = "session")
