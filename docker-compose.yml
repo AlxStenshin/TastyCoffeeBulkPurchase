@@ -2,7 +2,6 @@ version: '3'
 
 services:
   tastycoffee:
-    platform: linux/amd64
     container_name: tastycoffee
     ports:
       - "8080:8080"
@@ -16,8 +15,8 @@ services:
       - ./data/report:/report
 
   db:
-    image: 'postgres:14-alpine'
     container_name: db
+    image: 'postgres:14-alpine'
     ports:
       - "5432:5432"
     environment:
@@ -40,8 +39,8 @@ services:
       - ./data/cache:/data
 
   rabbitmq:
-    image: rabbitmq:management
     container_name: rabbitmq
+    image: rabbitmq:management
     ports:
       - "5672:5672"
       - "15672:15672"

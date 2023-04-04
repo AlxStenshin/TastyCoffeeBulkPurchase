@@ -41,12 +41,11 @@ public class TastyCoffeePage {
         this.publisher = newProductPublisher;
         this.tastyCoffeeConfig = tastyCoffeeConfigProperties;
 
-        System.setProperty("chromeoptions.args", "--remote-allow-origins=*");
-
         Configuration.timeout = 10;
         Configuration.browserSize = "1920x1080";
         Configuration.browserPosition = "2x2";
         Configuration.headless = true;
+        Configuration.browser = "firefox";
     }
 
     public List<Product> buildPriceList() {
