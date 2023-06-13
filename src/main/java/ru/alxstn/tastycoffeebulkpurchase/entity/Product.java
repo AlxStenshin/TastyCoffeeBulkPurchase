@@ -200,6 +200,7 @@ public class Product {
 
     public boolean isDiscountable() {
         return (!getSpecialMark().equals("Сорт недели") &&
+                !getSpecialMark().equals("Микролот недели") &&
                 (getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
                 getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") ||
                 getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")));
@@ -220,7 +221,9 @@ public class Product {
     }
 
     public boolean isSpecialOffer() {
-        return getSpecialMark().equals("Сорт недели") || getSpecialMark().equals("Сорт месяца");
+        return getSpecialMark().equals("Сорт недели") ||
+                getSpecialMark().equals("Микролот недели") ||
+                getSpecialMark().equals("Сорт месяца") ;
     }
 
     public String getIcon() {
