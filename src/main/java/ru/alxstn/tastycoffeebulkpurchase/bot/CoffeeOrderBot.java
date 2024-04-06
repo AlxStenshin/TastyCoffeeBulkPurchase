@@ -71,7 +71,7 @@ public class CoffeeOrderBot extends TelegramLongPollingBot {
                     return;
                 }
             } catch (Exception e) {
-                logger.error("Error handling update: " + update + "\nMessage: " + e.getMessage());
+                logger.error("Error handling update: " + update + "\nMessage: " + e.getMessage(), e);
             }
         }
     }

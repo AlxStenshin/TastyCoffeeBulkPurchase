@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
@@ -115,6 +116,73 @@ class BasicPurchaseFilterServiceTest {
     @Test
     void shouldCorrectlyCreateService() {
         assertNotNull(service);
+    }
+
+    @Test
+    void shouldFilterUnavailableProduct() {
+        Product unavailableProduct =  new Product("Beans",
+                new BigDecimal(1),
+                "none",
+                pack,
+                "Group",
+                "Subgroup",
+                "Зерно",
+                true);
+                unavailableProduct.setSpecialMark("нет");
+
+        when(productManagerService.findAllActiveCategories())
+                .thenReturn(List.of("Чай", "Шоколад", "Сиропы"));
+
+        when(productManagerService.findAllActiveProductForms())
+                .thenReturn(List.of("Зерно", "Мелкий", "Средний", "Крупный"));
+
+        var properties = service.createFilter(
+                session, SessionProductFilterType.ACCEPT_FILTER, true);
+
+        properties.getProductTypeFilters().stream()
+                .filter(p -> Objects.equals(p.getDescription(), "Зерно"))
+                .forEach(p -> p.setValue(true));
+
+        Map<Product, Integer> purchases = new HashMap<>();
+        purchases.put(unavailableProduct, 1);
+        var result = service.filterPurchases(properties, purchases);
+
+        assertFalse(unavailableProduct.isAvailable());
+        Assertions.assertEquals(0, result.entrySet().size());
+    }
+
+    @Test
+    void shouldFilterNotActualProduct() {
+        Product unavailableProduct =  new Product("Beans",
+                new BigDecimal(1),
+                "none",
+                pack,
+                "Group",
+                "Subgroup",
+                "Зерно",
+                true);
+
+                unavailableProduct.setActual(false);
+
+        when(productManagerService.findAllActiveCategories())
+                .thenReturn(List.of("Чай", "Шоколад", "Сиропы"));
+
+        when(productManagerService.findAllActiveProductForms())
+                .thenReturn(List.of("Зерно", "Мелкий", "Средний", "Крупный"));
+
+        var properties = service.createFilter(
+                session, SessionProductFilterType.ACCEPT_FILTER, true);
+
+        properties.getProductTypeFilters().stream()
+                .filter(p -> Objects.equals(p.getDescription(), "Зерно"))
+                .forEach(p -> p.setValue(true));
+
+        Map<Product, Integer> purchases = new HashMap<>();
+        purchases.put(unavailableProduct, 1);
+        var result = service.filterPurchases(properties, purchases);
+
+        assertFalse(unavailableProduct.isActual());
+        Assertions.assertEquals(0, result.entrySet().size());
     }
 
     @ParameterizedTest

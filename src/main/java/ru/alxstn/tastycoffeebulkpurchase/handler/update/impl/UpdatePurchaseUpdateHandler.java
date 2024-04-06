@@ -49,27 +49,36 @@ public class UpdatePurchaseUpdateHandler extends CallbackUpdateHandler<UpdatePur
         logger.info("Update Purchase Command Received");
         Purchase purchase = dto.getPurchase();
         try {
+            if (!purchase.getProduct().isActual() || !purchase.getProduct().isAvailable()) {
+                publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
+                        .cacheTime(0)
+                        .text("Ошибка! Товар не доступен для заказа.\n" +
+                                new ProductCaptionBuilder(purchase.getProduct()).createIconNameMarkPackagePriceCatSubcatView())
+                        .showAlert(true)
+                        .callbackQueryId(update.getCallbackQuery().getId())
+                        .build()));
+                return;
+            }
+
             purchaseManagerService.save(purchase);
             Payment payment = paymentManagerService.getCustomerSessionPayment(
                             purchase.getSession(), purchase.getCustomer())
                     .orElse(new Payment(purchase.getCustomer(), purchase.getSession()));
             paymentManagerService.save(payment);
+
+            publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
+                    .cacheTime(0)
+                    .text("Сохранено!\n" +
+                            new ProductCaptionBuilder(purchase.getProduct()).createIconNameMarkPackagePriceCatSubcatView())
+                    .showAlert(false)
+                    .callbackQueryId(update.getCallbackQuery().getId())
+                    .build()));
+
+            publisher.publishEvent(new CustomerSummaryCheckRequestEvent(this, purchase.getCustomer(), "Save"));
+            publisher.publishEvent(new SessionSummaryCheckRequestEvent(this, "Save"));
         } catch (Exception e) {
             logger.error("Saving purchase : " + purchase + " " + e.getMessage());
         }
-
-        publisher.publishEvent(new AlertMessageEvent(this, AnswerCallbackQuery.builder()
-                .cacheTime(0)
-                .text("Сохранено!\n" +
-                        new ProductCaptionBuilder(purchase.getProduct()).createIconNameMarkPackagePriceCatSubcatView())
-                .showAlert(false)
-                .callbackQueryId(update.getCallbackQuery().getId())
-                .build()));
-
-        publisher.publishEvent(new CustomerSummaryCheckRequestEvent(this, purchase.getCustomer(), "Save"));
-        publisher.publishEvent(new SessionSummaryCheckRequestEvent(this, "Save"));
-
         // ToDo: Show Edit Purchase List After That
-
     }
 }

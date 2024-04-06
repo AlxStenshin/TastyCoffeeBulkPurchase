@@ -52,7 +52,7 @@ public class BasicPurchaseFilterService implements PurchaseFilterService {
         else if (filter.getFilterType() == ACCEPT_FILTER) {
             List<Product> finalFilteredProducts = filteredProducts;
             requiredPurchases = requiredPurchases.entrySet().stream()
-                    .filter(e -> finalFilteredProducts.contains(e.getKey()))
+                    .filter(e -> finalFilteredProducts.contains(e.getKey()) && e.getKey().isAvailable() && e.getKey().isActual())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
         return requiredPurchases;
