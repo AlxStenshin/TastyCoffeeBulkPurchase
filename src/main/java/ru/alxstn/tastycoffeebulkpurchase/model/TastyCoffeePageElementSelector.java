@@ -16,6 +16,7 @@ public enum TastyCoffeePageElementSelector {
     PRODUCT_ROW("css", "tr.searchTab", true),
 
     PRODUCT_TITLE("css", "button.font-13.p-0.selectable.btn.pointer"),
+    PRODUCT_PROCESSING_TYPE("css", "span.d-block.font-10"),
     PRODUCT_MARK_TITLE("css", "div.prefixdiv.empty-ic"),
 
     PRODUCT_REGULAR_PACKAGE("css", "td.price-count-1", true),

@@ -20,7 +20,6 @@ import ru.alxstn.tastycoffeebulkpurchase.model.TastyCoffeeWebPageElement;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.codeborne.selenide.Selectors.*;
@@ -386,10 +385,8 @@ public class TastyCoffeePage {
                         .applySelector(PRODUCT_TABLE)
                         .applySelector(PRODUCT_ROW)
                         .getElements()) {
-                    List<String> titles = getMultilineProductTitle(product);
-                    productBuilder.setName(titles.get(0));
-                    if (titles.size() > 1)
-                        logger.info("Product Processing Type: " + titles.get(1));
+                    productBuilder.setName(getProductTitle(product));
+
                     try {
                         productBuilder.setSpecialMark(getSpecialMarkTitle(product));
                     } catch (ElementNotFound ignored) {
@@ -451,16 +448,25 @@ public class TastyCoffeePage {
     }
 
     // First string contains product name, second one is optional and contains product processing type.
-    private List<String> getMultilineProductTitle(SelenideElement product) {
+    private String getProductTitle(SelenideElement product) {
         SelenideElement productNameTableCell = new TastyCoffeeWebPageElement(product)
                 .applySelector(PRODUCT_TITLE)
                 .getElement();
 
-        return Arrays.stream(Objects.requireNonNull(productNameTableCell.getAttribute("textContent"))
-                .split("\n"))
-                .map(String::trim)
-                .filter(Predicate.not(String::isBlank))
-                .toList();
+        String productProcessingType = null;
+        try {
+            productProcessingType = new TastyCoffeeWebPageElement(product)
+                    .applySelector(PRODUCT_PROCESSING_TYPE)
+                    .getElement()
+                    .getAttribute("textContent");
+        }
+        catch (Exception ignored) { }
+
+        var productName = Objects.requireNonNull(productNameTableCell.getAttribute("textContent"));
+        if (productProcessingType != null) {
+            productName = productName.replace(productProcessingType, "").trim();
+        }
+        return productName;
     }
 
     private String getSpecialMarkTitle(SelenideElement product) {
