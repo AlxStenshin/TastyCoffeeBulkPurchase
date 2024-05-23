@@ -21,10 +21,10 @@ public enum TastyCoffeePageElementSelector {
     PRODUCT_REGULAR_PACKAGE("css", "td.price-count-1", true),
     PRODUCT_GRINDABLE_PACKAGE("css", "td.price-count-2", true),
 
-    BULK_PURCHASE_SECTION("text", "Вход для оптовых клиентов"),
+    BULK_PURCHASE_SECTION("text", "Вход для оптовых покупателей"),
     PERSONAL_ACCOUNT_SECTION("text", "Личный кабинет"),
     ACCOUNT_LOGIN_BUTTON("text", "Войти"),
-    ACCOUNT_LOGOUT_BUTTON("text", "Выйти"),
+    ACCOUNT_LOGOUT_BUTTON("css", "div.menu-navigation__go-out-wrap"),
     USERNAME_INPUT("name", "login"),
     PASSWORD_INPUT("name", "password"),
 
@@ -36,7 +36,7 @@ public enum TastyCoffeePageElementSelector {
 
     private final String selector;
     private final String selectorType;
-    private boolean  expectingList;
+    private boolean expectingList;
 
     TastyCoffeePageElementSelector(String selectorType, String selector) {
         this.selectorType = selectorType;

@@ -424,7 +424,7 @@ public class TastyCoffeePage {
     }
 
     private SelenideElement getProductCountInput(SelenideElement counter) {
-        return counter.find(By.cssSelector("div.input-wrap")).find(By.name("count"));
+        return counter.find(By.cssSelector("div.input-wrap")).find(By.name("offerCount"));
     }
 
     private SelenideElement getIncrementButtonFromQuantityCounter(SelenideElement counter) {
