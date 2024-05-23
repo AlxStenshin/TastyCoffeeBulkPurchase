@@ -460,7 +460,9 @@ public class TastyCoffeePage {
                     .getElement()
                     .getAttribute("textContent");
         }
-        catch (Exception ignored) { }
+        catch (Throwable e) {
+            logger.info("Product Processing Type NOT FOUND", e);
+        }
 
         var productName = Objects.requireNonNull(productNameTableCell.getAttribute("textContent"));
         if (productProcessingType != null) {
