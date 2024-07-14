@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.0.4'
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'java'
+    id 'org.jetbrains.kotlin.jvm'
 }
 
 group = 'ru.alxstn'
@@ -27,9 +28,10 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
 
     implementation 'org.flywaydb:flyway-core:9.16.0'
-    implementation 'org.springframework.boot:spring-boot-starter:3.0.4'
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.4'
-    implementation 'org.springframework.boot:spring-boot-starter-amqp:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter:3.3.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.3.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux:3.3.0'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp:3.3.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.4'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.0.4'
     implementation ('org.springframework.boot:spring-boot-starter-data-redis:3.0.4') {
@@ -43,13 +45,17 @@ dependencies {
 
     testImplementation 'com.h2database:h2:2.1.214'
     testImplementation 'org.springframework.amqp:spring-rabbit-test:3.0.2'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.3.0'
 
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.0.4'
     testAnnotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.0.4'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+kotlin {
+    jvmToolchain(17)
 }

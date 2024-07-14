@@ -199,21 +199,21 @@ public class Product {
     }
 
     public boolean isDiscountable() {
-        return (!getSpecialMark().equals("Сорт недели") &&
-                !getSpecialMark().equals("Микролот недели") &&
-                (getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
-                getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") ||
-                getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")));
+        return (!getSpecialMark().equalsIgnoreCase("Сорт недели") &&
+                !getSpecialMark().equalsIgnoreCase("Микролот недели") &&
+                (getProductCategory().equalsIgnoreCase("КОФЕ ДЛЯ ФИЛЬТРА") ||
+                getProductCategory().equalsIgnoreCase("КОФЕ ДЛЯ ЭСПРЕССО") ||
+                getProductCategory().equalsIgnoreCase("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ")));
     }
 
     public boolean isWeightableCoffee() {
-        return (getProductCategory().equals("КОФЕ ДЛЯ ФИЛЬТРА") ||
-                getProductCategory().equals("КОФЕ ДЛЯ ЭСПРЕССО") ||
-                getProductCategory().equals("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ"));
+        return (getProductCategory().equalsIgnoreCase("КОФЕ ДЛЯ ФИЛЬТРА") ||
+                getProductCategory().equalsIgnoreCase("КОФЕ ДЛЯ ЭСПРЕССО") ||
+                getProductCategory().equalsIgnoreCase("КОФЕ ДЛЯ МОЛОЧНЫХ НАПИТКОВ"));
     }
 
     public boolean isTea() {
-        return getProductCategory().equals("Чай");
+        return getProductCategory().equalsIgnoreCase("Чай");
     }
 
     public boolean isAvailable() {
