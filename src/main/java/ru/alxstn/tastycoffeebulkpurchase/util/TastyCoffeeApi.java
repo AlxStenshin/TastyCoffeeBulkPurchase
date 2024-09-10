@@ -2,6 +2,8 @@ package ru.alxstn.tastycoffeebulkpurchase.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -9,9 +11,7 @@ import reactor.core.publisher.Mono;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.model.api.categories.CategoriesResponse;
-import ru.alxstn.tastycoffeebulkpurchase.model.api.categories.CategoryData;
 import ru.alxstn.tastycoffeebulkpurchase.model.api.login.LoginResponse;
-import ru.alxstn.tastycoffeebulkpurchase.model.api.product.ProductData;
 import ru.alxstn.tastycoffeebulkpurchase.model.api.product.ProductsResponse;
 
 import java.util.HashMap;
@@ -24,8 +24,10 @@ public class TastyCoffeeApi {
     private final WebClient.Builder webClientBuilder;
     private final TastyCoffeeConfigProperties tastyCoffeeConfig;
 
-    public TastyCoffeeApi(WebClient.Builder webClientBuilder, TastyCoffeeConfigProperties tastyCoffeeConfig) {
-        this.webClientBuilder = webClientBuilder;
+    public TastyCoffeeApi(TastyCoffeeConfigProperties tastyCoffeeConfig) {
+        this.webClientBuilder = WebClient.builder()
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024));
         this.tastyCoffeeConfig = tastyCoffeeConfig;
     }
 
@@ -35,11 +37,6 @@ public class TastyCoffeeApi {
         var products = productsRequest(token);
 
         return ProductMapper.map(categories, products);
-    }
-
-    public List<Product> buildOutputProducts(CategoriesResponse categories, ProductsResponse products) {
-        var productToCategoryMap = new HashMap<CategoryData, List<ProductData>>();
-        return List.of();
     }
 
     public String login() throws JsonProcessingException {

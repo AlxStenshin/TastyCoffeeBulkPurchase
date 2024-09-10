@@ -123,11 +123,13 @@ public class ProductCaptionBuilder {
     }
 
     private ProductCaptionBuilder pack() {
-        String pack = product.getProductPackage().getDescription();
-        if (!pack.isEmpty()) {
-            captionBuilder.append(pack);
-            if (separatorApplied)
-                separatorApplied = false;
+        if (product.getProductPackage() != null) {
+            String pack = product.getProductPackage().getDescription();
+            if (!pack.isEmpty()) {
+                captionBuilder.append(pack);
+                if (separatorApplied)
+                    separatorApplied = false;
+            }
         }
         return this;
     }

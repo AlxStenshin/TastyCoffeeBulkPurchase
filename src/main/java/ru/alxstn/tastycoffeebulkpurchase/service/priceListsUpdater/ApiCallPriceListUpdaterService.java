@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Product;
 import ru.alxstn.tastycoffeebulkpurchase.event.PriceListReceivedEvent;
 import ru.alxstn.tastycoffeebulkpurchase.event.ProductFoundEvent;
@@ -12,6 +13,7 @@ import ru.alxstn.tastycoffeebulkpurchase.util.TastyCoffeeApi;
 
 import java.util.List;
 
+@Service
 public class ApiCallPriceListUpdaterService implements PriceListUpdaterService {
 
     Logger logger = LogManager.getLogger(ApiCallPriceListUpdaterService.class);
@@ -30,7 +32,7 @@ public class ApiCallPriceListUpdaterService implements PriceListUpdaterService {
     }
 
     @Override
-    @Scheduled(fixedRate = 3 * 60 * 60 * 1000, initialDelay = 5000)
+    @Scheduled(fixedRate = 3 * 60 * 60 * 1000, initialDelay = 500)
     public void updatePriceList() {
         try {
             List<Product> priceList = tastyCoffeeApi.buildPriceList();

@@ -26,9 +26,9 @@ class ProductMapper {
                             BigDecimal(offer.price),
                             rawProduct?.label?.name ?: "",
                             if (offer.isIs_coffee_or_tea) findPackage(offer.weight) else ProductPackage(""),
-                            cats[0],
-                            cats[1],
-                            offer.type?.toProductForm(),
+                                cats[1],
+                                cats[0],
+                            offer.type?.toProductForm() ?: "",
                             offer.type?.toGrindableFlag() ?: false
                         ).apply { isActual = !rawProduct.isNot_available }
                     }
@@ -69,7 +69,7 @@ class ProductMapper {
         }
 
         private fun findPackage(weight: Int) =
-            availablePackages.firstOrNull { it.weight == weight.toDouble() / 1000 }
+            availablePackages.firstOrNull { it.weight == weight.toDouble() / 1000 } ?: ProductPackage("")
 
         private val availablePackages = listOf(
             ProductPackage("Упаковка 100 г"),

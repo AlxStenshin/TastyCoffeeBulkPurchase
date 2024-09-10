@@ -104,26 +104,26 @@ public class EditPurchaseUpdateHandler extends CallbackUpdateHandler<EditPurchas
                             new Purchase(purchase, product))))
                     .build()));
 
-            Optional<Product> coarseProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Крупный");
+            Optional<Product> coarseProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Молотый");
             coarseProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Крупный") ? "Крупный ✅" : "Крупный")
+                    .text(currentForm.equals("Молотый") ? "Молотый ✅" : "Молотый")
                     .callbackData(serializer.serialize(new EditPurchaseCommandDto(
                             new Purchase(purchase, product))))
                     .build()));
-
-            Optional<Product> mediumProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Средний");
-            mediumProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Средний") ? "Средний ✅" : "Средний")
-                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                            new Purchase(purchase, product))))
-                    .build()));
-
-            Optional<Product> fineProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Мелкий");
-            fineProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
-                    .text(currentForm.equals("Мелкий") ? "Мелкий ✅" : "Мелкий")
-                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
-                            new Purchase(purchase, product))))
-                    .build()));
+//
+//            Optional<Product> mediumProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Средний");
+//            mediumProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
+//                    .text(currentForm.equals("Средний") ? "Средний ✅" : "Средний")
+//                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+//                            new Purchase(purchase, product))))
+//                    .build()));
+//
+//            Optional<Product> fineProduct = productManagerService.findProductWithForm(purchase.getProduct(), "Мелкий");
+//            fineProduct.ifPresent(product -> productFormButtons.add(InlineKeyboardButton.builder()
+//                    .text(currentForm.equals("Мелкий") ? "Мелкий ✅" : "Мелкий")
+//                    .callbackData(serializer.serialize(new EditPurchaseCommandDto(
+//                            new Purchase(purchase, product))))
+//                    .build()));
 
             keyboardRows.add(productFormButtons);
         }
