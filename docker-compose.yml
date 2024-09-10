@@ -3,6 +3,8 @@ version: '3'
 services:
   tastycoffee:
     container_name: tastycoffee
+    environment:
+      - TZ=Europe/Samara
     ports:
       - "8080:8080"
     build:
