@@ -8,23 +8,10 @@ services:
     build:
       context: .
     depends_on:
-      - db
       - cache
       - rabbitmq
     volumes:
       - ./data/report:/report
-
-  db:
-    container_name: db
-    image: 'postgres:14-alpine'
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: tastycoffee
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
 
   cache:
     container_name: redis
@@ -47,5 +34,5 @@ services:
 
 volumes:
   postgres:
-  tastycoffee:
+#  tastycoffee:
   cache:

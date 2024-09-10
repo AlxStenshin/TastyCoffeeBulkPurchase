@@ -13,7 +13,6 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundExcept
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
-import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.WebPageOrderCreatorService;
 
 import java.util.List;
 
@@ -22,18 +21,15 @@ public class BasicSessionManagerService implements SessionManagerService {
 
     private final ApplicationEventPublisher publisher;
     private final SessionRepository sessionRepository;
-    private final WebPageOrderCreatorService webPageOrderCreator;
     private final TextFileOrderCreatorService textFileOrderCreator;
     private final PurchaseFilterService purchaseFilterService;
 
     public BasicSessionManagerService(ApplicationEventPublisher publisher,
                                       SessionRepository sessionRepository,
-                                      WebPageOrderCreatorService webPageOrderCreator,
                                       TextFileOrderCreatorService textFileOrderCreator,
                                       PurchaseFilterService purchaseFilterService) {
         this.publisher = publisher;
         this.sessionRepository = sessionRepository;
-        this.webPageOrderCreator = webPageOrderCreator;
         this.textFileOrderCreator = textFileOrderCreator;
         this.purchaseFilterService = purchaseFilterService;
     }
@@ -68,7 +64,6 @@ public class BasicSessionManagerService implements SessionManagerService {
     @Override
     public void placeSessionPurchases(SessionProductFilters productFilters) {
         textFileOrderCreator.placeOrderWithProductFilter(productFilters);
-        webPageOrderCreator.placeOrderWithProductFilter(productFilters);
     }
 
     @Override

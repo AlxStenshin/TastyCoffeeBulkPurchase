@@ -1,15 +1,12 @@
 package ru.alxstn.tastycoffeebulkpurchase.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.reactive.function.client.WebClient;
 import ru.alxstn.tastycoffeebulkpurchase.configuration.TastyCoffeeConfigProperties;
 
 import static org.mockito.Mockito.when;
@@ -26,10 +23,7 @@ class TastyCoffeeApiTest {
 
     @BeforeEach
     public void init() {
-        WebClient.Builder webClientBuilder = WebClient.builder()
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024));
-        api = new TastyCoffeeApi(webClientBuilder, tastyCoffeeTestConfig);
+        api = new TastyCoffeeApi(tastyCoffeeTestConfig);
 
         when(tastyCoffeeTestConfig.getUserName()).thenReturn("alexander.stn@gmail.com");
         when(tastyCoffeeTestConfig.getPassword()).thenReturn("");
