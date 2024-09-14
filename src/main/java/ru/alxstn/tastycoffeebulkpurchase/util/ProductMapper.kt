@@ -64,6 +64,7 @@ class ProductMapper {
         private fun String?.toGrindableFlag(): Boolean {
             return when (this) {
                 "bean_coffee" -> true
+                "ground_coffee" -> true
                 else -> false
             }
         }
