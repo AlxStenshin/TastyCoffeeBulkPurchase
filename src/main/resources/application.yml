@@ -18,8 +18,11 @@ spring:
 #    local dev
 #    import: properties/db/db-local-dev.yml, properties/cache/cache-local.yml, properties/secrets-dev.yml, properties/mq/rabbitmq-local.yml
 
+#    remote db dev
+     import: properties/db/db-remote-dev.yml, properties/cache/cache-local.yml, properties/secrets-dev.yml, properties/mq/rabbitmq-local.yml
+
 #    remote db prod
-    import: properties/db/db-remote-prod.yml, properties/cache/cache-docker.yml, properties/secrets-prod.yml, properties/mq/rabbitmq-docker.yml
+#    import: properties/db/db-remote-prod.yml, properties/cache/cache-docker.yml, properties/secrets-prod.yml, properties/mq/rabbitmq-docker.yml
 
 
   jpa:

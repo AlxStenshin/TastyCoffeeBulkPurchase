@@ -12,6 +12,7 @@ import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionIsNotOpenExcep
 import ru.alxstn.tastycoffeebulkpurchase.exception.session.SessionNotFoundException;
 import ru.alxstn.tastycoffeebulkpurchase.repository.SessionRepository;
 import ru.alxstn.tastycoffeebulkpurchase.service.PurchaseFilterService;
+import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.ImprovedTextFileCreatorService;
 import ru.alxstn.tastycoffeebulkpurchase.service.orderCreator.TextFileOrderCreatorService;
 
 import java.util.List;
@@ -22,15 +23,18 @@ public class BasicSessionManagerService implements SessionManagerService {
     private final ApplicationEventPublisher publisher;
     private final SessionRepository sessionRepository;
     private final TextFileOrderCreatorService textFileOrderCreator;
+    private final ImprovedTextFileCreatorService nextTextFileOrderCreator;
     private final PurchaseFilterService purchaseFilterService;
 
     public BasicSessionManagerService(ApplicationEventPublisher publisher,
                                       SessionRepository sessionRepository,
                                       TextFileOrderCreatorService textFileOrderCreator,
+                                      ImprovedTextFileCreatorService nextTextFileOrderCreator,
                                       PurchaseFilterService purchaseFilterService) {
         this.publisher = publisher;
         this.sessionRepository = sessionRepository;
         this.textFileOrderCreator = textFileOrderCreator;
+        this.nextTextFileOrderCreator = nextTextFileOrderCreator;
         this.purchaseFilterService = purchaseFilterService;
     }
 
@@ -59,6 +63,8 @@ public class BasicSessionManagerService implements SessionManagerService {
         session.setCloseSoonNotificationSent(true);
         sessionRepository.save(session);
         publisher.publishEvent(new ActiveSessionClosedNotificationEvent(this, session));
+        textFileOrderCreator.placeFullOrder(session);
+        nextTextFileOrderCreator.placeFullOrder(session);
     }
 
     @Override

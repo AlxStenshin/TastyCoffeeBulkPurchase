@@ -42,7 +42,7 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
         var allAccepted = purchaseFilterService.createFilter(
                 session, SessionProductFilterType.DISCARD_FILTER, false);
 
-        saveReport(session, report, Optional.ofNullable(allAccepted));
+        TextReportSaver.saveReport(session, report, "", Optional.ofNullable(allAccepted));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
             Map<Product, Integer> requiredPurchases = purchaseFilterService.filterPurchases(filter, currentSessionPurchases);
             String report = buildReport(requiredPurchases);
             logger.info("Report Created successfully: \n\n" + report);
-            saveReport(session, report, Optional.of(filter));
+            TextReportSaver.saveReport(session, report, "", Optional.of(filter));
         } else logger.info("No purchases found, report building skipped.");
     }
 
@@ -72,41 +72,4 @@ public class TextFileOrderCreatorService implements OrderCreatorService {
         logger.info("totalProductsCount: " + totalCount);
         return report;
     }
-
-    private void saveReport(Session session, String report, Optional<SessionProductFilters> productProperties) {
-        File dir = new File("report");
-        if (!dir.exists())
-            if (!dir.mkdirs())
-                logger.error("Could not create text files report directory");
-
-        StringBuilder fileName = new StringBuilder(dir.getAbsolutePath() + File.separator + session.getId() + "_" + session.getTitle() + "_");
-
-        if (productProperties.isPresent()) {
-            List<String> filteredProducts = productProperties.get().getProductTypeFilters().stream()
-                    .filter(ProductTypeFilter::getValue)
-                    .map(ProductTypeFilter::getDescription)
-                    .toList();
-
-            if (!filteredProducts.isEmpty()) {
-                fileName.append(productProperties.get().getFilterType().getShortDescription());
-                fileName.append("=");
-                for (int i = 0; i < filteredProducts.size(); i++) {
-                    fileName.append(filteredProducts.get(i));
-                    if (i != filteredProducts.size() - 1)
-                        fileName.append(", ");
-                }
-                fileName.append("_");
-            }
-        }
-
-        fileName.append("SessionReport.json");
-        logger.info("Report File Name: " + fileName);
-
-        try (PrintWriter out = new PrintWriter(fileName.toString())) {
-            out.println(report);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

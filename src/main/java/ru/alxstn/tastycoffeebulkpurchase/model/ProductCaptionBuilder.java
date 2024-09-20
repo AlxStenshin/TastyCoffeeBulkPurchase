@@ -69,6 +69,13 @@ public class ProductCaptionBuilder {
                 .build();
     }
 
+    public String createNamePackageFormView() {
+        return name().separator(SPACE)
+                .pack().separator(SPACE)
+                .form()
+                .build();
+    }
+
     public String createCatSubcatNameMarkPackageView() {
         return cat().separator(COMMA_SPACE)
                 .subcat().separator(COMMA_SPACE)

@@ -82,6 +82,14 @@ class ProductCaptionBuilderTest {
     }
 
     @Test
+    void shouldReturnNamePackageFormViewView() {
+        Assertions.assertEquals(unavailablePackagedProductWithForm.getName() + " " +
+                unavailablePackagedProductWithForm.getProductPackage() + " " +
+                unavailablePackagedProductWithForm.getProductForm(),
+                new ProductCaptionBuilder(unavailablePackagedProductWithForm).createNamePackageFormView());
+    }
+
+    @Test
     void shouldReturnIconNameMarkPriceView() {
         Assertions.assertEquals(unavailablePackagedProductWithForm.getIcon() + " " +
                 unavailablePackagedProductWithForm.getName() + ", " +
