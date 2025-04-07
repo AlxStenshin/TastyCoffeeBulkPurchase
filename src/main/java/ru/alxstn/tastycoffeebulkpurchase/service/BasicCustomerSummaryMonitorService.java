@@ -49,7 +49,11 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
         Payment payment = paymentManagerService.getCustomerSessionPayment(session, customer)
                 .orElse(new Payment(customer, session));
         List<Purchase> purchases = purchaseManagerService
-                .findAllPurchasesInSessionByCustomer(session, customer);
+                .findAllPurchasesInSessionByCustomer(session, customer)
+                .stream()
+                .filter(purchase ->
+                        purchase.getProduct().isActual() && purchase.getProduct().isAvailable()
+                ).toList();
 
         int discountValue = session.getDiscountPercentage();
         BigDecimal totalPrice = new BigDecimal(0);
@@ -58,7 +62,7 @@ public class BasicCustomerSummaryMonitorService implements CustomerPurchaseSumma
         BigDecimal discountableTotal = new BigDecimal(0);
         BigDecimal nonDiscountableTotal = new BigDecimal(0);
 
-        if (purchases.size() > 0) {
+        if (!purchases.isEmpty()) {
             for (var purchase : purchases) {
                 totalPrice = totalPrice.add(purchase.getTotalPrice());
 
