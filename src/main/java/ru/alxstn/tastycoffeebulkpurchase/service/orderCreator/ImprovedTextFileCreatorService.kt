@@ -43,7 +43,7 @@ class ImprovedTextFileCreatorService(
                         ?.forEach { productToCount ->
                             val product = productToCount.key
                             val productCount = productToCount.value
-                            val productTitle = ProductCaptionBuilder(product).createNamePackageFormView();
+                            val productTitle = ProductCaptionBuilder(product).createNamePackageFormView()
                             customerReport.append("\t\t\t$productCount шт. - $productTitle $newLine")
                         }
                 }
