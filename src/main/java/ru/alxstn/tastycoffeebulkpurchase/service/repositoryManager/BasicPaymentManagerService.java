@@ -7,6 +7,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 import ru.alxstn.tastycoffeebulkpurchase.repository.PaymentRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,6 +57,11 @@ public class BasicPaymentManagerService implements PaymentManagerService {
     @Override
     public Optional<BigDecimal> getSessionTotalPrice(Session session) {
         return paymentRepository.getSessionTotalPrice(session);
+    }
+
+    @Override
+    public List<Payment> getUnpaidOrders(Session session) {
+        return paymentRepository.getUnpaidOrders(session);
     }
 
     @Override

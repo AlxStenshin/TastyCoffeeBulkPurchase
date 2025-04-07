@@ -5,6 +5,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Payment;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface PaymentManagerService {
@@ -24,6 +25,8 @@ public interface PaymentManagerService {
     Optional<BigDecimal> getSessionTotalPriceWithDiscount(Session session);
 
     Optional<BigDecimal> getSessionTotalPrice(Session session);
+
+    List<Payment> getUnpaidOrders(Session session);
 
     void save(Payment payment);
 }

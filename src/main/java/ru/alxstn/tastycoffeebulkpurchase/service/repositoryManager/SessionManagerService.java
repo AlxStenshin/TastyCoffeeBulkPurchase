@@ -12,6 +12,7 @@ public interface SessionManagerService {
     Session addNewSession() throws SessionCreationException;
     void saveSession(Session session) throws SessionCreationException;
     void closeSession(Session session);
+    void buildReport(Session session);
     void placeSessionPurchases(SessionProductFilters productFilters);
     SessionProductFilters buildDiscardedProductTypes(Session session);
     SessionProductFilters buildAcceptedProductTypes(Session session);

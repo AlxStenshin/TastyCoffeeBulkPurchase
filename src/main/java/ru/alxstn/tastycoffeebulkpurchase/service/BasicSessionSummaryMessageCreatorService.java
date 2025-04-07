@@ -9,6 +9,7 @@ import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PaymentManage
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 @Service
 public class BasicSessionSummaryMessageCreatorService implements SessionSummaryMessageCreatorService {
@@ -26,6 +27,14 @@ public class BasicSessionSummaryMessageCreatorService implements SessionSummaryM
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         DecimalFormat decimalFormat = new DecimalFormat("#.00");
+        var unpaidOrders = "";
+        if (session.isClosed()) {
+            unpaidOrders = "\nНеоплаченные заказы:\n" + paymentManagerService.getUnpaidOrders(session).stream()
+                    .filter( payment -> payment.getTotalAmountWithDiscount().compareTo(BigDecimal.ZERO) > 0)
+                    .map(payment ->
+                            "- " + payment.getCustomer().toString() + ": " + payment.getTotalAmountWithDiscount() + "₽"
+                    ).collect(Collectors.joining("\n"));
+        }
 
         return (session.isClosed() ? "\n<b>! Сессия закрыта. Заказы не принимаются. !</b>\n" : "") +
                 "<code>" +
@@ -41,7 +50,7 @@ public class BasicSessionSummaryMessageCreatorService implements SessionSummaryM
                 "\nКоличество участников: " + paymentManagerService.getSessionCustomersCount(session).orElse(0) +
                 "\nОплачено заказов: " + paymentManagerService.getCompletePaymentsCount(session).orElse(0) +
                 "\nНа сумму: " +  paymentManagerService.getSessionTotalPaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
-                "\nОсталось оплатить: " + paymentManagerService.getSessionTotalUnpaidAmount(session).orElse(new BigDecimal(0)) + "₽" +
+                unpaidOrders +
                 "</code>";
     }
 }

@@ -11,6 +11,7 @@ import ru.alxstn.tastycoffeebulkpurchase.entity.Payment;
 import ru.alxstn.tastycoffeebulkpurchase.entity.Session;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -36,7 +37,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Integer> getCompletePaymentsCount(@Param(value = "session") Session session);
 
     @Query("SELECT COUNT(p) FROM payment p WHERE" +
-            " p.session = :session")
+            " p.session = :session AND " +
+            " p.totalAmountWithDiscount > 0")
     Optional<Integer> getSessionCustomersCount(@Param(value = "session") Session session);
 
     @Query("SELECT SUM(p.totalAmountWithDiscount) FROM payment p WHERE " +
@@ -57,4 +59,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             "p.session = :session")
     Optional<BigDecimal> getSessionTotalPrice(@Param(value = "session") Session session);
 
+    @Query("SELECT p FROM payment p WHERE " +
+            "p.session = :session AND " +
+            "p.paymentStatus = false")
+    List<Payment> getUnpaidOrders(@Param(value = "session") Session session);
 }

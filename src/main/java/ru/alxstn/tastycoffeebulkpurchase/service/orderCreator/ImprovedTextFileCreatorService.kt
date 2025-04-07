@@ -6,6 +6,7 @@ import ru.alxstn.tastycoffeebulkpurchase.model.ProductCaptionBuilder
 import ru.alxstn.tastycoffeebulkpurchase.model.SessionProductFilters
 import ru.alxstn.tastycoffeebulkpurchase.service.repositoryManager.PurchaseManagerService
 import java.lang.System
+import java.util.*
 
 @Service
 class ImprovedTextFileCreatorService(
@@ -51,7 +52,7 @@ class ImprovedTextFileCreatorService(
             customerReport.append("$newLine$newLine")
             report.append(customerReport)
         }
-        TextReportSaver.saveReport(session, report.toString(), this.javaClass.simpleName, null)
+        TextReportSaver.saveReport(session, report.toString(), this.javaClass.simpleName, Optional.empty())
     }
 
     override fun placeOrderWithProductFilter(productTypes: SessionProductFilters?) {

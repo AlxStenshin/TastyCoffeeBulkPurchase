@@ -4,7 +4,9 @@ public class Offer {
     private int id;
     private String name;
     private int price;
-    private Object discount; // Since it's null in JSON
+    private Object discount;
+    private Object grindings;
+    private Object image;
     private int weight;
     private String type;
     private boolean is_coffee_or_tea;
@@ -40,6 +42,22 @@ public class Offer {
 
     public void setDiscount(Object discount) {
         this.discount = discount;
+    }
+
+    public Object getGrindings() {
+        return grindings;
+    }
+
+    public void setGrindings(Object grindings) {
+        this.grindings = grindings;
+    }
+
+    public Object getImage() {
+        return image;
+    }
+
+    public void setImage(Object image) {
+        this.image = image;
     }
 
     public Integer getWeight() {

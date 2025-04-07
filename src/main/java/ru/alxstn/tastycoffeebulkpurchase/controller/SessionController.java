@@ -75,6 +75,14 @@ public class SessionController {
         return "redirect:/sessions";
     }
 
+    @GetMapping(value = "/sessions/{id}/report", produces = MediaType.TEXT_HTML_VALUE)
+    public String sessionReport(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        Session session = sessionManager.getSessionById(id);
+        sessionManager.buildReport(session);
+        redirectAttributes.addFlashAttribute("message", "Session Report is ready!");
+        return "redirect:/sessions";
+    }
+
     @GetMapping(value = "/sessions/{id}/placeOrder/discardedTypes/", produces = MediaType.TEXT_HTML_VALUE)
     public String discardSessionProducts(@PathVariable("id") Integer id,
                                          Model model) {

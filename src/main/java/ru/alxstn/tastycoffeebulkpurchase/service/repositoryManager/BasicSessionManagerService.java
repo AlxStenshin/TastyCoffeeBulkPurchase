@@ -68,6 +68,12 @@ public class BasicSessionManagerService implements SessionManagerService {
     }
 
     @Override
+    public void buildReport(Session session) {
+        textFileOrderCreator.placeFullOrder(session);
+        nextTextFileOrderCreator.placeFullOrder(session);
+    }
+
+    @Override
     public void placeSessionPurchases(SessionProductFilters productFilters) {
         textFileOrderCreator.placeOrderWithProductFilter(productFilters);
     }
